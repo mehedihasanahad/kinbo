@@ -6,22 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
+            $table->string('name', 191);
+            $table->string('email', 191)->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password')->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->string('avatar')->nullable();
+            $table->char('locale', 2)->default('en');
+            $table->string('provider', 30)->nullable();
+            $table->string('provider_id', 191)->nullable();
+            $table->tinyInteger('is_active')->default(1);
+            $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index('phone', 'idx_users_phone');
+            $table->index(['provider', 'provider_id'], 'idx_users_provider');
+            $table->index('is_active', 'idx_users_is_active');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->index();
-            $table->string('token')->unique();
+            $table->string('email')->primary();
+            $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
 
@@ -35,13 +45,10 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };
