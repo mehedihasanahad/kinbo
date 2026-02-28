@@ -200,7 +200,7 @@
             <p class="text-primary-600 text-sm font-semibold uppercase tracking-wider mb-1">{{ __('front.browse_by') }}</p>
             <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ __('front.shop_categories') }}</h2>
         </div>
-        <a href="#" class="text-sm text-primary-600 font-semibold hover:text-primary-800 transition-colors hidden sm:block">
+        <a href="{{ route('shop.category') }}" class="text-sm text-primary-600 font-semibold hover:text-primary-800 transition-colors hidden sm:block">
             {{ __('front.all_categories') }}
         </a>
     </div>
@@ -208,8 +208,11 @@
     @if($categories->isNotEmpty())
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             @foreach($categories as $category)
-                @php $t = $category->getTranslation(app()->getLocale()) ?? $category->getTranslation('en'); @endphp
-                <a href="#"
+                @php
+                    $t = $category->getTranslation(app()->getLocale()) ?? $category->getTranslation('en');
+                    $catSlug = $t?->slug;
+                @endphp
+                <a href="{{ !empty($catSlug) ? route('shop.category', ['category' => $catSlug]) : '#' }}"
                    class="group relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border border-gray-100 hover:border-primary-300 hover:shadow-lg transition-all duration-200 p-6 flex flex-col items-center text-center">
                     @if($category->image)
                         <img src="{{ asset('storage/' . $category->image) }}"
@@ -249,7 +252,7 @@
                 <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ __('front.featured_products') }}</h2>
             </div>
             <div class="flex items-center gap-3">
-                <a href="#" class="text-sm text-primary-600 font-semibold hover:text-primary-800 transition-colors hidden sm:block">
+                <a href="{{ route('shop.category') }}" class="text-sm text-primary-600 font-semibold hover:text-primary-800 transition-colors hidden sm:block">
                     {{ __('front.view_all') }}
                 </a>
                 <div class="flex gap-2">
@@ -324,7 +327,7 @@
                 <p class="text-red-500 text-sm font-semibold uppercase tracking-wider mb-1">{{ __('front.save_big') }}</p>
                 <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ __('front.todays_deals') }}</h2>
             </div>
-            <a href="#" class="text-sm text-red-500 font-semibold hover:text-red-700 transition-colors hidden sm:block">
+            <a href="{{ route('shop.category') . '?sort=discount' }}" class="text-sm text-red-500 font-semibold hover:text-red-700 transition-colors hidden sm:block">
                 {{ __('front.all_deals') }}
             </a>
         </div>
@@ -388,7 +391,7 @@
             <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ __('front.new_arrivals') }}</h2>
         </div>
         <div class="flex items-center gap-3">
-            <a href="#" class="text-sm text-accent-600 font-semibold hover:text-accent-800 transition-colors hidden sm:block">
+            <a href="{{ route('shop.category') }}" class="text-sm text-accent-600 font-semibold hover:text-accent-800 transition-colors hidden sm:block">
                 {{ __('front.see_all') }}
             </a>
             <div class="flex gap-2">
