@@ -24,6 +24,7 @@ class SettingsPage extends Page
     public array $contact  = [];
     public array $payment  = [];
     public array $social   = [];
+    public array $branding = [];
 
     public function mount(): void
     {
@@ -58,11 +59,41 @@ class SettingsPage extends Page
             'youtube_url'   => Setting::get('youtube_url', ''),
             'twitter_url'   => Setting::get('twitter_url', ''),
         ];
+
+        $this->branding = [
+            'site_logo'    => Setting::get('site_logo', '') ? [Setting::get('site_logo')] : [],
+            'site_favicon' => Setting::get('site_favicon', '') ? [Setting::get('site_favicon')] : [],
+        ];
     }
 
     protected function getForms(): array
     {
-        return ['generalForm', 'contactForm', 'paymentForm', 'socialForm'];
+        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'socialForm'];
+    }
+
+    public function brandingForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\FileUpload::make('site_logo')
+                ->label('Store Logo')
+                ->image()
+                ->directory('settings')
+                ->imagePreviewHeight('100')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
+                ->maxSize(1024)
+                ->nullable()
+                ->helperText('Displayed in the storefront header. Recommended: 200×60px, transparent PNG or SVG.'),
+
+            Forms\Components\FileUpload::make('site_favicon')
+                ->label('Favicon')
+                ->image()
+                ->directory('settings')
+                ->imagePreviewHeight('100')
+                ->acceptedFileTypes(['image/x-icon', 'image/png', 'image/webp'])
+                ->maxSize(256)
+                ->nullable()
+                ->helperText('Browser tab icon. 32×32px PNG or ICO recommended.'),
+        ])->statePath('branding')->columns(2);
     }
 
     public function generalForm(Form $form): Form
@@ -123,6 +154,12 @@ class SettingsPage extends Page
     {
         $this->generalForm->validate();
         $this->contactForm->validate();
+
+        // Branding: FileUpload returns an array; persist only the first path
+        $logo    = $this->branding['site_logo'];
+        $favicon = $this->branding['site_favicon'];
+        Setting::set('site_logo',    is_array($logo)    ? (reset($logo)    ?: '') : ($logo    ?? ''), 'branding');
+        Setting::set('site_favicon', is_array($favicon) ? (reset($favicon) ?: '') : ($favicon ?? ''), 'branding');
 
         foreach ($this->general as $key => $value) {
             Setting::set($key, $value, 'general');

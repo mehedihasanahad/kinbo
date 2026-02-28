@@ -97,6 +97,45 @@ class ProductResource extends Resource
                 Forms\Components\Toggle::make('is_featured')->default(false)->inline(false),
                 Forms\Components\TextInput::make('sort_order')->numeric()->integer()->default(0),
             ])->columns(3),
+
+            Forms\Components\Section::make('Product Images')
+                ->description('First image marked as primary will be used as the main thumbnail.')
+                ->schema([
+                    Forms\Components\Repeater::make('images')
+                        ->relationship('images')
+                        ->schema([
+                            Forms\Components\FileUpload::make('path')
+                                ->label('Image')
+                                ->image()
+                                ->directory('products')
+                                ->imageEditor()
+                                ->imagePreviewHeight('120')
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->maxSize(2048)
+                                ->required(),
+
+                            Forms\Components\TextInput::make('alt_text')
+                                ->label('Alt Text')
+                                ->maxLength(191)
+                                ->nullable()
+                                ->placeholder('Describe the image for SEO'),
+
+                            Forms\Components\TextInput::make('sort_order')
+                                ->label('Order')
+                                ->numeric()->integer()->default(0)->minValue(0),
+
+                            Forms\Components\Toggle::make('is_primary')
+                                ->label('Primary Image')
+                                ->default(false)
+                                ->inline(false)
+                                ->helperText('Shown as the thumbnail in listings'),
+                        ])
+                        ->columns(4)
+                        ->addActionLabel('Add Image')
+                        ->reorderable('sort_order')
+                        ->collapsible()
+                        ->defaultItems(0),
+                ]),
         ]);
     }
 
@@ -104,6 +143,12 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('primaryImage.path')
+                    ->label('Image')
+                    ->square()
+                    ->defaultImageUrl(fn () => null)
+                    ->extraImgAttributes(['class' => 'rounded-lg object-cover']),
+
                 Tables\Columns\TextColumn::make('sku')
                     ->searchable()->sortable()->copyable(),
 

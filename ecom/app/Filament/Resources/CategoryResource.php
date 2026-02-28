@@ -57,7 +57,14 @@ class CategoryResource extends Resource
 
             Forms\Components\Section::make('Image')->schema([
                 Forms\Components\FileUpload::make('image')
-                    ->image()->directory('categories')->nullable(),
+                    ->image()
+                    ->directory('categories')
+                    ->imageEditor()
+                    ->imagePreviewHeight('160')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
+                    ->maxSize(1024)
+                    ->nullable()
+                    ->helperText('Recommended: square image, 300×300px minimum.'),
             ]),
         ]);
     }

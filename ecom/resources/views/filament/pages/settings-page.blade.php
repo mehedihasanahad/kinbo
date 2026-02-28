@@ -1,14 +1,23 @@
 <x-filament-panels::page>
     <form wire:submit="save">
 
-        {{-- General Settings --}}
+        {{-- Branding --}}
         <x-filament::section>
+            <x-slot name="heading">Branding</x-slot>
+            <x-slot name="description">Store logo and favicon displayed across the storefront.</x-slot>
+
+            {{ $this->brandingForm }}
+        </x-filament::section>
+
+        {{-- General --}}
+        <x-filament::section class="mt-6">
             <x-slot name="heading">General</x-slot>
             <x-slot name="description">Store name, tagline and locale.</x-slot>
 
             {{ $this->generalForm }}
         </x-filament::section>
 
+        {{-- Contact --}}
         <x-filament::section class="mt-6">
             <x-slot name="heading">Contact Information</x-slot>
             <x-slot name="description">Customer-facing contact details.</x-slot>
@@ -16,6 +25,7 @@
             {{ $this->contactForm }}
         </x-filament::section>
 
+        {{-- Payment --}}
         <x-filament::section class="mt-6">
             <x-slot name="heading">Payment Settings</x-slot>
             <x-slot name="description">bKash, Nagad merchant numbers and shipping thresholds.</x-slot>
@@ -23,6 +33,7 @@
             {{ $this->paymentForm }}
         </x-filament::section>
 
+        {{-- Social --}}
         <x-filament::section class="mt-6">
             <x-slot name="heading">Social Media</x-slot>
             <x-slot name="description">Links shown in the storefront footer.</x-slot>

@@ -20,7 +20,7 @@ class BrandResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make()->schema([
+            Forms\Components\Section::make('Brand Info')->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()->maxLength(191)->live(debounce: 400)
                     ->afterStateUpdated(fn ($state, $set) =>
@@ -32,11 +32,19 @@ class BrandResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->rows(3)->nullable()->columnSpanFull(),
 
-                Forms\Components\FileUpload::make('logo')
-                    ->image()->directory('brands')->nullable(),
-
                 Forms\Components\Toggle::make('is_active')->default(true)->inline(false),
             ])->columns(2),
+
+            Forms\Components\Section::make('Logo')->schema([
+                Forms\Components\FileUpload::make('logo')
+                    ->image()
+                    ->directory('brands')
+                    ->imagePreviewHeight('140')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
+                    ->maxSize(512)
+                    ->nullable()
+                    ->helperText('Recommended: transparent PNG or SVG, 400×200px.'),
+            ]),
         ]);
     }
 
