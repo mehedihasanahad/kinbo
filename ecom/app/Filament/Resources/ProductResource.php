@@ -1,0 +1,177 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductTranslation;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class ProductResource extends Resource
+{
+    protected static ?string $model = Product::class;
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationGroup = 'Catalog';
+    protected static ?int $navigationSort = 2;
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Section::make('Basic Info')->schema([
+                Forms\Components\TextInput::make('sku')
+                    ->label('SKU')
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(100),
+
+                Forms\Components\Select::make('category_id')
+                    ->label('Category')
+                    ->options(fn () => Category::active()->with('translations')
+                        ->get()->mapWithKeys(fn ($c) => [$c->id => $c->getTranslation('en')?->name ?? 'Category #' . $c->id]))
+                    ->searchable()
+                    ->required(),
+
+                Forms\Components\Select::make('brand_id')
+                    ->label('Brand')
+                    ->options(Brand::active()->pluck('name', 'id'))
+                    ->searchable()
+                    ->nullable(),
+            ])->columns(3),
+
+            Forms\Components\Section::make('Translation (English)')->schema([
+                Forms\Components\TextInput::make('translation_name')
+                    ->label('Name')
+                    ->required()
+                    ->maxLength(191)
+                    ->dehydrated(false)
+                    ->afterStateHydrated(function ($state, $record, $set) {
+                        $set('translation_name', $record?->getTranslation('en')?->name);
+                    }),
+
+                Forms\Components\TextInput::make('translation_slug')
+                    ->label('Slug')
+                    ->maxLength(191)
+                    ->dehydrated(false)
+                    ->afterStateHydrated(function ($state, $record, $set) {
+                        $set('translation_slug', $record?->getTranslation('en')?->slug);
+                    }),
+
+                Forms\Components\Textarea::make('translation_short_description')
+                    ->label('Short Description')
+                    ->rows(2)
+                    ->dehydrated(false)
+                    ->afterStateHydrated(function ($state, $record, $set) {
+                        $set('translation_short_description', $record?->getTranslation('en')?->short_description);
+                    }),
+
+                Forms\Components\RichEditor::make('translation_description')
+                    ->label('Full Description')
+                    ->columnSpanFull()
+                    ->dehydrated(false)
+                    ->afterStateHydrated(function ($state, $record, $set) {
+                        $set('translation_description', $record?->getTranslation('en')?->description);
+                    }),
+            ])->columns(2),
+
+            Forms\Components\Section::make('Pricing & Stock')->schema([
+                Forms\Components\TextInput::make('price')
+                    ->numeric()->prefix('৳')->required(),
+                Forms\Components\TextInput::make('sale_price')
+                    ->numeric()->prefix('৳')->nullable(),
+                Forms\Components\TextInput::make('stock')
+                    ->numeric()->integer()->required()->default(0),
+                Forms\Components\TextInput::make('low_stock_threshold')
+                    ->numeric()->integer()->default(5),
+                Forms\Components\TextInput::make('weight')
+                    ->numeric()->suffix('kg')->nullable(),
+            ])->columns(5),
+
+            Forms\Components\Section::make('Status')->schema([
+                Forms\Components\Toggle::make('is_active')->default(true)->inline(false),
+                Forms\Components\Toggle::make('is_featured')->default(false)->inline(false),
+                Forms\Components\TextInput::make('sort_order')->numeric()->integer()->default(0),
+            ])->columns(3),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('sku')
+                    ->searchable()->sortable()->copyable(),
+
+                Tables\Columns\TextColumn::make('translation.name')
+                    ->label('Name')
+                    ->getStateUsing(fn ($record) => $record->getTranslation('en')?->name ?? '—')
+                    ->searchable(query: fn ($query, $search) =>
+                        $query->whereHas('translations', fn ($q) =>
+                            $q->where('locale', 'en')->where('name', 'like', "%{$search}%")))
+                    ->sortable(query: fn ($query, $direction) =>
+                        $query->leftJoin('product_translations as pt_sort', fn ($j) =>
+                            $j->on('pt_sort.product_id', '=', 'products.id')->where('pt_sort.locale', 'en'))
+                        ->orderBy('pt_sort.name', $direction)),
+
+                Tables\Columns\TextColumn::make('category.translations')
+                    ->label('Category')
+                    ->getStateUsing(fn ($record) => $record->category?->getTranslation('en')?->name ?? '—'),
+
+                Tables\Columns\TextColumn::make('brand.name')->label('Brand'),
+
+                Tables\Columns\TextColumn::make('price')
+                    ->money('BDT')->sortable(),
+
+                Tables\Columns\TextColumn::make('sale_price')
+                    ->money('BDT')->placeholder('—'),
+
+                Tables\Columns\TextColumn::make('stock')->sortable()
+                    ->color(fn ($state) => $state <= 5 ? 'danger' : ($state <= 20 ? 'warning' : 'success')),
+
+                Tables\Columns\IconColumn::make('is_active')->boolean()->label('Active'),
+                Tables\Columns\IconColumn::make('is_featured')->boolean()->label('Featured'),
+
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
+                Tables\Filters\TernaryFilter::make('is_featured')->label('Featured'),
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->options(fn () => Category::active()->with('translations')
+                        ->get()->mapWithKeys(fn ($c) => [$c->id => $c->getTranslation('en')?->name ?? '#' . $c->id])),
+                Tables\Filters\SelectFilter::make('brand_id')
+                    ->label('Brand')
+                    ->options(Brand::active()->pluck('name', 'id')),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index'  => Pages\ListProducts::route('/'),
+            'create' => Pages\CreateProduct::route('/create'),
+            'edit'   => Pages\EditProduct::route('/{record}/edit'),
+        ];
+    }
+}
