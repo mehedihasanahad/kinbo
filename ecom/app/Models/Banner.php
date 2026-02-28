@@ -14,7 +14,6 @@ class Banner extends Model
         'button_text',
         'button_url',
         'image',
-        'mobile_image',
         'locale',
         'sort_order',
         'is_active',
@@ -50,8 +49,4 @@ class Banner extends Model
         return Storage::url($this->image);
     }
 
-    public function getMobileImageUrlAttribute(): ?string
-    {
-        return $this->mobile_image ? Storage::url($this->mobile_image) : null;
-    }
 }

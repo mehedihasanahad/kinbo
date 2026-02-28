@@ -47,28 +47,42 @@ class BannerResource extends Resource
                         ->nullable(),
                 ])->columns(2),
 
-            Forms\Components\Section::make('Images')
+            Forms\Components\Section::make('Banner Image')
+                ->description('This single image is used on all screen sizes. Use a wide landscape image — it will be cropped responsively on mobile.')
                 ->schema([
                     Forms\Components\FileUpload::make('image')
-                        ->label('Desktop Banner Image')
+                        ->label('Banner Image')
                         ->image()
                         ->required()
                         ->directory('banners')
-                        ->imagePreviewHeight('160')
+                        ->disk('public')
+                        ->visibility('public')
+                        ->imagePreviewHeight('200')
                         ->maxSize(4096)
+                        ->minSize(10)
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                        ->helperText('Recommended: 1920×700px. JPEG/PNG/WebP, max 4MB.'),
-
-                    Forms\Components\FileUpload::make('mobile_image')
-                        ->label('Mobile Banner Image')
-                        ->image()
-                        ->nullable()
-                        ->directory('banners')
-                        ->imagePreviewHeight('160')
-                        ->maxSize(2048)
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                        ->helperText('Recommended: 768×500px. Falls back to desktop image if not set.'),
-                ])->columns(2),
+                        ->imageResizeTargetWidth('1920')
+                        ->imageResizeTargetHeight('700')
+                        ->imageResizeMode('cover')
+                        ->imageResizeUpscale(false)
+                        ->helperText('📐 Recommended: 1920 × 700 px  |  Aspect ratio 16:5.8  |  JPEG / PNG / WebP  |  Max 4 MB. The image auto-scales on all screen sizes.')
+                        ->rules([
+                            'required',
+                            'image',
+                            'mimes:jpeg,jpg,png,webp',
+                            'max:4096',
+                            'dimensions:min_width=800,min_height=300,max_width=5000,max_height=2000',
+                        ])
+                        ->validationMessages([
+                            'required'   => 'A banner image is required.',
+                            'image'      => 'The file must be a valid image.',
+                            'mimes'      => 'Only JPEG, PNG, and WebP images are accepted.',
+                            'max'        => 'The image must not exceed 4 MB.',
+                            'dimensions' => 'Image must be at least 800 × 300 px and no larger than 5000 × 2000 px.',
+                        ])
+                        ->columnSpanFull(),
+                ])
+                ->collapsible(false),
 
             Forms\Components\Section::make('Visibility & Scheduling')
                 ->schema([

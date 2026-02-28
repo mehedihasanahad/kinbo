@@ -5,89 +5,82 @@
 @section('content')
 
 {{-- ============================================================
-    1. HERO SLIDER (Swiper)
+    1. HERO SLIDER (Swiper) — picture/srcset for responsive images
 ============================================================ --}}
 <section class="relative overflow-hidden">
     <div class="swiper hero-swiper">
         <div class="swiper-wrapper">
 
-            {{-- Dynamic slides from DB --}}
+            {{-- ── Dynamic slides from DB ── --}}
             @forelse($banners as $banner)
                 <div class="swiper-slide">
-                    <div class="relative w-full h-full flex items-center overflow-hidden"
-                         style="background-image: url('{{ asset('storage/' . $banner->image) }}');
-                                background-size: cover; background-position: center;">
-                        {{-- Gradient overlay --}}
-                        <div class="absolute inset-0 bg-gradient-to-r from-primary-950/80 via-primary-950/50 to-transparent"></div>
+                    <div class="hero-slide-inner">
 
-                        <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full">
-                            <div class="max-w-xl">
-                                <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 drop-shadow-lg">
+                        {{-- Single image — CSS object-fit handles all screen sizes --}}
+                        <img
+                            src="{{ asset('storage/' . $banner->image) }}"
+                            alt="{{ $banner->title }}"
+                            class="hero-slide-bg"
+                            loading="eager"
+                            fetchpriority="{{ $loop->first ? 'high' : 'auto' }}">
+
+                        {{-- Gradient overlay --}}
+                        <div class="hero-slide-overlay"></div>
+
+                        {{-- Text content --}}
+                        <div class="hero-slide-content">
+                            <div class="max-w-2xl">
+
+                                {{-- Optional badge chip --}}
+                                <span class="inline-block bg-accent-500/25 text-accent-200 text-xs font-bold
+                                             px-4 py-1.5 rounded-full mb-4 tracking-widest uppercase
+                                             backdrop-blur-sm border border-accent-400/20">
+                                    {{ __('front.hero_badge') }}
+                                </span>
+
+                                <h1 class="hero-slide-title">
                                     {!! nl2br(e($banner->title)) !!}
                                 </h1>
+
                                 @if($banner->subtitle)
-                                    <p class="text-primary-100 text-base sm:text-lg mb-8 leading-relaxed">
+                                    <p class="hero-slide-subtitle">
                                         {{ $banner->subtitle }}
                                     </p>
                                 @endif
-                                @if($banner->button_text && $banner->button_url)
-                                    <a href="{{ $banner->button_url }}"
-                                       class="inline-flex items-center gap-2 bg-accent-500 hover:bg-accent-400 text-white font-bold px-8 py-4 rounded-full transition-all duration-200 shadow-xl hover:shadow-accent-500/30 hover:-translate-y-0.5 text-sm sm:text-base">
-                                        {{ $banner->button_text }}
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                                        </svg>
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @empty
-                {{-- Fallback static slide when no banners in DB --}}
-                <div class="swiper-slide">
-                    <div class="relative w-full h-full flex items-center bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 overflow-hidden">
-                        {{-- Decorative circles --}}
-                        <div class="absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary-700/20 rounded-full blur-3xl pointer-events-none"></div>
-                        <div class="absolute bottom-0 -left-24 w-80 h-80 bg-accent-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-                        <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full flex flex-col lg:flex-row items-center gap-12">
-                            <div class="flex-1 text-center lg:text-left">
-                                <span class="inline-block bg-accent-500/20 text-accent-300 text-xs font-bold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
-                                    {{ __('front.hero_badge') }}
-                                </span>
-                                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
-                                    {!! __('front.hero_title') !!}
-                                </h1>
-                                <p class="text-primary-200 text-lg mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                                    {{ __('front.hero_subtitle') }}
-                                </p>
-                                <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
-                                    <a href="#featured"
-                                       class="bg-accent-500 hover:bg-accent-400 text-white font-bold px-8 py-3.5 rounded-full transition-all duration-200 shadow-lg hover:shadow-accent-500/30 hover:-translate-y-0.5">
-                                        {{ __('front.hero_cta_shop') }}
-                                    </a>
+                                {{-- CTA buttons --}}
+                                <div class="flex flex-wrap gap-3 justify-center sm:justify-start">
+                                    @if($banner->button_text && $banner->button_url)
+                                        <a href="{{ $banner->button_url }}" class="hero-slide-btn">
+                                            {{ $banner->button_text }}
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                            </svg>
+                                        </a>
+                                    @endif
                                     <a href="#categories"
-                                       class="border border-white/30 text-white font-semibold px-8 py-3.5 rounded-full hover:bg-white/10 transition-all duration-200">
+                                       class="inline-flex items-center gap-2 border-2 border-white/30 text-white font-semibold
+                                              px-6 py-3.5 rounded-full hover:bg-white/15 hover:border-white/50
+                                              backdrop-blur-sm transition-all duration-200 text-sm sm:text-base">
                                         {{ __('front.hero_cta_browse') }}
                                     </a>
                                 </div>
 
-                                {{-- Trust badges --}}
-                                <div class="mt-10 flex flex-wrap gap-6 justify-center lg:justify-start text-sm text-primary-300">
-                                    <span class="flex items-center gap-2">
+                                {{-- Trust micro-badges (hidden on smallest screens to keep it clean) --}}
+                                <div class="hidden sm:flex flex-wrap gap-5 mt-7 text-sm text-primary-200">
+                                    <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-accent-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                         </svg>
                                         {{ __('front.hero_rated') }}
                                     </span>
-                                    <span class="flex items-center gap-2">
+                                    <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                         </svg>
                                         {{ __('front.hero_returns') }}
                                     </span>
-                                    <span class="flex items-center gap-2">
+                                    <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                         </svg>
@@ -95,17 +88,65 @@
                                     </span>
                                 </div>
                             </div>
+                        </div>
 
-                            {{-- Hero illustration --}}
-                            <div class="hidden lg:flex flex-col items-center gap-4">
-                                <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 text-center border border-white/20 shadow-2xl">
-                                    <div class="w-28 h-28 bg-primary-700/50 rounded-2xl mx-auto mb-4 flex items-center justify-center border border-primary-600/30">
-                                        <svg class="w-14 h-14 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </div>
+                </div>
+            @empty
+                {{-- ── Fallback static slide when no banners in DB ── --}}
+                <div class="swiper-slide">
+                    <div class="hero-slide-inner bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800">
+
+                        {{-- Decorative blobs --}}
+                        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary-700/15 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute bottom-0 -left-32 w-96 h-96 bg-accent-500/8 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary-600/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <div class="hero-slide-content">
+                            <div class="max-w-2xl">
+                                <span class="inline-block bg-accent-500/20 text-accent-300 text-xs font-bold
+                                             px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
+                                    {{ __('front.hero_badge') }}
+                                </span>
+                                <h1 class="hero-slide-title">
+                                    {!! __('front.hero_title') !!}
+                                </h1>
+                                <p class="hero-slide-subtitle">
+                                    {{ __('front.hero_subtitle') }}
+                                </p>
+                                <div class="flex flex-wrap gap-3 justify-center sm:justify-start">
+                                    <a href="#featured" class="hero-slide-btn">
+                                        {{ __('front.hero_cta_shop') }}
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                                         </svg>
-                                    </div>
-                                    <p class="text-white font-bold text-lg">{{ __('front.hero_products') }}</p>
-                                    <p class="text-primary-300 text-sm mt-1">{{ __('front.hero_ready') }}</p>
+                                    </a>
+                                    <a href="#categories"
+                                       class="inline-flex items-center gap-2 border-2 border-white/30 text-white font-semibold
+                                              px-6 py-3.5 rounded-full hover:bg-white/15 hover:border-white/50
+                                              transition-all duration-200 text-sm sm:text-base">
+                                        {{ __('front.hero_cta_browse') }}
+                                    </a>
+                                </div>
+                                <div class="hidden sm:flex flex-wrap gap-5 mt-7 text-sm text-primary-300">
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-accent-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        {{ __('front.hero_rated') }}
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        {{ __('front.hero_returns') }}
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                        </svg>
+                                        {{ __('front.hero_secure') }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -121,7 +162,6 @@
         <div class="swiper-pagination"></div>
     </div>
 </section>
-
 {{-- ============================================================
     2. VALUE PROPOSITIONS BAR
 ============================================================ --}}
