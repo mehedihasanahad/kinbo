@@ -79,6 +79,42 @@ class ProductResource extends Resource
                     }),
             ])->columns(2),
 
+            Forms\Components\Section::make('Translation (Bengali / বাংলা)')
+                ->collapsed()
+                ->schema([
+                    Forms\Components\TextInput::make('bn_name')
+                        ->label('Name (বাংলা)')
+                        ->maxLength(191)
+                        ->dehydrated(false)
+                        ->afterStateHydrated(function ($state, $record, $set) {
+                            $set('bn_name', $record?->getTranslation('bn')?->name);
+                        }),
+
+                    Forms\Components\TextInput::make('bn_slug')
+                        ->label('Slug')
+                        ->maxLength(191)
+                        ->dehydrated(false)
+                        ->afterStateHydrated(function ($state, $record, $set) {
+                            $set('bn_slug', $record?->getTranslation('bn')?->slug);
+                        }),
+
+                    Forms\Components\Textarea::make('bn_short_description')
+                        ->label('Short Description (বাংলা)')
+                        ->rows(2)
+                        ->dehydrated(false)
+                        ->afterStateHydrated(function ($state, $record, $set) {
+                            $set('bn_short_description', $record?->getTranslation('bn')?->short_description);
+                        }),
+
+                    Forms\Components\RichEditor::make('bn_description')
+                        ->label('Full Description (বাংলা)')
+                        ->columnSpanFull()
+                        ->dehydrated(false)
+                        ->afterStateHydrated(function ($state, $record, $set) {
+                            $set('bn_description', $record?->getTranslation('bn')?->description);
+                        }),
+                ])->columns(2),
+
             Forms\Components\Section::make('Pricing & Stock')->schema([
                 Forms\Components\TextInput::make('price')
                     ->numeric()->prefix('৳')->required(),
@@ -135,6 +171,79 @@ class ProductResource extends Resource
                         ->reorderable('sort_order')
                         ->collapsible()
                         ->defaultItems(0),
+                ]),
+
+            Forms\Components\Section::make('Variants')
+                ->description('Add size, colour, or any other variants. Each variant has its own SKU, price modifier, stock and named options.')
+                ->schema([
+                    Forms\Components\Repeater::make('variants')
+                        ->relationship('variants')
+                        ->schema([
+                            Forms\Components\TextInput::make('sku')
+                                ->label('Variant SKU')
+                                ->nullable()
+                                ->maxLength(100)
+                                ->unique('product_variants', 'sku', ignoreRecord: true),
+
+                            Forms\Components\TextInput::make('price_modifier')
+                                ->label('Price Modifier (৳)')
+                                ->numeric()
+                                ->default(0)
+                                ->prefix('৳')
+                                ->helperText('Added to base price. Use negative for a discount.'),
+
+                            Forms\Components\TextInput::make('stock')
+                                ->label('Stock')
+                                ->numeric()
+                                ->integer()
+                                ->required()
+                                ->default(0)
+                                ->minValue(0),
+
+                            Forms\Components\TextInput::make('sort_order')
+                                ->label('Order')
+                                ->numeric()
+                                ->integer()
+                                ->default(0),
+
+                            Forms\Components\Toggle::make('is_active')
+                                ->label('Active')
+                                ->default(true)
+                                ->inline(false),
+
+                            Forms\Components\Repeater::make('options')
+                                ->relationship('options')
+                                ->label('Options (e.g. Size: M, Colour: Red)')
+                                ->schema([
+                                    Forms\Components\TextInput::make('option_name')
+                                        ->label('Name')
+                                        ->placeholder('Size')
+                                        ->required()
+                                        ->maxLength(50),
+                                    Forms\Components\TextInput::make('option_value')
+                                        ->label('Value')
+                                        ->placeholder('M')
+                                        ->required()
+                                        ->maxLength(100),
+                                ])
+                                ->columns(2)
+                                ->addActionLabel('Add Option')
+                                ->defaultItems(1)
+                                ->minItems(1)
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(5)
+                        ->addActionLabel('Add Variant')
+                        ->reorderable('sort_order')
+                        ->collapsible()
+                        ->defaultItems(0)
+                        ->itemLabel(function (array $state): string {
+                            $options = collect($state['options'] ?? [])
+                                ->map(fn ($o) => trim(($o['option_name'] ?? '') . ': ' . ($o['option_value'] ?? '')))
+                                ->filter()
+                                ->implode(' / ');
+                            return $options ?: 'New Variant';
+                        }),
                 ]),
         ]);
     }

@@ -28,5 +28,17 @@ class EditProduct extends EditRecord
                 'description'       => $data['translation_description'] ?? null,
             ]
         );
+
+        if (! empty($data['bn_name'])) {
+            $this->record->translations()->updateOrCreate(
+                ['locale' => 'bn'],
+                [
+                    'name'              => $data['bn_name'],
+                    'slug'              => $data['bn_slug'] ?? \Str::slug($data['bn_name']),
+                    'short_description' => $data['bn_short_description'] ?? null,
+                    'description'       => $data['bn_description'] ?? null,
+                ]
+            );
+        }
     }
 }

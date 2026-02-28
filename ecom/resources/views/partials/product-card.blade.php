@@ -5,10 +5,12 @@
     $currentPrice = $product->current_price;
     $badge       = $badge ?? null;
     $productName = $t?->name ?? $product->sku;
+    $productSlug = $t?->slug ?? ($product->getTranslation('en')?->slug ?? $product->sku);
 @endphp
 
-<div class="product-card bg-white rounded-2xl overflow-hidden border border-gray-100
-            hover:border-primary-300 hover:shadow-xl transition-all duration-300 group">
+<a href="{{ route('product.show', $productSlug) }}"
+   class="product-card bg-white rounded-2xl overflow-hidden border border-gray-100
+          hover:border-primary-300 hover:shadow-xl transition-all duration-300 group block">
 
     {{-- ── Fixed-height image area ── --}}
     <div class="product-card-image relative bg-gray-50 overflow-hidden">
@@ -117,4 +119,4 @@
             </button>
         </div>
     </div>
-</div>
+</a>

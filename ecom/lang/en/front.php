@@ -117,4 +117,22 @@ return [
     'pagination_prev'     => '← Previous',
     'pagination_next'     => 'Next →',
     'pagination_info'     => 'Showing :first–:last of :total results',
+
+    // Product detail page
+    'in_stock'           => 'In Stock',
+    'low_stock_n'        => 'Low Stock (:count left)',
+    'sku'                => 'SKU',
+    'weight'             => 'Weight',
+    'qty'                => 'Qty',
+    'tab_description'    => 'Description',
+    'tab_reviews'        => 'Reviews (:count)',
+    'add_to_wishlist'    => 'Add to Wishlist',
+    'overall_rating'     => 'Overall Rating',
+    'no_reviews'         => 'No reviews yet. Be the first to review!',
+    'related_products'   => 'You May Also Like',
+    'write_review'       => 'Write a Review',
+    'discount_off'       => ':percent% Off',
+    'no_description'     => 'No description available.',
+    'reviews_out_of'     => 'out of 5',
+    'no_related'         => 'No related products found.',
 ];

@@ -117,4 +117,22 @@ return [
     'pagination_prev'     => '← আগের পাতা',
     'pagination_next'     => 'পরের পাতা →',
     'pagination_info'     => ':total টি ফলাফলের মধ্যে :first–:last দেখাচ্ছে',
+
+    // Product detail page
+    'in_stock'           => 'স্টকে আছে',
+    'low_stock_n'        => 'কম স্টক (:count টি বাকি)',
+    'sku'                => 'এসকেইউ',
+    'weight'             => 'ওজন',
+    'qty'                => 'পরিমাণ',
+    'tab_description'    => 'বিবরণ',
+    'tab_reviews'        => 'রিভিউ (:count)',
+    'add_to_wishlist'    => 'উইশলিস্টে যোগ করুন',
+    'overall_rating'     => 'সামগ্রিক রেটিং',
+    'no_reviews'         => 'এখনো কোন রিভিউ নেই। প্রথম রিভিউ দিন!',
+    'related_products'   => 'আপনার পছন্দ হতে পারে',
+    'write_review'       => 'রিভিউ লিখুন',
+    'discount_off'       => ':percent% ছাড়',
+    'no_description'     => 'কোন বিবরণ নেই।',
+    'reviews_out_of'     => '৫ এর মধ্যে',
+    'no_related'         => 'কোন সম্পর্কিত পণ্য পাওয়া যায়নি।',
 ];
