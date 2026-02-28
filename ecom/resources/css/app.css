@@ -4,3 +4,156 @@
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
 @source "../**/*.js";
+
+/* ============================================================
+   Global Design Tokens — Emerald + Gold Palette
+   Primary: Emerald Green  |  Accent: Amber/Gold
+============================================================ */
+@theme {
+    --color-primary-50:   #ecfdf5;
+    --color-primary-100:  #d1fae5;
+    --color-primary-200:  #a7f3d0;
+    --color-primary-300:  #6ee7b7;
+    --color-primary-400:  #34d399;
+    --color-primary-500:  #10b981;
+    --color-primary-600:  #059669;
+    --color-primary-700:  #047857;
+    --color-primary-800:  #065f46;
+    --color-primary-900:  #064e3b;
+    --color-primary-950:  #052e16;
+
+    --color-accent-50:    #fffbeb;
+    --color-accent-100:   #fef3c7;
+    --color-accent-200:   #fde68a;
+    --color-accent-300:   #fcd34d;
+    --color-accent-400:   #fbbf24;
+    --color-accent-500:   #f59e0b;
+    --color-accent-600:   #d97706;
+    --color-accent-700:   #b45309;
+    --color-accent-800:   #92400e;
+    --color-accent-900:   #78350f;
+    --color-accent-950:   #451a03;
+}
+
+/* ============================================================
+   Swiper Custom Styles
+============================================================ */
+.hero-swiper {
+    height: 580px;
+}
+
+@media (max-width: 768px) {
+    .hero-swiper {
+        height: 420px;
+    }
+}
+
+.hero-swiper .swiper-slide {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.hero-swiper .swiper-button-next::after,
+.hero-swiper .swiper-button-prev::after {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.hero-swiper .swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.5);
+    width: 8px;
+    height: 8px;
+    opacity: 1;
+}
+
+.hero-swiper .swiper-pagination-bullet-active {
+    background: white;
+    width: 28px;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Product & Reviews sliders */
+.products-swiper,
+.new-arrivals-swiper {
+    padding-bottom: 44px !important;
+}
+
+.products-swiper .swiper-button-next,
+.products-swiper .swiper-button-prev,
+.new-arrivals-swiper .swiper-button-next,
+.new-arrivals-swiper .swiper-button-prev {
+    color: #059669;
+    background: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    top: 38%;
+}
+
+.products-swiper .swiper-button-next::after,
+.products-swiper .swiper-button-prev::after,
+.new-arrivals-swiper .swiper-button-next::after,
+.new-arrivals-swiper .swiper-button-prev::after {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.reviews-swiper {
+    padding-bottom: 48px !important;
+}
+
+.reviews-swiper .swiper-pagination-bullet {
+    background: #d1fae5;
+    opacity: 1;
+}
+
+.reviews-swiper .swiper-pagination-bullet-active {
+    background: #059669;
+}
+
+/* ============================================================
+   Product Card — Fixed Dimensions
+============================================================ */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.product-card-image {
+    height: 210px;
+    flex-shrink: 0;
+}
+
+.product-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.product-card-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.5rem;
+    line-height: 1.25rem;
+}
+
+.product-card-footer {
+    margin-top: auto;
+}

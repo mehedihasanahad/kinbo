@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -15,6 +16,8 @@ class HomeController extends Controller
     {
         $settings = Setting::group('general');
 
+        $banners = Banner::active()->get();
+
         $categories = Category::active()
             ->root()
             ->with(['translations', 'children.translations'])
@@ -26,14 +29,14 @@ class HomeController extends Controller
             ->inStock()
             ->with(['primaryImage', 'translations', 'brand', 'category.translations'])
             ->orderBy('sort_order')
-            ->take(8)
+            ->take(12)
             ->get();
 
         $newArrivals = Product::active()
             ->inStock()
             ->with(['primaryImage', 'translations', 'brand'])
             ->latest()
-            ->take(8)
+            ->take(12)
             ->get();
 
         $onSaleProducts = Product::active()
@@ -54,11 +57,12 @@ class HomeController extends Controller
             ->with(['user', 'product.translations'])
             ->where('rating', '>=', 4)
             ->latest()
-            ->take(6)
+            ->take(9)
             ->get();
 
         return view('home', compact(
             'settings',
+            'banners',
             'categories',
             'featuredProducts',
             'newArrivals',

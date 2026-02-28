@@ -1,0 +1,99 @@
+<?php
+
+return [
+    // Header / Nav
+    'track_order'        => 'অর্ডার ট্র্যাক করুন',
+    'help'               => 'সাহায্য',
+    'sign_in'            => 'সাইন ইন',
+    'register'           => 'নিবন্ধন করুন',
+    'wishlist'           => 'উইশলিস্ট',
+    'cart'               => 'কার্ট',
+    'search_placeholder' => 'পণ্য, ব্র্যান্ড, বিভাগ খুঁজুন...',
+    'free_shipping_bar'  => '৳৯৯৯-এর উপরে অর্ডারে বিনামূল্যে ডেলিভারি &nbsp;|&nbsp; কোড <strong class="text-white">WELCOME10</strong> ব্যবহার করুন ১০% ছাড়ের জন্য',
+
+    // Hero
+    'hero_badge'      => 'নতুন মৌসুমী পণ্য',
+    'hero_title'      => "আপনার পছন্দের<br><span>পণ্য আবিষ্কার করুন</span>",
+    'hero_subtitle'   => 'ইলেকট্রনিক্স, ফ্যাশন, গৃহস্থালি পণ্যসহ হাজার হাজার কিউরেটেড পণ্য — বাংলাদেশজুড়ে দ্রুত ডেলিভারি সহ।',
+    'hero_cta_shop'   => 'এখনই কিনুন',
+    'hero_cta_browse' => 'বিভাগ দেখুন',
+    'hero_rated'      => '৪.৯★ রেটেড',
+    'hero_returns'    => 'বিনামূল্যে রিটার্ন',
+    'hero_secure'     => 'নিরাপদ চেকআউট',
+    'hero_products'   => '১০,০০০+ পণ্য',
+    'hero_ready'      => 'পাঠানোর জন্য প্রস্তুত',
+
+    // Value Props
+    'prop_delivery_title' => 'বিনামূল্যে ডেলিভারি',
+    'prop_delivery_sub'   => '৳৯৯৯-এর উপরে অর্ডারে',
+    'prop_returns_title'  => 'সহজ রিটার্ন',
+    'prop_returns_sub'    => '৭ দিনের রিটার্ন পলিসি',
+    'prop_secure_title'   => 'নিরাপদ পেমেন্ট',
+    'prop_secure_sub'     => '১০০% নিরাপদ লেনদেন',
+    'prop_support_title'  => '২৪/৭ সাপোর্ট',
+    'prop_support_sub'    => 'চ্যাট ও ফোন সাপোর্ট',
+
+    // Sections
+    'browse_by'          => 'ব্রাউজ করুন',
+    'shop_categories'    => 'বিভাগ অনুযায়ী কেনাকাটা',
+    'all_categories'     => 'সব বিভাগ →',
+    'sub_categories'     => ':count টি উপ-বিভাগ',
+    'hand_picked'        => 'বিশেষভাবে নির্বাচিত',
+    'featured_products'  => 'বিশেষ পণ্যসমূহ',
+    'view_all'           => 'সব দেখুন →',
+    'just_landed'        => 'সদ্য এসেছে',
+    'new_arrivals'       => 'নতুন পণ্য',
+    'see_all'            => 'সব দেখুন →',
+    'save_big'           => 'বড় সাশ্রয়',
+    'todays_deals'       => 'আজকের ডিল',
+    'all_deals'          => 'সব ডিল →',
+    'trusted_brands'     => 'বিশ্বস্ত ব্র্যান্ড',
+    'shop_by_brand'      => 'ব্র্যান্ড অনুযায়ী কেনাকাটা',
+    'happy_customers'    => 'সন্তুষ্ট গ্রাহক',
+    'reviews_heading'    => 'গ্রাহকরা কী বলছেন',
+    'verified_purchase'  => 'যাচাইকৃত কেনাকাটা',
+    'no_categories'      => 'কোন বিভাগ পাওয়া যায়নি।',
+    'no_featured'        => 'কোন বিশেষ পণ্য পাওয়া যায়নি।',
+    'no_new_arrivals'    => 'কোন নতুন পণ্য পাওয়া যায়নি।',
+
+    // Product card
+    'add_to_cart'   => 'কার্টে যোগ করুন',
+    'low_stock'     => 'স্বল্প মজুদ',
+    'new_badge'     => 'নতুন',
+    'out_of_stock'  => 'স্টক শেষ',
+
+    // Promo banners
+    'flash_sale_badge'   => 'সীমিত সময়',
+    'flash_sale_title'   => 'ফ্ল্যাশ সেল',
+    'flash_sale_sub'     => 'নির্বাচিত পণ্যে ৫০% পর্যন্ত ছাড়',
+    'flash_sale_btn'     => 'সেল দেখুন',
+    'new_in_badge'       => 'নতুন এসেছে',
+    'new_arrivals_title' => 'নতুন পণ্য',
+    'new_arrivals_sub'   => 'এই সপ্তাহে যোগ হওয়া সর্বশেষ পণ্য দেখুন',
+    'explore_now'        => 'এখনই দেখুন',
+
+    // Newsletter
+    'newsletter_title'       => 'এক্সক্লুসিভ ডিল আপনার ইনবক্সে পান',
+    'newsletter_sub'         => 'সাবস্ক্রাইব করুন এবং নতুন পণ্য, সেল ও অফার সম্পর্কে প্রথমে জানুন।',
+    'newsletter_placeholder' => 'আপনার ইমেইল ঠিকানা',
+    'newsletter_btn'         => 'বিনামূল্যে সাবস্ক্রাইব',
+    'newsletter_note'        => 'কোন স্প্যাম নেই। যেকোনো সময় আনসাবস্ক্রাইব করুন।',
+
+    // Footer
+    'footer_tagline'     => 'সেরা দামে মানসম্পন্ন পণ্যের জন্য আপনার বিশ্বস্ত অনলাইন স্টোর। বাংলাদেশজুড়ে দ্রুত ডেলিভারি।',
+    'quick_links'        => 'দ্রুত লিংক',
+    'about_us'           => 'আমাদের সম্পর্কে',
+    'contact'            => 'যোগাযোগ',
+    'blog'               => 'ব্লগ',
+    'careers'            => 'ক্যারিয়ার',
+    'customer_care'      => 'গ্রাহক সেবা',
+    'track_my_order'     => 'আমার অর্ডার ট্র্যাক করুন',
+    'returns_exchanges'  => 'রিটার্ন ও এক্সচেঞ্জ',
+    'faq'                => 'প্রায়শই জিজ্ঞাসিত প্রশ্ন',
+    'privacy_policy'     => 'গোপনীয়তা নীতি',
+    'newsletter_footer'  => 'নিউজলেটার',
+    'newsletter_footer_sub' => 'সরাসরি আপনার ইনবক্সে ডিল ও আপডেট পান।',
+    'footer_email_placeholder' => 'আপনার ইমেইল',
+    'footer_go'          => 'পাঠান',
+    'all_rights'         => 'সর্বস্বত্ব সংরক্ষিত।',
+];

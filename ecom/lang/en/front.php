@@ -1,0 +1,99 @@
+<?php
+
+return [
+    // Header / Nav
+    'track_order'        => 'Track Order',
+    'help'               => 'Help',
+    'sign_in'            => 'Sign In',
+    'register'           => 'Register',
+    'wishlist'           => 'Wishlist',
+    'cart'               => 'Cart',
+    'search_placeholder' => 'Search products, brands, categories...',
+    'free_shipping_bar'  => 'Free shipping on orders over ৳999 &nbsp;|&nbsp; Use code <strong class="text-white">WELCOME10</strong> for 10% off',
+
+    // Hero
+    'hero_badge'      => 'New Season Arrivals',
+    'hero_title'      => "Discover Products<br><span>You'll Love</span>",
+    'hero_subtitle'   => 'Shop thousands of curated products — electronics, fashion, home goods and more — with fast delivery across Bangladesh.',
+    'hero_cta_shop'   => 'Shop Now',
+    'hero_cta_browse' => 'Browse Categories',
+    'hero_rated'      => '4.9★ Rated',
+    'hero_returns'    => 'Free Returns',
+    'hero_secure'     => 'Secure Checkout',
+    'hero_products'   => '10,000+ Products',
+    'hero_ready'      => 'Ready to ship',
+
+    // Value Props
+    'prop_delivery_title' => 'Free Delivery',
+    'prop_delivery_sub'   => 'On orders above ৳999',
+    'prop_returns_title'  => 'Easy Returns',
+    'prop_returns_sub'    => '7-day return policy',
+    'prop_secure_title'   => 'Secure Payment',
+    'prop_secure_sub'     => '100% safe transactions',
+    'prop_support_title'  => '24/7 Support',
+    'prop_support_sub'    => 'Chat & phone support',
+
+    // Sections
+    'browse_by'          => 'Browse by',
+    'shop_categories'    => 'Shop Categories',
+    'all_categories'     => 'All Categories →',
+    'sub_categories'     => ':count sub-categories',
+    'hand_picked'        => 'Hand-picked',
+    'featured_products'  => 'Featured Products',
+    'view_all'           => 'View All →',
+    'just_landed'        => 'Just Landed',
+    'new_arrivals'       => 'New Arrivals',
+    'see_all'            => 'See All →',
+    'save_big'           => 'Save Big',
+    'todays_deals'       => "Today's Deals",
+    'all_deals'          => 'All Deals →',
+    'trusted_brands'     => 'Trusted Brands',
+    'shop_by_brand'      => 'Shop by Brand',
+    'happy_customers'    => 'Happy Customers',
+    'reviews_heading'    => 'What People Are Saying',
+    'verified_purchase'  => 'Verified Purchase',
+    'no_categories'      => 'No categories found.',
+    'no_featured'        => 'No featured products available.',
+    'no_new_arrivals'    => 'No new arrivals found.',
+
+    // Product card
+    'add_to_cart'   => 'Add to Cart',
+    'low_stock'     => 'Low Stock',
+    'new_badge'     => 'New',
+    'out_of_stock'  => 'Out of Stock',
+
+    // Promo banners
+    'flash_sale_badge'   => 'Limited Time',
+    'flash_sale_title'   => 'Flash Sale',
+    'flash_sale_sub'     => 'Up to 50% off on selected items',
+    'flash_sale_btn'     => 'Shop Sale',
+    'new_in_badge'       => 'New In',
+    'new_arrivals_title' => 'New Arrivals',
+    'new_arrivals_sub'   => 'Explore the latest products added this week',
+    'explore_now'        => 'Explore Now',
+
+    // Newsletter
+    'newsletter_title'       => 'Get Exclusive Deals in Your Inbox',
+    'newsletter_sub'         => 'Subscribe and be the first to know about new arrivals, sales, and exclusive offers.',
+    'newsletter_placeholder' => 'Enter your email address',
+    'newsletter_btn'         => 'Subscribe Free',
+    'newsletter_note'        => 'No spam. Unsubscribe anytime.',
+
+    // Footer
+    'footer_tagline'     => 'Your trusted online store for quality products at the best prices. Fast delivery across Bangladesh.',
+    'quick_links'        => 'Quick Links',
+    'about_us'           => 'About Us',
+    'contact'            => 'Contact',
+    'blog'               => 'Blog',
+    'careers'            => 'Careers',
+    'customer_care'      => 'Customer Care',
+    'track_my_order'     => 'Track My Order',
+    'returns_exchanges'  => 'Returns & Exchanges',
+    'faq'                => 'FAQ',
+    'privacy_policy'     => 'Privacy Policy',
+    'newsletter_footer'  => 'Newsletter',
+    'newsletter_footer_sub' => 'Get deals and updates directly in your inbox.',
+    'footer_email_placeholder' => 'Your email',
+    'footer_go'          => 'Go',
+    'all_rights'         => 'All rights reserved.',
+];
