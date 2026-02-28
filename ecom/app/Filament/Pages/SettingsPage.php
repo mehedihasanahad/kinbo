@@ -8,6 +8,8 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class SettingsPage extends Page
 {
@@ -24,7 +26,10 @@ class SettingsPage extends Page
     public array $contact  = [];
     public array $payment  = [];
     public array $social   = [];
-    public array $branding = [];
+
+    // Branding — kept flat (no statePath) so FileUpload can store files properly
+    public ?array $site_logo    = [];
+    public ?array $site_favicon = [];
 
     public function mount(): void
     {
@@ -60,10 +65,13 @@ class SettingsPage extends Page
             'twitter_url'   => Setting::get('twitter_url', ''),
         ];
 
-        $this->branding = [
-            'site_logo'    => Setting::get('site_logo', '') ? [Setting::get('site_logo')] : [],
-            'site_favicon' => Setting::get('site_favicon', '') ? [Setting::get('site_favicon')] : [],
-        ];
+        // Hydrate flat FileUpload properties from stored paths.
+        // Filament v3 FileUpload expects [path => path] when loading existing files.
+        $logoPath    = Setting::get('site_logo', '');
+        $faviconPath = Setting::get('site_favicon', '');
+
+        $this->site_logo    = $logoPath    ? [$logoPath    => $logoPath]    : [];
+        $this->site_favicon = $faviconPath ? [$faviconPath => $faviconPath] : [];
     }
 
     protected function getForms(): array
@@ -77,6 +85,8 @@ class SettingsPage extends Page
             Forms\Components\FileUpload::make('site_logo')
                 ->label('Store Logo')
                 ->image()
+                ->disk('public')
+                ->visibility('public')
                 ->directory('settings')
                 ->imagePreviewHeight('100')
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
@@ -87,13 +97,16 @@ class SettingsPage extends Page
             Forms\Components\FileUpload::make('site_favicon')
                 ->label('Favicon')
                 ->image()
+                ->disk('public')
+                ->visibility('public')
                 ->directory('settings')
                 ->imagePreviewHeight('100')
                 ->acceptedFileTypes(['image/x-icon', 'image/png', 'image/webp'])
                 ->maxSize(256)
                 ->nullable()
                 ->helperText('Browser tab icon. 32×32px PNG or ICO recommended.'),
-        ])->statePath('branding')->columns(2);
+        ])->columns(2);
+        // No ->statePath() — binds directly to $this->site_logo and $this->site_favicon
     }
 
     public function generalForm(Form $form): Form
@@ -155,11 +168,16 @@ class SettingsPage extends Page
         $this->generalForm->validate();
         $this->contactForm->validate();
 
-        // Branding: FileUpload returns an array; persist only the first path
-        $logo    = $this->branding['site_logo'];
-        $favicon = $this->branding['site_favicon'];
-        Setting::set('site_logo',    is_array($logo)    ? (reset($logo)    ?: '') : ($logo    ?? ''), 'branding');
-        Setting::set('site_favicon', is_array($favicon) ? (reset($favicon) ?: '') : ($favicon ?? ''), 'branding');
+        // Persist branding files manually.
+        // $this->site_logo is either:
+        //   - [uuid => TemporaryUploadedFile]  — a new upload waiting to be stored
+        //   - ['settings/file.png' => 'settings/file.png']  — an already-stored file (no action needed)
+        //   - []  — cleared / no image
+        $logoPath    = $this->storeOrKeep($this->site_logo,    'settings');
+        $faviconPath = $this->storeOrKeep($this->site_favicon, 'settings');
+
+        Setting::set('site_logo',    $logoPath,    'branding');
+        Setting::set('site_favicon', $faviconPath, 'branding');
 
         foreach ($this->general as $key => $value) {
             Setting::set($key, $value, 'general');
@@ -177,5 +195,34 @@ class SettingsPage extends Page
         Cache::forget('settings.public');
 
         Notification::make()->title('Settings saved successfully')->success()->send();
+    }
+
+    /**
+     * Given the raw FileUpload state array, either:
+     *  - store a new TemporaryUploadedFile to $directory on the public disk, or
+     *  - return the existing path as-is, or
+     *  - return '' if cleared.
+     */
+    private function storeOrKeep(?array $state, string $directory): string
+    {
+        if (empty($state)) {
+            return '';
+        }
+
+        $first = array_values($state)[0];
+
+        // New upload — Livewire TemporaryUploadedFile instance
+        if ($first instanceof TemporaryUploadedFile) {
+            $path = $first->store($directory, 'public');
+            return $path ?: '';
+        }
+
+        // Already stored — the key is the path
+        $key = array_key_first($state);
+        if (is_string($key) && Storage::disk('public')->exists($key)) {
+            return $key;
+        }
+
+        return '';
     }
 }
