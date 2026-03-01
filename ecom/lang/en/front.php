@@ -204,6 +204,7 @@ return [
     'manual_pay_pending'           => 'Your payment is under review. We\'ll confirm within 24 hours.',
     'cod_pending'                  => 'You will pay cash on delivery.',
     'my_orders'                    => 'My Orders',
+    'download_invoice'             => 'Download Invoice',
     'view_order'                   => 'View Order',
     'order_date'                   => 'Order Date',
     'order_status'                 => 'Status',

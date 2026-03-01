@@ -88,14 +88,14 @@
 
 ---
 
-### 2.2 Invoice / PDF Download ✗
+### 2.2 Invoice / PDF Download ✅ DONE
 
-- [ ] Install: `composer require barryvdh/laravel-dompdf`
-- [ ] Invoice Blade template (`resources/views/orders/invoice.blade.php`)
-- [ ] Route: `GET /orders/{order}/invoice` → `OrderController@invoice`
-- [ ] PDF generation with order details, items, totals, addresses
-- [ ] "Download Invoice" button on order detail page (`orders/show.blade.php`)
-- [ ] Admin: Download invoice from Filament `OrderResource`-
+- [x] Install: `composer require barryvdh/laravel-dompdf`
+- [x] Invoice Blade template (`resources/views/orders/invoice.blade.php`)
+- [x] Route: `GET /orders/{order}/invoice` → `OrderController@invoice`
+- [x] PDF generation with order details, items, totals, addresses
+- [x] "Download Invoice" button on order detail page (`orders/show.blade.php`)
+- [x] Admin: Download invoice from Filament `OrderResource` (table row action + ViewOrder header button)
 
 ---
 

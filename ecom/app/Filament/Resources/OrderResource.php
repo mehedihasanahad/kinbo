@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -155,6 +156,19 @@ class OrderResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('invoice')
+                    ->label('Invoice')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('warning')
+                    ->action(function (Order $record) {
+                        $record->load(['items', 'manualPayment', 'coupon']);
+                        $pdf = Pdf::loadView('orders.invoice', ['order' => $record])->setPaper('a4', 'portrait');
+                        return response()->streamDownload(
+                            fn () => print($pdf->output()),
+                            'Invoice-' . $record->order_number . '.pdf',
+                            ['Content-Type' => 'application/pdf']
+                        );
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }
