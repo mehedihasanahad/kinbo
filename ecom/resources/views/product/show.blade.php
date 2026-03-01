@@ -247,6 +247,7 @@
                             −
                         </button>
                         <input id="qty-input" type="number" value="1" min="1" max="{{ $product->stock }}"
+                               oninput="syncQty(this)"
                                class="w-14 h-11 text-center text-sm font-semibold text-gray-900 border-x border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 bg-white">
                         <button type="button" onclick="changeQty(1)"
                                 class="w-11 h-11 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-lg font-bold">
@@ -256,20 +257,42 @@
                 @endif
 
                 {{-- Add to Cart --}}
-                <button type="button"
-                        {{ ! $product->is_in_stock ? 'disabled' : '' }}
-                        class="flex-1 sm:flex-none flex items-center justify-center gap-2
-                               {{ $product->is_in_stock
-                                    ? 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800 cursor-pointer'
-                                    : 'bg-gray-300 cursor-not-allowed' }}
-                               text-white font-semibold px-7 py-3 rounded-xl transition-colors duration-150 text-sm">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
-                                 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
-                    {{ __('front.add_to_cart') }}
-                </button>
+                @auth
+                    <form method="POST" action="{{ route('cart.store') }}" class="flex-1 sm:flex-none" id="atc-form">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="variant_id" id="selected-variant-id" value="">
+                        <input type="hidden" name="quantity" id="form-quantity" value="1">
+                        <button type="submit"
+                                {{ ! $product->is_in_stock ? 'disabled' : '' }}
+                                class="w-full flex items-center justify-center gap-2
+                                       {{ $product->is_in_stock
+                                            ? 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800 cursor-pointer'
+                                            : 'bg-gray-300 cursor-not-allowed' }}
+                                       text-white font-semibold px-7 py-3 rounded-xl transition-colors duration-150 text-sm">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
+                                         1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            {{ __('front.add_to_cart') }}
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}"
+                       class="flex-1 sm:flex-none flex items-center justify-center gap-2
+                              {{ $product->is_in_stock
+                                   ? 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800'
+                                   : 'bg-gray-300 pointer-events-none' }}
+                              text-white font-semibold px-7 py-3 rounded-xl transition-colors duration-150 text-sm">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
+                                     1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        {{ __('front.add_to_cart') }}
+                    </a>
+                @endauth
 
                 {{-- Wishlist --}}
                 <button type="button"
@@ -528,14 +551,26 @@ function swapMainImage(src, btn) {
     btn.classList.add('border-primary-500');
 }
 
+// ── Qty: clamp typed value and sync to hidden form input ──
+function syncQty(input) {
+    const min = parseInt(input.min) || 1;
+    const max = parseInt(input.max) || 999;
+    const val = Math.min(max, Math.max(min, parseInt(input.value) || min));
+    input.value = val;
+    const formQty = document.getElementById('form-quantity');
+    if (formQty) formQty.value = val;
+}
+
 // ── Qty: increment/decrement ──
 function changeQty(delta) {
     const input = document.getElementById('qty-input');
-    if (! input) return;
+    if (!input) return;
     const min = parseInt(input.min) || 1;
     const max = parseInt(input.max) || 999;
     const val = Math.min(max, Math.max(min, parseInt(input.value || 1) + delta));
     input.value = val;
+    const formQty = document.getElementById('form-quantity');
+    if (formQty) formQty.value = val;
 }
 
 // ── Tab switching ──
@@ -581,14 +616,18 @@ function findBestVariant() {
 }
 
 function applyVariant(variant) {
+    const inStock = variant.stock > 0;
+
+    // Update price
     const priceEl = document.getElementById('current-price');
     if (priceEl) {
         priceEl.textContent = '৳' + Math.round(variant.price).toLocaleString('en-US');
     }
 
+    // Update stock badge
     const stockBadge = document.getElementById('stock-badge');
     if (stockBadge) {
-        if (variant.stock <= 0) {
+        if (!inStock) {
             stockBadge.innerHTML = `<span class="inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 bg-red-50 px-3 py-1.5 rounded-full"><span class="w-2 h-2 bg-red-500 rounded-full"></span>{{ __('front.out_of_stock') }}</span>`;
         } else if (variant.stock <= 5) {
             stockBadge.innerHTML = `<span class="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full"><span class="w-2 h-2 bg-amber-500 rounded-full"></span>{{ __('front.low_stock_n', ['count' => '${variant.stock}']) }}</span>`;
@@ -597,8 +636,38 @@ function applyVariant(variant) {
         }
     }
 
+    // Update qty input: clamp current value to new max, reset to 1 if out of stock
     const qtyInput = document.getElementById('qty-input');
-    if (qtyInput) qtyInput.max = variant.stock > 0 ? variant.stock : 1;
+    if (qtyInput) {
+        if (!inStock) {
+            qtyInput.max = 1;
+            qtyInput.value = 1;
+            qtyInput.disabled = true;
+        } else {
+            qtyInput.max = variant.stock;
+            qtyInput.value = Math.min(parseInt(qtyInput.value) || 1, variant.stock);
+            qtyInput.disabled = false;
+        }
+        const formQty = document.getElementById('form-quantity');
+        if (formQty) formQty.value = qtyInput.value;
+    }
+
+    // Store selected variant id
+    const variantIdInput = document.getElementById('selected-variant-id');
+    if (variantIdInput) variantIdInput.value = variant.id;
+
+    // Disable/enable the ATC submit button
+    const atcBtn = document.querySelector('#atc-form button[type="submit"]');
+    if (atcBtn) {
+        atcBtn.disabled = !inStock;
+        if (!inStock) {
+            atcBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700', 'active:bg-primary-800', 'cursor-pointer');
+            atcBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
+        } else {
+            atcBtn.classList.add('bg-primary-600', 'hover:bg-primary-700', 'active:bg-primary-800', 'cursor-pointer');
+            atcBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
+        }
+    }
 }
 
 function selectVariantOption(optionName, optionValue, btn) {

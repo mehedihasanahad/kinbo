@@ -81,31 +81,55 @@
             {{-- Nav actions --}}
             <div class="flex items-center gap-3">
                 @auth
+                    {{-- Wishlist --}}
                     <a href="#" class="hidden sm:flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary-600 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                         {{ __('front.wishlist') }}
                     </a>
-                    <a href="#" class="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary-600 transition-colors relative">
+
+                    {{-- Cart with badge --}}
+                    <a href="{{ route('cart.index') }}" class="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary-600 transition-colors relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                         <span class="hidden sm:inline">{{ __('front.cart') }}</span>
+                        @if($cartCount > 0)
+                            <span class="absolute -top-2 -right-2 bg-accent-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                                {{ $cartCount > 9 ? '9+' : $cartCount }}
+                            </span>
+                        @endif
                     </a>
+
+                    {{-- User dropdown --}}
                     <div class="relative group">
                         <button class="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary-600 transition-colors">
                             <div class="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-xs">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <span class="hidden sm:inline">{{ auth()->user()->name }}</span>
+                            <svg class="w-3.5 h-3.5 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
                         </button>
+                        <div class="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                            <a href="#" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl">My Account</a>
+                            <a href="#" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">My Orders</a>
+                            <div class="border-t border-gray-100 my-0.5"></div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-b-xl">
+                                    Sign Out
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @else
-                    <a href="#" class="hidden sm:inline text-sm text-gray-600 hover:text-primary-600 transition-colors">
+                    <a href="{{ route('login') }}" class="hidden sm:inline text-sm text-gray-600 hover:text-primary-600 transition-colors">
                         {{ __('front.sign_in') }}
                     </a>
-                    <a href="#" class="text-sm bg-primary-600 text-white px-4 py-2 rounded-full hover:bg-primary-700 transition-colors font-medium">
+                    <a href="{{ route('register') }}" class="text-sm bg-primary-600 text-white px-4 py-2 rounded-full hover:bg-primary-700 transition-colors font-medium">
                         {{ __('front.register') }}
                     </a>
                 @endauth
@@ -125,6 +149,18 @@
         </div>
     </div>
 </header>
+
+{{-- Flash messages --}}
+@if(session('cart_success'))
+    <div class="bg-emerald-50 border-b border-emerald-200 text-emerald-800 text-sm px-4 py-3 text-center">
+        {{ session('cart_success') }}
+    </div>
+@endif
+@if(session('cart_error'))
+    <div class="bg-red-50 border-b border-red-200 text-red-800 text-sm px-4 py-3 text-center">
+        {{ session('cart_error') }}
+    </div>
+@endif
 
 {{-- Main content --}}
 <main>
