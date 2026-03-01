@@ -14,6 +14,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Share google login flag with all views (needed in child views like auth/login)
+        View::share('googleLoginEnabled',
+            (bool) \App\Models\Setting::get('google_login_enabled', '0')
+            && \App\Models\Setting::get('google_client_id', '') !== ''
+            && \App\Models\Setting::get('google_client_secret', '') !== ''
+        );
+
         View::composer('layouts.app', function ($view) {
             $cartCount = auth()->check()
                 ? auth()->user()->cartItems()->sum('quantity')

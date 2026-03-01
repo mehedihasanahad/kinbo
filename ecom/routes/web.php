@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ReportExportController;
+use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -75,5 +76,9 @@ Route::get('/payment/result/{orderNumber}', [PaymentController::class, 'result']
 Route::get('/admin/reports/export', [ReportExportController::class, 'export'])
     ->middleware(['web', \Filament\Http\Middleware\Authenticate::class])
     ->name('admin.reports.export');
+
+// Social Login (Google OAuth) — admin-controlled via Settings
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 require __DIR__.'/auth.php';

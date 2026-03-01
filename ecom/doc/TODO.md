@@ -134,7 +134,7 @@
 
 ---
 
-### 3.3 Social Login ✗
+### 3.3 Social Login ✅ DONE
 
 - [ ] Install: `composer require laravel/socialite`
 - [ ] Add env vars: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT`
@@ -159,7 +159,7 @@
 
 ---
 
-### 4.2 Staff Roles & Permissions ⚠ (models exist, not enforced)
+### 4.2 Staff Roles & Permissions ⚠ (models exist, not enforced) ✅ DONE
 
 - [ ] Define permission list (e.g. `manage_orders`, `manage_products`, `verify_payments`)
 - [ ] Seed default roles: `admin` (all), `staff` (orders + payments), `editor` (products only)

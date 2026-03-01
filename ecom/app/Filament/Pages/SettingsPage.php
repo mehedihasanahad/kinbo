@@ -33,6 +33,7 @@ class SettingsPage extends Page
     public array $payment  = [];
     public array $policy   = [];
     public array $social   = [];
+    public array $oauth    = [];
 
     // Branding — kept flat (no statePath) so FileUpload can store files properly
     public ?array $site_logo    = [];
@@ -82,6 +83,12 @@ class SettingsPage extends Page
             'twitter_url'   => Setting::get('twitter_url', ''),
         ];
 
+        $this->oauth = [
+            'google_login_enabled' => (bool) Setting::get('google_login_enabled', '0'),
+            'google_client_id'     => Setting::get('google_client_id', ''),
+            'google_client_secret' => Setting::get('google_client_secret', ''),
+        ];
+
         // Hydrate flat FileUpload properties from stored paths.
         // Filament v3 FileUpload expects [path => path] when loading existing files.
         $logoPath    = Setting::get('site_logo', '');
@@ -93,7 +100,7 @@ class SettingsPage extends Page
 
     protected function getForms(): array
     {
-        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'policyForm', 'socialForm'];
+        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'policyForm', 'socialForm', 'oauthForm'];
     }
 
     public function brandingForm(Form $form): Form
@@ -228,6 +235,31 @@ class SettingsPage extends Page
         ])->statePath('social')->columns(2);
     }
 
+    public function oauthForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Section::make('Google OAuth')->schema([
+                Forms\Components\Toggle::make('google_login_enabled')
+                    ->label('Enable Google Login')
+                    ->helperText('Show "Continue with Google" button on login and register pages.')
+                    ->inline(false)
+                    ->live(),
+                Forms\Components\TextInput::make('google_client_id')
+                    ->label('Client ID')
+                    ->nullable()
+                    ->visible(fn ($get) => $get('google_login_enabled'))
+                    ->helperText('From Google Cloud Console → APIs & Services → Credentials.'),
+                Forms\Components\TextInput::make('google_client_secret')
+                    ->label('Client Secret')
+                    ->password()
+                    ->revealable()
+                    ->nullable()
+                    ->visible(fn ($get) => $get('google_login_enabled'))
+                    ->helperText('Keep this secret. Never share it publicly.'),
+            ])->columns(2),
+        ])->statePath('oauth');
+    }
+
     public function save(): void
     {
         $this->generalForm->validate();
@@ -258,6 +290,9 @@ class SettingsPage extends Page
         }
         foreach ($this->social as $key => $value) {
             Setting::set($key, $value, 'social');
+        }
+        foreach ($this->oauth as $key => $value) {
+            Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'oauth');
         }
 
         Cache::forget('settings.public');
