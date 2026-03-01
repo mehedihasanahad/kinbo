@@ -51,7 +51,7 @@ class Coupon extends Model
         if ($this->expires_at && $this->expires_at->isPast()) return false;
         if ($orderTotal < $this->min_order_amount) return false;
         if ($this->max_uses && $this->used_count >= $this->max_uses) return false;
-        if ($this->usages()->where('user_id', $userId)->count() >= $this->per_user_limit) return false;
+        if ($this->per_user_limit && $this->usages()->where('user_id', $userId)->count() >= $this->per_user_limit) return false;
 
         return true;
     }

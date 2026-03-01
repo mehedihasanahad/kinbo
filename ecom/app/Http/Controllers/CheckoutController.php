@@ -1,0 +1,321 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Coupon;
+use App\Models\CouponUsage;
+use App\Models\ManualPayment;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\OrderStatusHistory;
+use App\Models\PaymentTransaction;
+use App\Models\Setting;
+use App\Models\ShippingZoneDistrict;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class CheckoutController extends Controller
+{
+    public function index()
+    {
+        $cartItems = auth()->user()->cartItems()
+            ->with(['product.translations', 'product.primaryImage', 'variant.options'])
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('cart_error', __('front.cart_empty'));
+        }
+
+        $subtotal = $cartItems->sum('line_total');
+
+        $addresses = auth()->user()->addresses()->latest()->get();
+
+        // All districts for shipping dropdown (sorted alphabetically)
+        $districts = ShippingZoneDistrict::orderBy('district_name')->pluck('district_name')->unique()->values();
+
+        // Enabled payment methods from settings
+        $paymentMethods = [];
+        if (Setting::get('cod_enabled', '1') == '1') {
+            $paymentMethods[] = 'cod';
+        }
+        if (Setting::get('bkash_merchant_number', '')) {
+            $paymentMethods[] = 'bkash';
+        }
+        if (Setting::get('nagad_merchant_number', '')) {
+            $paymentMethods[] = 'nagad';
+        }
+
+        // Fallback: always show COD if nothing configured
+        if (empty($paymentMethods)) {
+            $paymentMethods[] = 'cod';
+        }
+
+        $bkashNumber = Setting::get('bkash_merchant_number', '');
+        $bkashName   = Setting::get('bkash_merchant_name', '');
+        $nagadNumber = Setting::get('nagad_merchant_number', '');
+        $nagadName   = Setting::get('nagad_merchant_name', '');
+
+        $couponSession = session('checkout.coupon');
+
+        $locale = app()->getLocale();
+
+        return view('checkout.index', compact(
+            'cartItems', 'subtotal', 'addresses', 'districts',
+            'paymentMethods', 'bkashNumber', 'bkashName', 'nagadNumber', 'nagadName',
+            'couponSession', 'locale'
+        ));
+    }
+
+    public function shippingRate(Request $request)
+    {
+        $request->validate(['district' => 'required|string']);
+
+        $subtotal = auth()->user()->cartItems()
+            ->with(['product', 'variant'])
+            ->get()
+            ->sum('line_total');
+
+        $zoneDistrict = ShippingZoneDistrict::where('district_name', $request->district)->first();
+
+        if (! $zoneDistrict) {
+            return response()->json([
+                'rate_id'            => null,
+                'method_name'        => __('front.free_shipping'),
+                'cost'               => 0,
+                'estimated_days_min' => null,
+                'estimated_days_max' => null,
+            ]);
+        }
+
+        $rate = $zoneDistrict->zone->rates()->active()->first();
+
+        if (! $rate) {
+            return response()->json([
+                'rate_id'            => null,
+                'method_name'        => __('front.free_shipping'),
+                'cost'               => 0,
+                'estimated_days_min' => null,
+                'estimated_days_max' => null,
+            ]);
+        }
+
+        $cost = $rate->isFreeFor($subtotal) ? 0 : (float) $rate->cost;
+
+        return response()->json([
+            'rate_id'            => $rate->id,
+            'method_name'        => $rate->method_name,
+            'cost'               => $cost,
+            'estimated_days_min' => $rate->estimated_days_min,
+            'estimated_days_max' => $rate->estimated_days_max,
+        ]);
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate(['coupon_code' => 'required|string|max:50']);
+
+        $subtotal = auth()->user()->cartItems()
+            ->with(['product', 'variant'])
+            ->get()
+            ->sum('line_total');
+
+        $coupon = Coupon::active()->where('code', strtoupper($request->coupon_code))->first();
+
+        if (! $coupon || ! $coupon->isValidFor($subtotal, auth()->id())) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => __('front.coupon_invalid')], 422);
+            }
+            return back()->with('coupon_error', __('front.coupon_invalid'));
+        }
+
+        $discount = $coupon->calculateDiscount($subtotal);
+
+        session(['checkout.coupon' => [
+            'id'       => $coupon->id,
+            'code'     => $coupon->code,
+            'discount' => $discount,
+        ]]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'code' => $coupon->code, 'discount' => $discount]);
+        }
+        return back()->with('coupon_success', __('front.coupon_applied', ['code' => $coupon->code]));
+    }
+
+    public function removeCoupon()
+    {
+        session()->forget('checkout.coupon');
+        return back();
+    }
+
+    public function placeOrder(Request $request)
+    {
+        $request->validate([
+            'ship_name'        => 'required|string|max:191',
+            'ship_phone'       => 'required|string|max:20',
+            'ship_address'     => 'required|string',
+            'ship_city'        => 'required|string|max:100',
+            'ship_district'    => 'required|string|max:100',
+            'ship_zip'         => 'nullable|string|max:10',
+            'shipping_rate_id' => 'nullable|exists:shipping_rates,id',
+            'payment_method'   => 'required|in:cod,bkash,nagad',
+            'notes'            => 'nullable|string|max:1000',
+            'sender_number'    => 'required_if:payment_method,bkash,nagad|nullable|string|max:20',
+            'transaction_id'   => 'required_if:payment_method,bkash,nagad|nullable|string|max:100',
+            'screenshot'       => 'nullable|image|max:2048',
+        ]);
+
+        $cartItems = auth()->user()->cartItems()
+            ->with(['product', 'variant.options'])
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('cart_error', __('front.cart_empty'));
+        }
+
+        // Re-validate stock
+        foreach ($cartItems as $item) {
+            $stock = $item->variant ? $item->variant->stock : $item->product->stock;
+            if ($item->quantity > $stock) {
+                return back()->with('checkout_error', __('front.insufficient_stock') . ': ' . ($item->product->getTranslation('en')?->name ?? $item->product->sku));
+            }
+        }
+
+        // Calculate totals
+        $subtotal       = $cartItems->sum('line_total');
+        $couponSession  = session('checkout.coupon');
+        $discountAmount = $couponSession ? (float) $couponSession['discount'] : 0;
+
+        $shippingAmount = 0;
+        if ($request->shipping_rate_id) {
+            $rate = \App\Models\ShippingRate::find($request->shipping_rate_id);
+            if ($rate) {
+                $shippingAmount = $rate->isFreeFor($subtotal) ? 0 : (float) $rate->cost;
+            }
+        }
+
+        $total = max(0, $subtotal - $discountAmount + $shippingAmount);
+
+        $order = DB::transaction(function () use ($request, $cartItems, $subtotal, $discountAmount, $shippingAmount, $total, $couponSession) {
+
+            // 1. Create order
+            $order = Order::create([
+                'order_number'    => Order::generateOrderNumber(),
+                'user_id'         => auth()->id(),
+                'coupon_id'       => $couponSession ? $couponSession['id'] : null,
+                'shipping_rate_id'=> $request->shipping_rate_id,
+                'subtotal'        => $subtotal,
+                'discount_amount' => $discountAmount,
+                'shipping_amount' => $shippingAmount,
+                'tax_amount'      => 0,
+                'total_amount'    => $total,
+                'status'          => Order::STATUS_PENDING,
+                'payment_status'  => Order::PAYMENT_UNPAID,
+                'payment_method'  => $request->payment_method,
+                'ship_name'       => $request->ship_name,
+                'ship_phone'      => $request->ship_phone,
+                'ship_address'    => $request->ship_address,
+                'ship_city'       => $request->ship_city,
+                'ship_district'   => $request->ship_district,
+                'ship_zip'        => $request->ship_zip,
+                'notes'           => $request->notes,
+            ]);
+
+            // 2. Create order items + decrement stock
+            foreach ($cartItems as $item) {
+                $unitPrice    = $item->variant ? $item->variant->effective_price : $item->product->current_price;
+                $productName  = $item->product->getTranslation('en')?->name ?? $item->product->sku;
+                $variantLabel = $item->variant?->label;
+
+                OrderItem::create([
+                    'order_id'      => $order->id,
+                    'product_id'    => $item->product_id,
+                    'variant_id'    => $item->variant_id,
+                    'product_name'  => $productName,
+                    'variant_label' => $variantLabel,
+                    'unit_price'    => $unitPrice,
+                    'quantity'      => $item->quantity,
+                    'subtotal'      => $unitPrice * $item->quantity,
+                ]);
+
+                // Decrement stock
+                if ($item->variant) {
+                    $item->variant->decrement('stock', $item->quantity);
+                } else {
+                    $item->product->decrement('stock', $item->quantity);
+                }
+            }
+
+            // 3. Coupon usage
+            if ($couponSession) {
+                CouponUsage::create([
+                    'coupon_id'       => $couponSession['id'],
+                    'user_id'         => auth()->id(),
+                    'order_id'        => $order->id,
+                    'discount_amount' => $couponSession['discount'],
+                    'created_at'      => now(),
+                ]);
+                Coupon::where('id', $couponSession['id'])->increment('used_count');
+            }
+
+            // 4. Payment record
+            if ($request->payment_method === 'cod') {
+                PaymentTransaction::create([
+                    'order_id' => $order->id,
+                    'gateway'  => 'cod',
+                    'amount'   => $order->total_amount,
+                    'currency' => 'BDT',
+                    'status'   => 'pending',
+                ]);
+            } else {
+                // bkash or nagad manual payment
+                $screenshotPath = null;
+                if ($request->hasFile('screenshot')) {
+                    $screenshotPath = $request->file('screenshot')->store('payments', 'public');
+                }
+
+                ManualPayment::create([
+                    'order_id'        => $order->id,
+                    'method'          => $request->payment_method,
+                    'sender_number'   => $request->sender_number,
+                    'transaction_id'  => $request->transaction_id,
+                    'amount'          => $order->total_amount,
+                    'screenshot_path' => $screenshotPath,
+                    'status'          => ManualPayment::STATUS_PENDING,
+                ]);
+
+                // Update payment_status to pending_verification
+                $order->update(['payment_status' => Order::PAYMENT_PENDING_VERIFICATION]);
+            }
+
+            // 5. Status history
+            OrderStatusHistory::create([
+                'order_id'   => $order->id,
+                'status'     => Order::STATUS_PENDING,
+                'notes'      => 'Order placed by customer.',
+                'changed_by' => auth()->id(),
+                'created_at' => now(),
+            ]);
+
+            // 6. Clear cart
+            auth()->user()->cartItems()->delete();
+
+            // 7. Clear coupon session
+            session()->forget('checkout.coupon');
+
+            return $order;
+        });
+
+        return redirect()->route('checkout.confirmation', $order)->with('order_placed', true);
+    }
+
+    public function confirmation(Order $order)
+    {
+        // Security: only the owner can view
+        abort_if($order->user_id !== auth()->id(), 403);
+
+        $order->load(['items.product', 'items.variant', 'manualPayment']);
+
+        return view('checkout.confirmation', compact('order'));
+    }
+}

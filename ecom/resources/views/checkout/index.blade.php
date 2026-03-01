@@ -1,0 +1,545 @@
+@extends('layouts.app')
+
+@section('title', __('front.checkout') . ' — ' . config('app.name'))
+
+@section('content')
+@php $locale = app()->getLocale(); @endphp
+
+{{-- Breadcrumb --}}
+<nav class="bg-gray-50 border-b border-gray-100 py-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ol class="flex items-center gap-1.5 text-sm text-gray-500 flex-wrap">
+            <li><a href="{{ route('home') }}" class="hover:text-primary-600 transition-colors">{{ __('front.home') }}</a></li>
+            <li><span class="text-gray-300">/</span></li>
+            <li><a href="{{ route('cart.index') }}" class="hover:text-primary-600 transition-colors">{{ __('front.your_cart') }}</a></li>
+            <li><span class="text-gray-300">/</span></li>
+            <li class="text-gray-800 font-medium">{{ __('front.checkout') }}</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-2xl font-bold text-gray-900 mb-8">{{ __('front.checkout') }}</h1>
+
+    {{-- Errors --}}
+    @if(session('checkout_error'))
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-4 text-sm">
+            {{ session('checkout_error') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-4 text-sm">
+            <ul class="list-disc list-inside space-y-1">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    {{-- Outer grid: left (form) + right (summary). Right column is OUTSIDE <form> to avoid nested forms. --}}
+    <div class="lg:grid lg:grid-cols-3 lg:gap-10">
+
+    <form method="POST" action="{{ route('checkout.place-order') }}" enctype="multipart/form-data" id="checkout-form" class="lg:col-span-2">
+        @csrf
+            {{-- ── LEFT: Checkout Steps ────────────────────────────────────── --}}
+            <div class="space-y-8 mb-10 lg:mb-0">
+
+                {{-- ── STEP 1: Delivery Address ── --}}
+                <div class="bg-white border border-gray-100 rounded-2xl p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-primary-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">1</span>
+                        {{ __('front.delivery_address') }}
+                    </h2>
+
+                    {{-- Saved addresses --}}
+                    @if($addresses->isNotEmpty())
+                        <div class="mb-5">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ __('front.address_saved') }}</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @foreach($addresses as $addr)
+                                    <button type="button"
+                                            onclick="fillAddress({{ json_encode(['name'=>$addr->recipient_name,'phone'=>$addr->phone,'address'=>$addr->address_line,'city'=>$addr->city,'district'=>$addr->district,'zip'=>$addr->zip_code]) }})"
+                                            class="text-left border-2 border-gray-200 hover:border-primary-400 rounded-xl p-3 transition-all text-sm">
+                                        @if($addr->label)
+                                            <span class="text-xs font-semibold text-primary-600 uppercase">{{ $addr->label }}</span><br>
+                                        @endif
+                                        <span class="font-medium text-gray-800">{{ $addr->recipient_name }}</span><br>
+                                        <span class="text-gray-500 text-xs">{{ $addr->address_line }}, {{ $addr->city }}, {{ $addr->district }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">{{ __('front.fill_from_saved') }}</p>
+                        </div>
+                        <div class="border-t border-gray-100 mb-5"></div>
+                    @endif
+
+                    {{-- Address form fields --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_name') }} <span class="text-red-500">*</span></label>
+                            <input type="text" name="ship_name" value="{{ old('ship_name', auth()->user()->name) }}" id="field-ship_name"
+                                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_name') border-red-400 @enderror">
+                            @error('ship_name')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_phone') }} <span class="text-red-500">*</span></label>
+                            <input type="text" name="ship_phone" value="{{ old('ship_phone', auth()->user()->phone ?? '') }}" id="field-ship_phone"
+                                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_phone') border-red-400 @enderror">
+                            @error('ship_phone')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_address') }} <span class="text-red-500">*</span></label>
+                            <input type="text" name="ship_address" value="{{ old('ship_address') }}" id="field-ship_address"
+                                   placeholder="House/Road/Area"
+                                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_address') border-red-400 @enderror">
+                            @error('ship_address')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_city') }} <span class="text-red-500">*</span></label>
+                            <input type="text" name="ship_city" value="{{ old('ship_city') }}" id="field-ship_city"
+                                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_city') border-red-400 @enderror">
+                            @error('ship_city')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_district') }} <span class="text-red-500">*</span></label>
+                            <select name="ship_district" id="district-select"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_district') border-red-400 @enderror">
+                                <option value="">{{ __('front.select_district') }}</option>
+                                @foreach($districts as $district)
+                                    <option value="{{ $district }}" {{ old('ship_district') === $district ? 'selected' : '' }}>
+                                        {{ $district }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('ship_district')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_zip') }}</label>
+                            <input type="text" name="ship_zip" value="{{ old('ship_zip') }}" id="field-ship_zip"
+                                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.order_notes') }}</label>
+                            <textarea name="notes" rows="2"
+                                      class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 resize-none">{{ old('notes') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ── STEP 2: Shipping Method ── --}}
+                <div class="bg-white border border-gray-100 rounded-2xl p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-primary-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</span>
+                        {{ __('front.shipping_method') }}
+                    </h2>
+
+                    <input type="hidden" name="shipping_rate_id" id="shipping-rate-id" value="{{ old('shipping_rate_id') }}">
+
+                    <div id="shipping-result"
+                         class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500">
+                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span id="shipping-label">{{ __('front.select_district') }}</span>
+                    </div>
+                </div>
+
+                {{-- ── STEP 3: Payment Method ── --}}
+                <div class="bg-white border border-gray-100 rounded-2xl p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-primary-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</span>
+                        {{ __('front.payment_method') }}
+                    </h2>
+
+                    <div class="space-y-3">
+
+                        {{-- COD --}}
+                        @if(in_array('cod', $paymentMethods))
+                            <label class="payment-card flex items-start gap-4 border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                                <input type="radio" name="payment_method" value="cod" class="mt-0.5 accent-primary-600"
+                                       {{ old('payment_method', 'cod') === 'cod' ? 'checked' : '' }}
+                                       onchange="togglePaymentFields('cod')">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_cod') }}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">{{ __('front.cod_description') }}</p>
+                                </div>
+                            </label>
+                        @endif
+
+                        {{-- bKash --}}
+                        @if(in_array('bkash', $paymentMethods))
+                            <label class="payment-card flex items-start gap-4 border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                                <input type="radio" name="payment_method" value="bkash" class="mt-0.5 accent-primary-600"
+                                       {{ old('payment_method') === 'bkash' ? 'checked' : '' }}
+                                       onchange="togglePaymentFields('bkash')">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-5 h-5 bg-pink-600 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0">b</span>
+                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_bkash') }}</span>
+                                    </div>
+                                    @if($bkashNumber)
+                                        <p class="text-xs text-gray-500 mt-1">{{ __('front.pay_to_number') }}: <span class="font-semibold text-gray-700">{{ $bkashNumber }}</span>{{ $bkashName ? ' (' . $bkashName . ')' : '' }}</p>
+                                    @endif
+                                </div>
+                            </label>
+                            {{-- bKash fields --}}
+                            <div id="fields-bkash" class="{{ old('payment_method') === 'bkash' ? '' : 'hidden' }} bg-pink-50 border border-pink-100 rounded-xl p-4 space-y-4 -mt-1">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.sender_number', ['method' => 'bKash']) }} <span class="text-red-500">*</span></label>
+                                        <input type="text" name="sender_number" value="{{ old('sender_number') }}"
+                                               placeholder="01XXXXXXXXX"
+                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('sender_number') border-red-400 @enderror">
+                                        @error('sender_number')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.transaction_id') }} <span class="text-red-500">*</span></label>
+                                        <input type="text" name="transaction_id" value="{{ old('transaction_id') }}"
+                                               placeholder="TrxID"
+                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('transaction_id') border-red-400 @enderror">
+                                        @error('transaction_id')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.payment_screenshot') }}</label>
+                                    <input type="file" name="screenshot" accept="image/*"
+                                           class="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                                    @error('screenshot')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Nagad --}}
+                        @if(in_array('nagad', $paymentMethods))
+                            <label class="payment-card flex items-start gap-4 border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                                <input type="radio" name="payment_method" value="nagad" class="mt-0.5 accent-primary-600"
+                                       {{ old('payment_method') === 'nagad' ? 'checked' : '' }}
+                                       onchange="togglePaymentFields('nagad')">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0">N</span>
+                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_nagad') }}</span>
+                                    </div>
+                                    @if($nagadNumber)
+                                        <p class="text-xs text-gray-500 mt-1">{{ __('front.pay_to_number') }}: <span class="font-semibold text-gray-700">{{ $nagadNumber }}</span>{{ $nagadName ? ' (' . $nagadName . ')' : '' }}</p>
+                                    @endif
+                                </div>
+                            </label>
+                            {{-- Nagad fields --}}
+                            <div id="fields-nagad" class="{{ old('payment_method') === 'nagad' ? '' : 'hidden' }} bg-orange-50 border border-orange-100 rounded-xl p-4 space-y-4 -mt-1">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.sender_number', ['method' => 'Nagad']) }} <span class="text-red-500">*</span></label>
+                                        <input type="text" name="sender_number" value="{{ old('sender_number') }}"
+                                               placeholder="01XXXXXXXXX"
+                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.transaction_id') }} <span class="text-red-500">*</span></label>
+                                        <input type="text" name="transaction_id" value="{{ old('transaction_id') }}"
+                                               placeholder="TrxID"
+                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.payment_screenshot') }}</label>
+                                    <input type="file" name="screenshot" accept="image/*"
+                                           class="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                                </div>
+                            </div>
+                        @endif
+
+                    </div>
+                </div>
+
+            </div>{{-- end left steps --}}
+
+    </form>{{-- end #checkout-form --}}
+
+            {{-- ── RIGHT: Order Summary ─────────────────────────────────────── --}}
+            {{-- Intentionally outside <form> so coupon sub-forms are not nested --}}
+            <div class="lg:col-span-1 mt-10 lg:mt-0">
+                <div class="bg-white border border-gray-100 rounded-2xl p-6 sticky top-24 space-y-5">
+                    <h2 class="text-base font-bold text-gray-900">{{ __('front.order_summary') }}</h2>
+
+                    {{-- Cart items --}}
+                    <div class="space-y-3 max-h-64 overflow-y-auto pr-1">
+                        @foreach($cartItems as $item)
+                            @php
+                                $t = $item->product->getTranslation($locale) ?? $item->product->getTranslation('en');
+                                $productName = $t?->name ?? $item->product->sku;
+                                $unitPrice = $item->variant ? $item->variant->effective_price : $item->product->current_price;
+                            @endphp
+                            <div class="flex items-center gap-3">
+                                @if($item->product->primaryImage)
+                                    <img src="{{ asset('storage/' . $item->product->primaryImage->path) }}"
+                                         class="w-12 h-12 rounded-xl object-cover border border-gray-100 shrink-0"
+                                         alt="{{ $productName }}">
+                                @else
+                                    <div class="w-12 h-12 rounded-xl bg-gray-100 shrink-0"></div>
+                                @endif
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-gray-800 line-clamp-1">{{ $productName }}</p>
+                                    @if($item->variant && $item->variant->label)
+                                        <p class="text-[11px] text-gray-500">{{ $item->variant->label }}</p>
+                                    @endif
+                                    <p class="text-[11px] text-gray-400">{{ $item->quantity }} × ৳{{ number_format($unitPrice, 0) }}</p>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-900 shrink-0">৳{{ number_format($item->line_total, 0) }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="border-t border-gray-100"></div>
+
+                    {{-- Coupon (standalone forms, outside checkout form) --}}
+                    <div id="coupon-message">
+                        @if(session('coupon_success'))
+                            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg px-3 py-2 text-xs mb-2">{{ session('coupon_success') }}</div>
+                        @endif
+                        @if(session('coupon_error'))
+                            <div class="bg-red-50 border border-red-200 text-red-600 rounded-lg px-3 py-2 text-xs mb-2">{{ session('coupon_error') }}</div>
+                        @endif
+                    </div>
+
+                    @if($couponSession)
+                        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
+                            <span class="text-xs font-semibold text-emerald-700">{{ $couponSession['code'] }}</span>
+                            <form method="POST" action="{{ route('checkout.remove-coupon') }}">
+                                @csrf
+                                <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors">
+                                    {{ __('front.remove_coupon') }}
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <div class="flex gap-2">
+                            <input type="text" id="coupon-input"
+                                   placeholder="{{ __('front.coupon_code') }}"
+                                   class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
+                            <button type="button" id="coupon-apply-btn"
+                                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm px-4 py-2 rounded-xl transition-colors shrink-0">
+                                {{ __('front.apply_coupon') }}
+                            </button>
+                        </div>
+                    @endif
+
+                    <div class="border-t border-gray-100"></div>
+
+                    {{-- Price breakdown --}}
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between text-gray-600">
+                            <span>{{ __('front.subtotal') }}</span>
+                            <span class="font-medium text-gray-900">৳{{ number_format($subtotal, 0) }}</span>
+                        </div>
+
+                        @if($couponSession)
+                            <div class="flex justify-between text-emerald-600">
+                                <span>{{ __('front.discount') }}</span>
+                                <span class="font-medium">−৳{{ number_format($couponSession['discount'], 0) }}</span>
+                            </div>
+                        @endif
+
+                        <div class="flex justify-between text-gray-600">
+                            <span>{{ __('front.shipping') }}</span>
+                            <span id="shipping-cost-display" class="text-gray-400 text-xs">{{ __('front.calculating') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100"></div>
+
+                    <div class="flex justify-between text-base font-bold text-gray-900">
+                        <span>{{ __('front.total') }}</span>
+                        <span id="total-display">
+                            ৳{{ number_format($subtotal - ($couponSession ? $couponSession['discount'] : 0), 0) }}
+                        </span>
+                    </div>
+
+                    {{-- Place order button (submits #checkout-form via JS) --}}
+                    <button type="button" id="place-order-btn"
+                            onclick="document.getElementById('checkout-form').requestSubmit()"
+                            class="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ __('front.place_order') }}
+                    </button>
+
+                    {{-- Trust badges --}}
+                    <div class="flex items-center justify-center gap-4 pt-2 border-t border-gray-100">
+                        <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            Secure
+                        </div>
+                        <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            Safe Payment
+                        </div>
+                    </div>
+                </div>
+            </div>{{-- end right column --}}
+
+    </div>{{-- end outer grid --}}
+</div>{{-- end page container --}}
+@endsection
+
+@push('scripts')
+<script>
+const subtotalBase = {{ $subtotal - ($couponSession ? $couponSession['discount'] : 0) }};
+let shippingCost = 0;
+
+// Fill address from saved address button
+function fillAddress(data) {
+    document.getElementById('field-ship_name').value    = data.name    || '';
+    document.getElementById('field-ship_phone').value   = data.phone   || '';
+    document.getElementById('field-ship_address').value = data.address || '';
+    document.getElementById('field-ship_city').value    = data.city    || '';
+    document.getElementById('field-ship_zip').value     = data.zip     || '';
+
+    const districtSelect = document.getElementById('district-select');
+    for (let i = 0; i < districtSelect.options.length; i++) {
+        if (districtSelect.options[i].value === data.district) {
+            districtSelect.selectedIndex = i;
+            break;
+        }
+    }
+    // Trigger shipping rate fetch for the filled district
+    fetchShippingRate(data.district);
+}
+
+// District change → fetch shipping rate
+document.getElementById('district-select').addEventListener('change', function () {
+    fetchShippingRate(this.value);
+});
+
+function fetchShippingRate(district) {
+    if (!district) return;
+
+    const label  = document.getElementById('shipping-label');
+    const rateId = document.getElementById('shipping-rate-id');
+    const costEl = document.getElementById('shipping-cost-display');
+    const totalEl = document.getElementById('total-display');
+
+    label.textContent = '{{ __('front.calculating') }}';
+
+    fetch('{{ route('checkout.shipping-rate') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ district: district }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        rateId.value = data.rate_id || '';
+        shippingCost = parseFloat(data.cost) || 0;
+
+        let labelText = data.method_name;
+        if (shippingCost > 0) {
+            labelText += ' — ৳' + Math.round(shippingCost).toLocaleString('en-US');
+        } else {
+            labelText += ' — {{ __('front.free_shipping') }}';
+        }
+        if (data.estimated_days_min && data.estimated_days_max) {
+            labelText += ' (' + data.estimated_days_min + '–' + data.estimated_days_max + ' days)';
+        }
+
+        label.textContent = labelText;
+        document.getElementById('shipping-result').classList.replace('border-gray-200', 'border-primary-200');
+        document.getElementById('shipping-result').classList.replace('bg-gray-50', 'bg-primary-50');
+
+        costEl.textContent = shippingCost > 0 ? '৳' + Math.round(shippingCost).toLocaleString('en-US') : '{{ __('front.free_shipping') }}';
+        costEl.classList.remove('text-gray-400');
+
+        totalEl.textContent = '৳' + (subtotalBase + shippingCost).toLocaleString('en-US', {maximumFractionDigits: 0});
+    })
+    .catch(() => {
+        label.textContent = '{{ __('front.free_shipping') }}';
+        costEl.textContent = '{{ __('front.free_shipping') }}';
+    });
+}
+
+// Payment method toggle
+function togglePaymentFields(method) {
+    ['bkash', 'nagad'].forEach(m => {
+        const el = document.getElementById('fields-' + m);
+        if (el) el.classList.toggle('hidden', m !== method);
+    });
+}
+
+// Prevent double submit
+document.getElementById('checkout-form').addEventListener('submit', function () {
+    const btn = document.getElementById('place-order-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';
+});
+
+// Coupon apply via AJAX
+const couponApplyBtn = document.getElementById('coupon-apply-btn');
+if (couponApplyBtn) {
+    couponApplyBtn.addEventListener('click', function () {
+        const input = document.getElementById('coupon-input');
+        const code  = input ? input.value.trim() : '';
+        if (!code) return;
+
+        couponApplyBtn.disabled = true;
+        couponApplyBtn.textContent = '...';
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        fetch('{{ route('checkout.apply-coupon') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ coupon_code: code }),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                // Reload so the session-based coupon state reflects
+                window.location.reload();
+            } else {
+                const msgDiv = document.getElementById('coupon-message');
+                msgDiv.innerHTML = '<div class="bg-red-50 border border-red-200 text-red-600 rounded-lg px-3 py-2 text-xs mb-2">' + data.message + '</div>';
+                couponApplyBtn.disabled = false;
+                couponApplyBtn.textContent = '{{ __('front.apply_coupon') }}';
+            }
+        })
+        .catch(() => {
+            couponApplyBtn.disabled = false;
+            couponApplyBtn.textContent = '{{ __('front.apply_coupon') }}';
+        });
+    });
+}
+
+// On page load: if district already selected (after validation error), fetch rate
+document.addEventListener('DOMContentLoaded', function () {
+    const districtSelect = document.getElementById('district-select');
+    if (districtSelect.value) fetchShippingRate(districtSelect.value);
+    // Show payment fields for old input
+    const checkedMethod = document.querySelector('input[name="payment_method"]:checked');
+    if (checkedMethod) togglePaymentFields(checkedMethod.value);
+});
+</script>
+@endpush
