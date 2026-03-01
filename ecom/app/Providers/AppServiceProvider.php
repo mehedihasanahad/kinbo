@@ -19,10 +19,15 @@ class AppServiceProvider extends ServiceProvider
                 ? auth()->user()->cartItems()->sum('quantity')
                 : 0;
 
+            $wishlistCount = auth()->check()
+                ? auth()->user()->wishlist()->count()
+                : 0;
+
             $announcementBarText = \App\Models\Setting::get('announcement_bar_text', '');
 
             $view->with(compact(
                 'cartCount',
+                'wishlistCount',
                 'announcementBarText'
             ));
         });

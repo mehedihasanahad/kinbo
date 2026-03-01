@@ -88,11 +88,14 @@
             <div class="flex items-center gap-3">
                 @auth
                     {{-- Wishlist --}}
-                    <a href="#" class="hidden sm:flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary-600 transition-colors">
+                    <a href="{{ route('wishlist.index') }}" class="hidden sm:flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary-600 transition-colors relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
-                        {{ __('front.wishlist') }}
+                        <span>{{ __('front.wishlist') }}</span>
+                        <span class="wishlist-badge absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none {{ $wishlistCount > 0 ? '' : 'hidden' }}">
+                            {{ $wishlistCount > 9 ? '9+' : $wishlistCount }}
+                        </span>
                     </a>
 
                     {{-- Cart with badge --}}
@@ -219,6 +222,60 @@
 
 {{-- Swiper JS --}}
 <script src="https://unpkg.com/swiper@11/swiper-bundle.min.js"></script>
+
+{{-- Shared wishlist AJAX toggle --}}
+<script>
+function toggleWishlist(btn, productId) {
+    const wishlisted = btn.dataset.wishlisted === 'true';
+    const url = wishlisted ? btn.dataset.destroyUrl : btn.dataset.storeUrl;
+    const method = wishlisted ? 'DELETE' : 'POST';
+    const body = wishlisted ? null : JSON.stringify({ product_id: productId });
+
+    fetch(url, {
+        method,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body,
+    })
+    .then(res => res.json())
+    .then(data => {
+        const nowWishlisted = data.in_wishlist;
+        btn.dataset.wishlisted = nowWishlisted ? 'true' : 'false';
+
+        // Update SVG fill
+        const svg = btn.querySelector('svg');
+        if (svg) svg.setAttribute('fill', nowWishlisted ? 'currentColor' : 'none');
+
+        // Update button colours
+        if (nowWishlisted) {
+            btn.classList.add('text-red-500');
+            btn.classList.remove('text-gray-400');
+            // detail page border
+            btn.classList.add('border-red-400');
+            btn.classList.remove('border-gray-200');
+        } else {
+            btn.classList.remove('text-red-500');
+            btn.classList.add('text-gray-400');
+            btn.classList.remove('border-red-400');
+            btn.classList.add('border-gray-200');
+        }
+
+        // Update header badge count
+        const badge = document.querySelector('.wishlist-badge');
+        if (badge) {
+            if (data.wishlist_count > 0) {
+                badge.textContent = data.wishlist_count > 9 ? '9+' : data.wishlist_count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    });
+}
+</script>
 
 @stack('scripts')
 </body>

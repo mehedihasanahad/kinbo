@@ -68,6 +68,9 @@ class ProductController extends Controller
 
         $currentTranslation = $product->getTranslation($locale);
 
+        $isWishlisted = auth()->check()
+            && auth()->user()->wishlist()->where('product_id', $product->id)->exists();
+
         return view('product.show', compact(
             'product',
             'currentTranslation',
@@ -77,6 +80,7 @@ class ProductController extends Controller
             'avgRating',
             'ratingCounts',
             'relatedProducts',
+            'isWishlisted',
         ));
     }
 }

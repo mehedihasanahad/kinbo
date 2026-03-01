@@ -302,16 +302,35 @@
                 @endauth
 
                 {{-- Wishlist --}}
-                <button type="button"
-                        class="w-12 h-12 flex items-center justify-center border-2 border-gray-200 rounded-xl
-                               text-gray-400 hover:border-red-400 hover:text-red-500 transition-all duration-150"
-                        title="{{ __('front.add_to_wishlist') }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
-                                 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                    </svg>
-                </button>
+                @auth
+                    <button type="button"
+                            id="wishlist-detail-btn"
+                            onclick="toggleWishlist(this, {{ $product->id }})"
+                            data-product-id="{{ $product->id }}"
+                            data-wishlisted="{{ $isWishlisted ? 'true' : 'false' }}"
+                            data-store-url="{{ route('wishlist.store') }}"
+                            data-destroy-url="{{ route('wishlist.destroy', $product->id) }}"
+                            title="{{ $isWishlisted ? __('front.remove_from_wishlist') : __('front.add_to_wishlist') }}"
+                            class="wishlist-btn w-12 h-12 flex items-center justify-center border-2 rounded-xl transition-all duration-150
+                                   {{ $isWishlisted ? 'border-red-400 text-red-500' : 'border-gray-200 text-gray-400 hover:border-red-400 hover:text-red-500' }}">
+                        <svg class="w-5 h-5" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
+                                     00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </button>
+                @else
+                    <a href="{{ route('login') }}"
+                       title="{{ __('front.add_to_wishlist') }}"
+                       class="w-12 h-12 flex items-center justify-center border-2 border-gray-200 rounded-xl
+                              text-gray-400 hover:border-red-400 hover:text-red-500 transition-all duration-150">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
+                                     00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </a>
+                @endauth
             </div>
 
             {{-- SKU / Weight meta --}}
