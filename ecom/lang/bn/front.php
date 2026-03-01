@@ -116,6 +116,8 @@ return [
     'showing_results'     => ':total টি পণ্যের মধ্যে :from–:to দেখাচ্ছে',
     'all_products'        => 'সকল পণ্য',
     'no_products_found'   => 'এই ফিল্টারে কোন পণ্য পাওয়া যায়নি।',
+    'search_results'      => '":q" এর জন্য অনুসন্ধান ফলাফল',
+    'search_empty'        => '":q" এর জন্য কোন পণ্য পাওয়া যায়নি। অন্য কীওয়ার্ড ব্যবহার করুন।',
     'pagination_prev'     => '← আগের পাতা',
     'pagination_next'     => 'পরের পাতা →',
     'pagination_info'     => ':total টি ফলাফলের মধ্যে :first–:last দেখাচ্ছে',

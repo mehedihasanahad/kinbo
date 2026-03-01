@@ -17,6 +17,10 @@ class ShopController extends Controller
         $category = null;
         $slug     = $request->query('category');
 
+        // ── Search query ───────────────────────────────────────────────────────
+        $q        = trim((string) $request->query('q', ''));
+        $isSearch = $q !== '';
+
         // ── Resolve category from optional ?category= query param ─────────────
         if ($slug !== null) {
             $translation = CategoryTranslation::where('slug', $slug)
@@ -49,6 +53,13 @@ class ShopController extends Controller
 
         // ── Product query ──────────────────────────────────────────────────────
         $query = Product::active()->with(['primaryImage', 'translations', 'brand']);
+
+        if ($isSearch) {
+            $query->whereHas('translations', function ($tq) use ($q) {
+                $tq->where('name', 'LIKE', '%' . $q . '%')
+                   ->orWhere('short_description', 'LIKE', '%' . $q . '%');
+            });
+        }
 
         if ($category !== null) {
             $categoryIds = $category->children->pluck('id')->push($category->id)->toArray();
@@ -88,11 +99,17 @@ class ShopController extends Controller
             ->get();
 
         $availableBrands = Brand::active()
-            ->whereHas('products', function ($q) use ($category) {
-                $q->active();
+            ->whereHas('products', function ($bq) use ($category, $q) {
+                $bq->active();
                 if ($category !== null) {
                     $categoryIds = $category->children->pluck('id')->push($category->id)->toArray();
-                    $q->whereIn('category_id', $categoryIds);
+                    $bq->whereIn('category_id', $categoryIds);
+                }
+                if ($q !== '') {
+                    $bq->whereHas('translations', function ($tq) use ($q) {
+                        $tq->where('name', 'LIKE', '%' . $q . '%')
+                           ->orWhere('short_description', 'LIKE', '%' . $q . '%');
+                    });
                 }
             })
             ->orderBy('name')
@@ -110,6 +127,8 @@ class ShopController extends Controller
             'priceMax',
             'view',
             'locale',
+            'q',
+            'isSearch',
         ));
     }
 }

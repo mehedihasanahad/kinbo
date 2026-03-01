@@ -2,14 +2,18 @@
 
 @php
     $isAllProducts = $category === null;
-    $catName = $isAllProducts
-        ? __('front.all_products')
-        : ($category->getTranslation($locale)?->name ?? $category->getTranslation('en')?->name ?? '');
-    $catMeta = $isAllProducts
+    $catName = $isSearch
+        ? __('front.search_results', ['q' => $q])
+        : ($isAllProducts
+            ? __('front.all_products')
+            : ($category->getTranslation($locale)?->name ?? $category->getTranslation('en')?->name ?? ''));
+    $catMeta = ($isSearch || $isAllProducts)
         ? ''
         : ($category->getTranslation($locale)?->meta_description ?? $category->getTranslation('en')?->meta_description ?? '');
-    $formAction = route('shop.category');
-    $resetUrl   = $isAllProducts ? route('shop.category') : route('shop.category', ['category' => $slug]);
+    $formAction = $isSearch ? route('shop.search') : route('shop.category');
+    $resetUrl   = $isSearch
+        ? route('shop.search', ['q' => $q])
+        : ($isAllProducts ? route('shop.category') : route('shop.category', ['category' => $slug]));
 @endphp
 
 @section('title', $catName . ' — ' . config('app.name'))
@@ -26,7 +30,9 @@
             </li>
             <li><span class="text-gray-300">/</span></li>
 
-            @if(! $isAllProducts)
+            @if($isSearch)
+                <li class="text-gray-900 font-medium">{{ __('front.search_results', ['q' => $q]) }}</li>
+            @elseif(! $isAllProducts)
                 <li>
                     <a href="{{ route('shop.category') }}"
                        class="hover:text-primary-600 transition-colors">{{ __('front.all_products') }}</a>
@@ -46,9 +52,11 @@
                     </li>
                     <li><span class="text-gray-300">/</span></li>
                 @endif
-            @endif
 
-            <li class="text-gray-900 font-medium">{{ $catName }}</li>
+                <li class="text-gray-900 font-medium">{{ $catName }}</li>
+            @else
+                <li class="text-gray-900 font-medium">{{ $catName }}</li>
+            @endif
         </ol>
     </div>
 </nav>
@@ -87,8 +95,10 @@
                       action="{{ $formAction }}"
                       id="filter-form">
 
-                    {{-- Preserve category, sort & view state across filter submissions --}}
-                    @if(! $isAllProducts)
+                    {{-- Preserve search query, category, sort & view state across filter submissions --}}
+                    @if($isSearch)
+                        <input type="hidden" name="q" value="{{ $q }}">
+                    @elseif(! $isAllProducts)
                         <input type="hidden" name="category" value="{{ $slug }}">
                     @endif
                     <input type="hidden" name="sort" value="{{ $sort }}">
@@ -309,7 +319,9 @@
                                   d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <p class="text-gray-500 font-medium mb-3">{{ __('front.no_products_found') }}</p>
+                    <p class="text-gray-500 font-medium mb-3">
+                        {{ $isSearch ? __('front.search_empty', ['q' => $q]) : __('front.no_products_found') }}
+                    </p>
                     <a href="{{ $resetUrl }}"
                        class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700
                               font-semibold transition-colors">

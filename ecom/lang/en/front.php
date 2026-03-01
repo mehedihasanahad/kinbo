@@ -116,6 +116,8 @@ return [
     'showing_results'     => 'Showing :from–:to of :total products',
     'all_products'        => 'All Products',
     'no_products_found'   => 'No products found for these filters.',
+    'search_results'      => 'Search results for ":q"',
+    'search_empty'        => 'No products found for ":q". Try a different keyword.',
     'pagination_prev'     => '← Previous',
     'pagination_next'     => 'Next →',
     'pagination_info'     => 'Showing :first–:last of :total results',

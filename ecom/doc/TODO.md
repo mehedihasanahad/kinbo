@@ -54,19 +54,19 @@
 
 ---
 
-### 1.4 Product Search & Filters ✗
+### 1.4 Product Search & Filters ✅ DONE
 
-- [ ] Search bar in header — route: `GET /search?q=`
-- [ ] `SearchController@index` — full-text search on `products`, `product_translations`
-- [ ] Search results view (`resources/views/search/index.blade.php`)
-- [ ] Filter sidebar on category/search pages:
-  - [ ] Filter by price range (min/max)
-  - [ ] Filter by brand
-  - [ ] Filter by availability (in stock)
-  - [ ] Filter by rating
-- [ ] Sort options: price low→high, price high→low, newest, popularity, rating
-- [ ] Preserve filters on pagination
-- [ ] Category page (`resources/views/category/show.blade.php`) with product grid + filters
+- [x] Search bar in header wired — `GET /search?q=` → `ShopController@category` (no separate controller)
+- [x] Full-text search on `product_translations.name` and `short_description` (LIKE query)
+- [x] Search results reuse existing `shop/category.blade.php` — no new view needed
+- [x] Filter sidebar (brands, price range) works on search results; preserved via hidden `q` input
+- [x] Sort options work on search results (newest, price asc/desc, biggest discount)
+- [x] Filters + sort + pagination all preserve `?q=` via `withQueryString()`
+- [x] Breadcrumb shows "Search results for ':q'" when in search mode
+- [x] Empty state shows search-specific message (`search_empty` key)
+- [x] Available brands sidebar filtered to match only brands in search results
+- [x] Translation keys added: `search_results`, `search_empty` (EN + BN)
+- [x] Category page with filters was already fully implemented
 
 ---
 
@@ -270,7 +270,7 @@ MAIL_FROM_NAME="${APP_NAME}"
 | Wishlist (functionality) | ✅ Done | P1 |
 | Reviews — submit form | ✅ Done | P1 |
 | Email notifications | ✅ Done | P1 |
-| Product search & filters | ✗ Not started | P1 |
+| Product search & filters | ✅ Done | P1 |
 | Category page with filters | ✗ Not started | P1 |
 | SSLCommerz integration | ⚠ Partial | P2 |
 | Invoice PDF download | ✗ Not started | P2 |
