@@ -32,6 +32,7 @@ class ProductController extends Controller
                 'brand',
                 'category.translations',
                 'variants.options',
+                'variants.images',
             ])
             ->findOrFail($translation->product_id);
 

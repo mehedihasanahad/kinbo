@@ -30,6 +30,11 @@ class ProductVariant extends Model
         return $this->hasMany(ProductVariantOption::class, 'variant_id');
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class, 'variant_id')->orderBy('sort_order');
+    }
+
     public function getEffectivePriceAttribute(): float
     {
         return $this->product->current_price + $this->price_modifier;

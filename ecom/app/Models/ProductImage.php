@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductImage extends Model
 {
-    protected $fillable = ['product_id', 'path', 'alt_text', 'sort_order', 'is_primary'];
+    protected $fillable = ['product_id', 'variant_id', 'path', 'alt_text', 'sort_order', 'is_primary'];
 
     protected function casts(): array
     {
@@ -19,5 +19,10 @@ class ProductImage extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
     }
 }

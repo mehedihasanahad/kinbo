@@ -231,6 +231,40 @@ class ProductResource extends Resource
                                 ->defaultItems(1)
                                 ->minItems(1)
                                 ->columnSpanFull(),
+
+                            Forms\Components\Repeater::make('images')
+                                ->relationship('images')
+                                ->label('Variant Images')
+                                ->schema([
+                                    Forms\Components\FileUpload::make('path')
+                                        ->label('Image')
+                                        ->image()
+                                        ->directory('products')
+                                        ->imageEditor()
+                                        ->imagePreviewHeight('100')
+                                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                        ->maxSize(2048)
+                                        ->required(),
+
+                                    Forms\Components\TextInput::make('alt_text')
+                                        ->label('Alt Text')
+                                        ->maxLength(191)
+                                        ->nullable()
+                                        ->placeholder('Describe the image'),
+
+                                    Forms\Components\TextInput::make('sort_order')
+                                        ->label('Order')
+                                        ->numeric()->integer()->default(0)->minValue(0),
+                                ])
+                                ->columns(3)
+                                ->addActionLabel('Add Variant Image')
+                                ->collapsible()
+                                ->defaultItems(0)
+                                ->columnSpanFull()
+                                ->mutateRelationshipDataBeforeCreateUsing(function (array $data, $record): array {
+                                    $data['product_id'] = $record->product_id;
+                                    return $data;
+                                }),
                         ])
                         ->columns(5)
                         ->addActionLabel('Add Variant')

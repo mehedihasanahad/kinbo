@@ -27,6 +27,11 @@
             }
         }
     }
+
+    // Merged image list: base product images + all variant images
+    $allImages = $product->images->concat(
+        $product->variants->flatMap(fn($v) => $v->images)->values()
+    );
 @endphp
 
 @section('title', $metaTitle)
@@ -74,9 +79,9 @@
         <div>
             {{-- Main image --}}
             <div class="relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 aspect-square mb-4 group">
-                @if($product->images->isNotEmpty())
+                @if($allImages->isNotEmpty())
                     <img id="main-image"
-                         src="{{ asset('storage/' . $product->images->first()->path) }}"
+                         src="{{ asset('storage/' . $allImages->first()->path) }}"
                          alt="{{ $productName }}"
                          class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105">
                 @else
@@ -96,11 +101,12 @@
                 @endif
             </div>
 
-            {{-- Thumbnail strip --}}
-            @if($product->images->count() > 1)
-                <div class="flex gap-2 flex-wrap">
-                    @foreach($product->images as $index => $image)
+            {{-- Thumbnail strip (base + all variant images) --}}
+            @if($allImages->count() > 1)
+                <div class="flex gap-2 flex-wrap" id="thumb-strip">
+                    @foreach($allImages as $index => $image)
                         <button onclick="swapMainImage('{{ asset('storage/' . $image->path) }}', this)"
+                                data-variant-id="{{ $image->variant_id ?? 'null' }}"
                                 class="thumb-btn w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200
                                        {{ $index === 0 ? 'border-primary-500' : 'border-gray-200 hover:border-primary-300' }}
                                        focus:outline-none focus:border-primary-500 shrink-0">
@@ -209,6 +215,7 @@
                                 'options' => $v->options->map(function($o) {
                                     return ['name' => $o->option_name, 'value' => $o->option_value];
                                 })->values(),
+                                'images'  => $v->images->map(fn($img) => asset('storage/' . $img->path))->values(),
                             ];
                         })->values());
                     @endphp
@@ -667,6 +674,33 @@ function applyVariant(variant) {
             atcBtn.classList.add('bg-primary-600', 'hover:bg-primary-700', 'active:bg-primary-800', 'cursor-pointer');
             atcBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
         }
+    }
+
+    // Update main image when variant selected
+    switchMainImageForVariant(variant.id, variant.images);
+}
+
+function switchMainImageForVariant(variantId, variantImages) {
+    const mainImg = document.getElementById('main-image');
+    if (!mainImg) return;
+
+    // If this variant has its own images, show the first one
+    // Otherwise keep the current main image unchanged
+    if (variantImages && variantImages.length > 0) {
+        const newSrc = variantImages[0];
+        mainImg.src = newSrc;
+
+        // Highlight the matching thumb, clear others
+        document.querySelectorAll('#thumb-strip .thumb-btn').forEach(b => {
+            const thumbSrc = b.querySelector('img')?.src;
+            if (thumbSrc === newSrc) {
+                b.classList.add('border-primary-500');
+                b.classList.remove('border-gray-200');
+            } else {
+                b.classList.remove('border-primary-500');
+                b.classList.add('border-gray-200');
+            }
+        });
     }
 }
 
