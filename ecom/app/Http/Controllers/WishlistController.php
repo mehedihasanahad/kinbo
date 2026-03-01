@@ -62,6 +62,16 @@ class WishlistController extends Controller
 
     public function moveToCart(Request $request, Product $product)
     {
+        // Products with variants require the user to choose options first
+        if ($product->variants()->exists()) {
+            $locale = app()->getLocale();
+            $translation = $product->getTranslation($locale) ?? $product->getTranslation('en');
+            $slug = $translation?->slug ?? $product->sku;
+
+            return redirect()->route('product.show', $slug)
+                ->with('info', __('front.select_options_to_add'));
+        }
+
         // Remove from wishlist
         auth()->user()->wishlist()
             ->where('product_id', $product->id)

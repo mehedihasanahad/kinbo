@@ -113,31 +113,24 @@
 
 ## Priority 3 — User Account & Profile
 
-### 3.1 Address Book Management UI ⚠ (model + checkout integration exist, no standalone CRUD)
+### 3.1 Address Book Management UI ✅ DONE
 
-- [ ] `UserAddressController` — `index()`, `store()`, `update()`, `destroy()`, `setDefault()`
-- [ ] Routes under `middleware('auth')`:
-    ```
-    GET    /account/addresses
-    POST   /account/addresses
-    PUT    /account/addresses/{address}
-    DELETE /account/addresses/{address}
-    POST   /account/addresses/{address}/default
-    ```
-- [ ] Address list view (`resources/views/account/addresses/index.blade.php`)
-- [ ] Add/Edit address form (modal or inline)
-- [ ] "Set as Default" button
-- [ ] Link from user account menu
+- [x] `UserAddressController` — `index()`, `store()`, `update()`, `destroy()`, `setDefault()`
+- [x] Routes under `middleware('auth')`: GET/POST/PUT/DELETE/POST-default all registered at `/account/addresses`
+- [x] Address list view (`resources/views/account/addresses/index.blade.php`)
+- [x] Add/Edit address form (modal with JS, pre-fills on edit)
+- [x] "Set as Default" button
+- [x] Link from user account nav dropdown
 
 ---
 
-### 3.2 Customer Dashboard / Account Hub ⚠ (orders + profile exist)
+### 3.2 Customer Dashboard / Account Hub ✅ DONE
 
-- [ ] Unified account dashboard (`resources/views/account/index.blade.php`)
-- [ ] Account navigation sidebar: Dashboard, Orders, Addresses, Wishlist, Reviews, Settings
-- [ ] "My Reviews" tab — list reviews the user has submitted
-- [ ] Profile picture upload (avatar stored in `public/avatars/`)
-- [ ] Account deletion confirmation flow
+- [x] Unified account dashboard (`resources/views/account/index.blade.php`) — stats cards + recent orders
+- [x] Account navigation sidebar: Dashboard, Orders, Addresses, Wishlist, Reviews (`account/partials/sidebar.blade.php`)
+- [x] "My Reviews" tab (`resources/views/account/reviews.blade.php`) — paginated list with product image, stars, status badge
+- [ ] Profile picture upload (avatar stored in `public/avatars/`) — deferred
+- [ ] Account deletion confirmation flow — deferred
 
 ---
 

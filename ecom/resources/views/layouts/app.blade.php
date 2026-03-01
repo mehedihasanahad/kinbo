@@ -137,13 +137,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
-                        <div class="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                            <a href="{{ $trackUrl }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl">{{ __('front.my_orders') }}</a>
+                        <div class="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                            <a href="{{ route('account.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl">{{ __('front.my_account') }}</a>
+                            <a href="{{ $trackUrl }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">{{ __('front.my_orders') }}</a>
+                            <a href="{{ route('account.addresses') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">{{ __('front.address_book') }}</a>
                             <div class="border-t border-gray-100 my-0.5"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-b-xl">
-                                    Sign Out
+                                    {{ __('front.sign_out') }}
                                 </button>
                             </form>
                         </div>
