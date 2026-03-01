@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Banner;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\ProductImage;
+use App\Observers\BannerObserver;
+use App\Observers\BrandObserver;
+use App\Observers\CategoryObserver;
+use App\Observers\ProductImageObserver;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Image optimization observers
+        ProductImage::observe(ProductImageObserver::class);
+        Banner::observe(BannerObserver::class);
+        Brand::observe(BrandObserver::class);
+        Category::observe(CategoryObserver::class);
+
         // Share google login flag with all views (needed in child views like auth/login)
         View::share('googleLoginEnabled',
             (bool) \App\Models\Setting::get('google_login_enabled', '0')

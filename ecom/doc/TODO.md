@@ -194,7 +194,7 @@
 - [ ] Auto-regenerate on product/category create/update (Observer or job)
 - [ ] Route: `GET /sitemap.xml`
 
-### 5.3 Image Optimization ✗
+### 5.3 Image Optimization ✅ DONE
 
 - [ ] Install: `composer require intervention/image`
 - [ ] Resize + compress product images on upload (max 1200px, WebP conversion)

@@ -83,7 +83,7 @@
                 @if($siteLogo)
                     <img src="{{ asset('storage/' . $siteLogo) }}"
                          alt="{{ config('app.name', 'ShopZone') }}"
-                         class="h-9 w-auto object-contain">
+                         class="h-16 max-w-48 w-auto object-contain">
                 @else
                     <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
