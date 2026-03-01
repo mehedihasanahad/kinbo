@@ -206,33 +206,46 @@
     </div>
 
     @if($categories->isNotEmpty())
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 lg:gap-5">
             @foreach($categories as $category)
                 @php
                     $t = $category->getTranslation(app()->getLocale()) ?? $category->getTranslation('en');
                     $catSlug = $t?->slug;
                 @endphp
                 <a href="{{ !empty($catSlug) ? route('shop.category', ['category' => $catSlug]) : '#' }}"
-                   class="group relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border border-gray-100 hover:border-primary-300 hover:shadow-lg transition-all duration-200 p-6 flex flex-col items-center text-center">
+                   class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 aspect-4/3 block">
+
+                    {{-- Background image or gradient fallback --}}
                     @if($category->image)
                         <img src="{{ asset('storage/' . $category->image) }}"
                              alt="{{ $t?->name ?? 'Category' }}"
-                             class="w-16 h-16 object-contain mb-3 group-hover:scale-110 transition-transform duration-200">
+                             class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
                     @else
-                        <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mb-3 group-hover:bg-primary-200 transition-colors">
-                            <svg class="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="absolute inset-0 bg-linear-to-br from-primary-400 to-primary-700"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                             </svg>
                         </div>
                     @endif
-                    <span class="font-semibold text-sm text-gray-800 group-hover:text-primary-700 transition-colors">
-                        {{ $t?->name ?? 'Category' }}
-                    </span>
-                    @if($category->children->isNotEmpty())
-                        <span class="text-xs text-gray-400 mt-0.5">
-                            {{ trans('front.sub_categories', ['count' => $category->children->count()]) }}
-                        </span>
-                    @endif
+
+                    {{-- Dark gradient overlay at bottom --}}
+                    <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent"></div>
+
+                    {{-- Text pinned to bottom --}}
+                    <div class="absolute bottom-0 left-0 right-0 p-3.5">
+                        <p class="font-bold text-white text-sm sm:text-base leading-tight drop-shadow-sm group-hover:text-primary-200 transition-colors duration-200">
+                            {{ $t?->name ?? 'Category' }}
+                        </p>
+                        @if($category->children->isNotEmpty())
+                            <p class="text-xs text-white/70 mt-0.5">
+                                {{ trans('front.sub_categories', ['count' => $category->children->count()]) }}
+                            </p>
+                        @endif
+                    </div>
+
+                    {{-- Hover shine border --}}
+                    <div class="absolute inset-0 rounded-2xl ring-2 ring-inset ring-white/0 group-hover:ring-white/20 transition-all duration-300"></div>
                 </a>
             @endforeach
         </div>
