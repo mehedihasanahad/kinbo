@@ -213,14 +213,16 @@
                                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.sender_number', ['method' => 'bKash']) }} <span class="text-red-500">*</span></label>
                                         <input type="text" name="sender_number" value="{{ old('sender_number') }}"
                                                placeholder="01XXXXXXXXX"
-                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('sender_number') border-red-400 @enderror">
+                                               {{ old('payment_method') !== 'bkash' ? 'disabled' : '' }}
+                                               class="w-full border {{ $errors->has('sender_number') ? 'border-red-400' : 'border-gray-200' }} rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
                                         @error('sender_number')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.transaction_id') }} <span class="text-red-500">*</span></label>
                                         <input type="text" name="transaction_id" value="{{ old('transaction_id') }}"
                                                placeholder="TrxID"
-                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('transaction_id') border-red-400 @enderror">
+                                               {{ old('payment_method') !== 'bkash' ? 'disabled' : '' }}
+                                               class="w-full border {{ $errors->has('transaction_id') ? 'border-red-400' : 'border-gray-200' }} rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
                                         @error('transaction_id')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                                     </div>
                                 </div>
@@ -256,13 +258,15 @@
                                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.sender_number', ['method' => 'Nagad']) }} <span class="text-red-500">*</span></label>
                                         <input type="text" name="sender_number" value="{{ old('sender_number') }}"
                                                placeholder="01XXXXXXXXX"
-                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
+                                               {{ old('payment_method') !== 'nagad' ? 'disabled' : '' }}
+                                               class="nagad-field w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.transaction_id') }} <span class="text-red-500">*</span></label>
                                         <input type="text" name="transaction_id" value="{{ old('transaction_id') }}"
                                                placeholder="TrxID"
-                                               class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
+                                               {{ old('payment_method') !== 'nagad' ? 'disabled' : '' }}
+                                               class="nagad-field w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400">
                                     </div>
                                 </div>
                                 <div>
@@ -533,11 +537,16 @@ function fetchShippingRate(district) {
     });
 }
 
-// Payment method toggle
+// Payment method toggle — show/hide panel AND enable/disable inputs to prevent duplicate name submission
 function togglePaymentFields(method) {
     ['bkash', 'nagad'].forEach(m => {
-        const el = document.getElementById('fields-' + m);
-        if (el) el.classList.toggle('hidden', m !== method);
+        const panel = document.getElementById('fields-' + m);
+        if (!panel) return;
+        const active = m === method;
+        panel.classList.toggle('hidden', !active);
+        panel.querySelectorAll('input[type="text"], input[type="file"]').forEach(input => {
+            input.disabled = !active;
+        });
     });
 }
 

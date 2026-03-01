@@ -34,12 +34,13 @@ class SettingsPage extends Page
     public function mount(): void
     {
         $this->general = [
-            'site_name'        => Setting::get('site_name', config('app.name')),
-            'site_tagline'     => Setting::get('site_tagline', ''),
-            'site_description' => Setting::get('site_description', ''),
-            'default_locale'   => Setting::get('default_locale', 'en'),
-            'currency'         => Setting::get('currency', 'BDT'),
-            'currency_symbol'  => Setting::get('currency_symbol', '৳'),
+            'site_name'             => Setting::get('site_name', config('app.name')),
+            'site_tagline'          => Setting::get('site_tagline', ''),
+            'site_description'      => Setting::get('site_description', ''),
+            'default_locale'        => Setting::get('default_locale', 'en'),
+            'currency'              => Setting::get('currency', 'BDT'),
+            'currency_symbol'       => Setting::get('currency_symbol', '৳'),
+            'announcement_bar_text' => Setting::get('announcement_bar_text', ''),
         ];
 
         $this->contact = [
@@ -119,6 +120,15 @@ class SettingsPage extends Page
                 ->options(['en' => 'English', 'bn' => 'Bengali'])->required(),
             Forms\Components\TextInput::make('currency')->maxLength(10)->default('BDT'),
             Forms\Components\TextInput::make('currency_symbol')->maxLength(5)->default('৳'),
+
+            Forms\Components\Section::make('Announcement Bar')->schema([
+                Forms\Components\TextInput::make('announcement_bar_text')
+                    ->label('Announcement Text')
+                    ->nullable()
+                    ->maxLength(500)
+                    ->columnSpanFull()
+                    ->helperText('Shown in the top bar. Leave blank to hide. Supports basic HTML like <strong>. E.g.: Free shipping over ৳999 &amp;nbsp;|&amp;nbsp; Use code &lt;strong&gt;WELCOME10&lt;/strong&gt; for 10% off'),
+            ])->columnSpanFull(),
         ])->statePath('general')->columns(2);
     }
 

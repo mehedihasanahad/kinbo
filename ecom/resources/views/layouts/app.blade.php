@@ -20,11 +20,16 @@
 <body class="bg-white text-gray-900 antialiased">
 
 {{-- ── Top announcement bar ── --}}
+@php
+    $trackUrl = auth()->check() ? route('orders.index') : route('login');
+@endphp
+
+@if($announcementBarText)
 <div class="bg-primary-950 text-primary-100 text-xs py-2 hidden sm:block">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        <span>{!! __('front.free_shipping_bar') !!}</span>
+        <span>{!! $announcementBarText !!}</span>
         <div class="flex items-center gap-5">
-            <a href="#" class="hover:text-white transition-colors">{{ __('front.track_order') }}</a>
+            <a href="{{ $trackUrl }}" class="hover:text-white transition-colors">{{ __('front.track_order') }}</a>
             <a href="#" class="hover:text-white transition-colors">{{ __('front.help') }}</a>
 
             {{-- Language switcher --}}
@@ -41,6 +46,7 @@
         </div>
     </div>
 </div>
+@endif
 
 {{-- ── Main header ── --}}
 <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
@@ -114,8 +120,7 @@
                             </svg>
                         </button>
                         <div class="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                            <a href="#" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl">My Account</a>
-                            <a href="#" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">My Orders</a>
+                            <a href="{{ $trackUrl }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl">{{ __('front.my_orders') }}</a>
                             <div class="border-t border-gray-100 my-0.5"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
