@@ -207,6 +207,36 @@
                 </div>
             @endif
 
+            {{-- Return request banner (if submitted) --}}
+            @if($order->returnRequest)
+                @php
+                    $retColors = ['pending' => 'bg-amber-50 border-amber-200 text-amber-800', 'approved' => 'bg-emerald-50 border-emerald-200 text-emerald-800', 'rejected' => 'bg-red-50 border-red-200 text-red-800'];
+                    $retColor  = $retColors[$order->returnRequest->status] ?? 'bg-gray-50 border-gray-200 text-gray-700';
+                @endphp
+                <div class="{{ $retColor }} border rounded-2xl px-5 py-4 mb-6 flex items-center gap-3">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                    </svg>
+                    <div class="flex-1">
+                        <span class="text-sm font-semibold">{{ __('front.return_request_status') }}:</span>
+                        <span class="text-sm ml-1">{{ __('front.return_status_' . $order->returnRequest->status) }}</span>
+                    </div>
+                    <a href="{{ route('orders.return', $order) }}" class="text-xs font-semibold underline">
+                        {{ __('front.view_details') }}
+                    </a>
+                </div>
+            @elseif($order->status === 'delivered' && ! $order->isReturnable())
+                {{-- Return window expired --}}
+                <div class="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-6 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="text-sm text-gray-500">
+                        {{ __('front.return_window_expired', ['days' => (int) \App\Models\Setting::get('return_window_days', '7')]) }}
+                    </p>
+                </div>
+            @endif
+
             {{-- Actions --}}
             <div class="flex flex-col sm:flex-row gap-3">
                 <a href="{{ route('orders.index') }}"
@@ -224,10 +254,20 @@
                     </svg>
                     {{ __('front.download_invoice') }}
                 </a>
-                <a href="{{ route('home') }}"
-                   class="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
-                    {{ __('front.continue_shopping') }}
-                </a>
+                @if($order->isReturnable() && ! $order->returnRequest)
+                    <a href="{{ route('orders.return', $order) }}"
+                       class="flex-1 flex items-center justify-center gap-2 border-2 border-gray-200 hover:border-red-300 text-gray-600 hover:text-red-600 font-semibold py-3 rounded-xl transition-all text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                        </svg>
+                        {{ __('front.request_return') }}
+                    </a>
+                @else
+                    <a href="{{ route('home') }}"
+                       class="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
+                        {{ __('front.continue_shopping') }}
+                    </a>
+                @endif
             </div>
 
         </div>

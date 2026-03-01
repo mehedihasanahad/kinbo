@@ -96,6 +96,11 @@ class Order extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function returnRequest(): HasOne
+    {
+        return $this->hasOne(ReturnRequest::class);
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;
@@ -104,6 +109,27 @@ class Order extends Model
     public function isCancellable(): bool
     {
         return in_array($this->status, [self::STATUS_PENDING, self::STATUS_PROCESSING]);
+    }
+
+    public function isReturnable(): bool
+    {
+        if ($this->status !== self::STATUS_DELIVERED) {
+            return false;
+        }
+
+        if (! Setting::get('returns_enabled', '1')) {
+            return false;
+        }
+
+        $windowDays = (int) Setting::get('return_window_days', '7');
+
+        // Prefer the history timestamp; fall back to order updated_at
+        $deliveredAt = $this->statusHistory()
+            ->where('status', self::STATUS_DELIVERED)
+            ->orderByDesc('created_at')
+            ->value('created_at') ?? $this->updated_at;
+
+        return now()->diffInDays($deliveredAt) <= $windowDays;
     }
 
     public static function generateOrderNumber(): string

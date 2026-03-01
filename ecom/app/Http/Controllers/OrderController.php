@@ -21,7 +21,7 @@ class OrderController extends Controller
     {
         abort_if($order->user_id !== auth()->id(), 403);
 
-        $order->load(['items.product.translations', 'items.variant', 'manualPayment', 'statusHistory', 'shippingRate']);
+        $order->load(['items.product.translations', 'items.variant', 'manualPayment', 'statusHistory', 'shippingRate', 'returnRequest']);
 
         return view('orders.show', compact('order'));
     }

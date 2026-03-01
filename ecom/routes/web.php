@@ -6,6 +6,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ShopController;
@@ -38,6 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+    Route::get('/orders/{order}/return',  [ReturnController::class, 'show'])->name('orders.return');
+    Route::post('/orders/{order}/return', [ReturnController::class, 'store'])->name('orders.return.store');
 
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::post('/reviews/{review}/vote', [ReviewController::class, 'vote'])->name('reviews.vote');

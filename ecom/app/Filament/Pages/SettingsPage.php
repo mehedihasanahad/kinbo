@@ -25,6 +25,7 @@ class SettingsPage extends Page
     public array $general  = [];
     public array $contact  = [];
     public array $payment  = [];
+    public array $policy   = [];
     public array $social   = [];
 
     // Branding — kept flat (no statePath) so FileUpload can store files properly
@@ -57,9 +58,15 @@ class SettingsPage extends Page
             'nagad_merchant_name'       => Setting::get('nagad_merchant_name', env('NAGAD_MERCHANT_NAME', '')),
             'sslcommerz_store_id'       => Setting::get('sslcommerz_store_id', ''),
             'sslcommerz_store_password' => Setting::get('sslcommerz_store_password', ''),
-            'sslcommerz_is_live'        => Setting::get('sslcommerz_is_live', '0'),
-            'cod_enabled'               => Setting::get('cod_enabled', '1'),
+            'sslcommerz_is_live'        => (bool) Setting::get('sslcommerz_is_live', '0'),
+            'cod_enabled'               => (bool) Setting::get('cod_enabled', '1'),
             'free_shipping_above'       => Setting::get('free_shipping_above', ''),
+        ];
+
+        $this->policy = [
+            'returns_enabled'      => (bool) Setting::get('returns_enabled', '1'),
+            'return_window_days'   => Setting::get('return_window_days', '7'),
+            'refund_days'          => Setting::get('refund_days', '5'),
         ];
 
         $this->social = [
@@ -80,7 +87,7 @@ class SettingsPage extends Page
 
     protected function getForms(): array
     {
-        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'socialForm'];
+        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'policyForm', 'socialForm'];
     }
 
     public function brandingForm(Form $form): Form
@@ -177,6 +184,34 @@ class SettingsPage extends Page
         ])->statePath('payment');
     }
 
+    public function policyForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Section::make('Return & Refund Policy')->schema([
+                Forms\Components\Toggle::make('returns_enabled')
+                    ->label('Allow Returns')
+                    ->helperText('When disabled, customers cannot submit return requests.')
+                    ->inline(false),
+                Forms\Components\TextInput::make('return_window_days')
+                    ->label('Return Window (days)')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(90)
+                    ->suffix('days')
+                    ->helperText('Number of days after delivery a customer can request a return.')
+                    ->required(),
+                Forms\Components\TextInput::make('refund_days')
+                    ->label('Refund Processing Time (days)')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(30)
+                    ->suffix('days')
+                    ->helperText('Shown to customers in the approval email: "Refund within X business days."')
+                    ->required(),
+            ])->columns(3),
+        ])->statePath('policy');
+    }
+
     public function socialForm(Form $form): Form
     {
         return $form->schema([
@@ -210,7 +245,10 @@ class SettingsPage extends Page
             Setting::set($key, $value, 'contact');
         }
         foreach ($this->payment as $key => $value) {
-            Setting::set($key, $value, 'payment');
+            Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'payment');
+        }
+        foreach ($this->policy as $key => $value) {
+            Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'policy');
         }
         foreach ($this->social as $key => $value) {
             Setting::set($key, $value, 'social');

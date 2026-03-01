@@ -99,7 +99,7 @@
 
 ---
 
-### 2.3 Return / Refund Flow ✗
+### 2.3 Return / Refund Flow ✅ DONE
 
 - [ ] `ReturnRequest` model and migration (`order_id`, `user_id`, `reason`, `status`, `admin_notes`)
 - [ ] "Request Return" button on order detail (within allowed window, e.g. 7 days after delivery)
