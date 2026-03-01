@@ -8,6 +8,30 @@
     <title>@yield('title', config('app.name', 'ShopZone'))</title>
     <meta name="description" content="@yield('meta_description', 'Your one-stop online shop for the best products.')">
 
+    {{-- Favicon --}}
+    @php $favicon = \App\Models\Setting::get('site_favicon', ''); @endphp
+    @if($favicon)
+        <link rel="icon" href="{{ Storage::url($favicon) }}" type="image/png">
+    @endif
+
+    {{-- Open Graph --}}
+    <meta property="og:type"        content="@yield('og_type', 'website')">
+    <meta property="og:site_name"   content="{{ config('app.name') }}">
+    <meta property="og:title"       content="@yield('og_title', @yield('title', config('app.name')))">
+    <meta property="og:description" content="@yield('og_description', @yield('meta_description', 'Your one-stop online shop for the best products.'))">
+    <meta property="og:url"         content="{{ url()->current() }}">
+    <meta property="og:image"       content="@yield('og_image', asset('images/og-default.png'))">
+    <meta property="og:locale"      content="{{ str_replace('-', '_', app()->getLocale()) }}">
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="@yield('og_title', @yield('title', config('app.name')))">
+    <meta name="twitter:description" content="@yield('og_description', @yield('meta_description', 'Your one-stop online shop for the best products.'))">
+    <meta name="twitter:image"       content="@yield('og_image', asset('images/og-default.png'))">
+
+    {{-- Canonical --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700&display=swap" rel="stylesheet"/>
 

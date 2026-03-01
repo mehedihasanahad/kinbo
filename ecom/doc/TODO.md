@@ -180,13 +180,13 @@
 
 ## Priority 5 — SEO & Performance
 
-### 5.1 Open Graph & Structured Data ✗
+### 5.1 Open Graph & Structured Data ✅ DONE
 
 - [ ] Open Graph meta tags in `layouts/app.blade.php` (title, description, image)
 - [ ] Product pages: OG image = primary product image
 - [ ] JSON-LD structured data (`Product` schema) on product detail page
 
-### 5.2 Sitemap ✗
+### 5.2 Sitemap ✅ DONE
 
 - [ ] Install: `composer require spatie/laravel-sitemap`
 - [ ] `SitemapController@generate` or Artisan command

@@ -39,6 +39,58 @@
     @section('meta_description', $metaDesc)
 @endif
 
+@php
+    $ogImage = $product->primaryImage?->image_path
+        ? Storage::url($product->primaryImage->image_path)
+        : asset('images/og-default.png');
+    $productUrl = url()->current();
+    $ogDesc = $metaDesc ?: ($currentTranslation?->short_description ?? '');
+@endphp
+@section('og_type', 'product')
+@section('og_title', $metaTitle)
+@section('og_description', $ogDesc)
+@section('og_image', $ogImage)
+
+@push('styles')
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "{{ addslashes($productName) }}",
+    "description": "{{ addslashes(strip_tags($ogDesc)) }}",
+    "url": "{{ $productUrl }}",
+    "sku": "{{ $product->sku }}",
+    @if($product->primaryImage?->image_path)
+    "image": "{{ $ogImage }}",
+    @endif
+    @if($product->brand)
+    "brand": {
+        "@type": "Brand",
+        "name": "{{ addslashes($product->brand->name) }}"
+    },
+    @endif
+    "offers": {
+        "@type": "Offer",
+        "url": "{{ $productUrl }}",
+        "priceCurrency": "{{ \App\Models\Setting::get('currency', 'BDT') }}",
+        "price": "{{ number_format((float) $product->current_price, 2, '.', '') }}",
+        "availability": "{{ $product->is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
+        "seller": {
+            "@type": "Organization",
+            "name": "{{ addslashes(config('app.name')) }}"
+        }
+    }
+    @if($averageRating > 0)
+    ,"aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ number_format($averageRating, 1) }}",
+        "reviewCount": "{{ $reviews->count() }}"
+    }
+    @endif
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- ── Breadcrumb ──────────────────────────────────────────────────────────── --}}
