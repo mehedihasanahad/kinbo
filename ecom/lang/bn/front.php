@@ -212,6 +212,7 @@ return [
     'payment_method_bkash'         => 'বিকাশ',
     'payment_method_nagad'         => 'নগদ',
     'order_items'                  => 'অর্ডারের পণ্যসমূহ',
+    'shipping_unavailable'         => 'এই জেলায় শিপিং পাওয়া যায় না। অনুগ্রহ করে অন্য জেলা বেছে নিন।',
     'shipping_address'             => 'শিপিং ঠিকানা',
     'order_timeline'               => 'অর্ডার টাইমলাইন',
     'payment_info'                 => 'পেমেন্ট তথ্য',

@@ -190,6 +190,7 @@ return [
     'new_address'                  => 'Enter new address',
     'checkout_error'               => 'Could not place your order. Please try again.',
     'estimated_delivery'           => ':min–:max days',
+    'shipping_unavailable'         => 'Shipping not available to this district. Please select another.',
     'ship_name'                    => 'Full Name',
     'ship_phone'                   => 'Phone Number',
     'ship_address'                 => 'Address',

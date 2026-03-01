@@ -143,13 +143,24 @@
 
                     <input type="hidden" name="shipping_rate_id" id="shipping-rate-id" value="{{ old('shipping_rate_id') }}">
 
-                    <div id="shipping-result"
-                         class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500">
-                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {{-- Placeholder shown before district is selected --}}
+                    <div id="shipping-placeholder" class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-400">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span id="shipping-label">{{ __('front.select_district') }}</span>
+                        <span>{{ __('front.select_district') }}</span>
                     </div>
+
+                    {{-- Unavailable notice --}}
+                    <div id="shipping-unavailable" class="hidden items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>{{ __('front.shipping_unavailable') }}</span>
+                    </div>
+
+                    {{-- Rate options (rendered by JS) --}}
+                    <div id="shipping-rates" class="hidden space-y-3"></div>
                 </div>
 
                 {{-- ── STEP 3: Payment Method ── --}}
@@ -424,20 +435,47 @@ function fillAddress(data) {
     fetchShippingRate(data.district);
 }
 
-// District change → fetch shipping rate
+// District change → fetch shipping rates
 document.getElementById('district-select').addEventListener('change', function () {
     fetchShippingRate(this.value);
 });
 
+function showShippingPanel(which) {
+    document.getElementById('shipping-placeholder').classList.toggle('hidden', which !== 'placeholder');
+    document.getElementById('shipping-unavailable').classList.toggle('hidden', which !== 'unavailable');
+    document.getElementById('shipping-rates').classList.toggle('hidden', which !== 'rates');
+}
+
+function selectRate(rateId, cost) {
+    document.getElementById('shipping-rate-id').value = rateId;
+    shippingCost = cost;
+
+    // Highlight selected card
+    document.querySelectorAll('.shipping-rate-card').forEach(card => {
+        const selected = card.dataset.rateId == rateId;
+        card.classList.toggle('border-primary-500', selected);
+        card.classList.toggle('bg-primary-50', selected);
+        card.classList.toggle('border-gray-200', !selected);
+    });
+
+    // Update summary
+    const costEl  = document.getElementById('shipping-cost-display');
+    const totalEl = document.getElementById('total-display');
+    costEl.textContent  = cost > 0 ? '৳' + Math.round(cost).toLocaleString('en-US') : '{{ __('front.free_shipping') }}';
+    costEl.classList.remove('text-gray-400');
+    totalEl.textContent = '৳' + (subtotalBase + cost).toLocaleString('en-US', {maximumFractionDigits: 0});
+}
+
 function fetchShippingRate(district) {
     if (!district) return;
 
-    const label  = document.getElementById('shipping-label');
-    const rateId = document.getElementById('shipping-rate-id');
-    const costEl = document.getElementById('shipping-cost-display');
-    const totalEl = document.getElementById('total-display');
-
-    label.textContent = '{{ __('front.calculating') }}';
+    // Reset
+    document.getElementById('shipping-rate-id').value = '';
+    shippingCost = 0;
+    document.getElementById('shipping-cost-display').textContent = '{{ __('front.calculating') }}';
+    document.getElementById('total-display').textContent = '৳' + subtotalBase.toLocaleString('en-US', {maximumFractionDigits: 0});
+    showShippingPanel('placeholder');
+    document.getElementById('shipping-placeholder').querySelector('span').textContent = '{{ __('front.calculating') }}';
 
     fetch('{{ route('checkout.shipping-rate') }}', {
         method: 'POST',
@@ -445,35 +483,53 @@ function fetchShippingRate(district) {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         },
-        body: JSON.stringify({ district: district }),
+        body: JSON.stringify({ district }),
     })
     .then(r => r.json())
     .then(data => {
-        rateId.value = data.rate_id || '';
-        shippingCost = parseFloat(data.cost) || 0;
-
-        let labelText = data.method_name;
-        if (shippingCost > 0) {
-            labelText += ' — ৳' + Math.round(shippingCost).toLocaleString('en-US');
-        } else {
-            labelText += ' — {{ __('front.free_shipping') }}';
-        }
-        if (data.estimated_days_min && data.estimated_days_max) {
-            labelText += ' (' + data.estimated_days_min + '–' + data.estimated_days_max + ' days)';
+        if (!data.available || !data.rates.length) {
+            showShippingPanel('unavailable');
+            document.getElementById('shipping-cost-display').textContent = '—';
+            return;
         }
 
-        label.textContent = labelText;
-        document.getElementById('shipping-result').classList.replace('border-gray-200', 'border-primary-200');
-        document.getElementById('shipping-result').classList.replace('bg-gray-50', 'bg-primary-50');
+        // Build rate cards
+        const container = document.getElementById('shipping-rates');
+        container.innerHTML = '';
+        data.rates.forEach((rate, i) => {
+            const costLabel = rate.cost > 0
+                ? '৳' + Math.round(rate.cost).toLocaleString('en-US')
+                : '{{ __('front.free_shipping') }}';
+            const daysLabel = (rate.estimated_days_min !== null && rate.estimated_days_max !== null)
+                ? (rate.estimated_days_min === rate.estimated_days_max
+                    ? rate.estimated_days_min + ' day' + (rate.estimated_days_min !== 1 ? 's' : '')
+                    : rate.estimated_days_min + '–' + rate.estimated_days_max + ' days')
+                : '';
 
-        costEl.textContent = shippingCost > 0 ? '৳' + Math.round(shippingCost).toLocaleString('en-US') : '{{ __('front.free_shipping') }}';
-        costEl.classList.remove('text-gray-400');
+            const card = document.createElement('label');
+            card.className = 'shipping-rate-card flex items-center justify-between border-2 border-gray-200 rounded-xl px-4 py-3 cursor-pointer transition-all hover:border-primary-300';
+            card.dataset.rateId = rate.id;
+            card.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <input type="radio" name="_shipping_rate_radio" value="${rate.id}" class="accent-primary-600" ${i === 0 ? 'checked' : ''}>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800">${rate.method_name}</p>
+                        ${daysLabel ? `<p class="text-xs text-gray-400">${daysLabel}</p>` : ''}
+                    </div>
+                </div>
+                <span class="text-sm font-bold text-gray-900">${costLabel}</span>
+            `;
+            card.addEventListener('click', () => selectRate(rate.id, rate.cost));
+            container.appendChild(card);
+        });
 
-        totalEl.textContent = '৳' + (subtotalBase + shippingCost).toLocaleString('en-US', {maximumFractionDigits: 0});
+        showShippingPanel('rates');
+        // Auto-select first rate
+        selectRate(data.rates[0].id, data.rates[0].cost);
     })
     .catch(() => {
-        label.textContent = '{{ __('front.free_shipping') }}';
-        costEl.textContent = '{{ __('front.free_shipping') }}';
+        showShippingPanel('unavailable');
+        document.getElementById('shipping-cost-display').textContent = '—';
     });
 }
 
@@ -485,8 +541,21 @@ function togglePaymentFields(method) {
     });
 }
 
-// Prevent double submit
-document.getElementById('checkout-form').addEventListener('submit', function () {
+// Guard submit: require shipping rate selected
+document.getElementById('checkout-form').addEventListener('submit', function (e) {
+    const rateId = document.getElementById('shipping-rate-id').value;
+    const unavailable = !document.getElementById('shipping-rates').classList.contains('hidden');
+    if (!rateId) {
+        e.preventDefault();
+        // Scroll to shipping section and flash it
+        const ratesEl = document.getElementById('shipping-unavailable').classList.contains('hidden')
+            ? document.getElementById('shipping-placeholder')
+            : document.getElementById('shipping-unavailable');
+        ratesEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ratesEl.classList.add('ring-2', 'ring-red-400');
+        setTimeout(() => ratesEl.classList.remove('ring-2', 'ring-red-400'), 2000);
+        return;
+    }
     const btn = document.getElementById('place-order-btn');
     btn.disabled = true;
     btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';

@@ -75,39 +75,31 @@ class CheckoutController extends Controller
             ->get()
             ->sum('line_total');
 
-        $zoneDistrict = ShippingZoneDistrict::where('district_name', $request->district)->first();
+        $zoneDistrict = ShippingZoneDistrict::with('zone')
+            ->where('district_name', $request->district)
+            ->whereHas('zone', fn($q) => $q->where('is_active', true))
+            ->first();
 
         if (! $zoneDistrict) {
-            return response()->json([
-                'rate_id'            => null,
-                'method_name'        => __('front.free_shipping'),
-                'cost'               => 0,
-                'estimated_days_min' => null,
-                'estimated_days_max' => null,
-            ]);
+            return response()->json(['available' => false, 'rates' => []]);
         }
 
-        $rate = $zoneDistrict->zone->rates()->active()->first();
+        $rates = $zoneDistrict->zone->rates()->active()->get()->map(function ($rate) use ($subtotal) {
+            $cost = $rate->isFreeFor($subtotal) ? 0 : (float) $rate->cost;
+            return [
+                'id'                 => $rate->id,
+                'method_name'        => $rate->method_name,
+                'cost'               => $cost,
+                'estimated_days_min' => $rate->estimated_days_min,
+                'estimated_days_max' => $rate->estimated_days_max,
+            ];
+        });
 
-        if (! $rate) {
-            return response()->json([
-                'rate_id'            => null,
-                'method_name'        => __('front.free_shipping'),
-                'cost'               => 0,
-                'estimated_days_min' => null,
-                'estimated_days_max' => null,
-            ]);
+        if ($rates->isEmpty()) {
+            return response()->json(['available' => false, 'rates' => []]);
         }
 
-        $cost = $rate->isFreeFor($subtotal) ? 0 : (float) $rate->cost;
-
-        return response()->json([
-            'rate_id'            => $rate->id,
-            'method_name'        => $rate->method_name,
-            'cost'               => $cost,
-            'estimated_days_min' => $rate->estimated_days_min,
-            'estimated_days_max' => $rate->estimated_days_max,
-        ]);
+        return response()->json(['available' => true, 'rates' => $rates]);
     }
 
     public function applyCoupon(Request $request)
