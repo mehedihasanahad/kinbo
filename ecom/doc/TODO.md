@@ -148,7 +148,7 @@
 
 ## Priority 4 — Admin Panel Additions
 
-### 4.1 Reporting & Analytics ✗
+### 4.1 Reporting & Analytics ✅ DONE
 
 - [ ] Sales report: revenue by date range, with chart
 - [ ] Orders report: order counts by status
@@ -166,16 +166,6 @@
 - [ ] Gate checks in Filament resources (`canAccess()`, `canCreate()`, etc.)
 - [ ] Staff management UI in Filament (assign roles to users)
 - [ ] Prevent non-admin staff from accessing settings page
-
----
-
-### 4.3 Inventory Management Enhancements ⚠
-
-- [ ] **Low stock alert**: admin notification when `stock <= low_stock_threshold`
-    - [ ] Add `low_stock_threshold` field to `products` table
-    - [ ] Queue job / scheduled command to check and notify
-- [ ] **Stock audit log**: track every stock change with reason (order, manual edit, return)
-- [ ] Bulk stock update tool in `ProductResource`
 
 ---
 

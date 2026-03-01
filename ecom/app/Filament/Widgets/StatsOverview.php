@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Carbon;
 
 class StatsOverview extends BaseWidget
 {
@@ -14,24 +15,54 @@ class StatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalRevenue = Order::where('payment_status', 'paid')->sum('total_amount');
-        $pendingOrders = Order::where('status', 'pending')->count();
-        $totalOrders = Order::count();
-        $totalProducts = Product::active()->count();
-        $totalUsers = User::where('is_active', true)->count();
-        $lowStock = Product::active()->where('stock', '>', 0)
-            ->whereColumn('stock', '<=', 'low_stock_threshold')->count();
+        $totalRevenue   = Order::where('payment_status', 'paid')->sum('total_amount');
+        $pendingOrders  = Order::where('status', 'pending')->count();
+        $totalOrders    = Order::count();
+        $totalProducts  = Product::active()->count();
+        $totalUsers     = User::where('is_active', true)->count();
+        $lowStock       = Product::active()->where('stock', '>', 0)
+                            ->whereColumn('stock', '<=', 'low_stock_threshold')->count();
+
+        // Month-over-month revenue comparison
+        $thisMonth    = Order::where('payment_status', 'paid')
+                            ->whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year)
+                            ->sum('total_amount');
+        $lastMonth    = Order::where('payment_status', 'paid')
+                            ->whereMonth('created_at', now()->subMonth()->month)
+                            ->whereYear('created_at', now()->subMonth()->year)
+                            ->sum('total_amount');
+        $revenueDesc  = $lastMonth > 0
+            ? round((($thisMonth - $lastMonth) / $lastMonth) * 100, 1) . '% vs last month'
+            : '৳' . number_format($thisMonth, 0) . ' this month';
+
+        // Average order value
+        $paidCount = Order::where('payment_status', 'paid')->count();
+        $aov       = $paidCount > 0 ? $totalRevenue / $paidCount : 0;
+
+        // New customers this month
+        $newCustomers = User::whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year)
+                            ->count();
+
+        // Today's orders
+        $todayOrders = Order::whereDate('created_at', today())->count();
 
         return [
-            Stat::make('Total Revenue', '৳' . number_format($totalRevenue, 2))
-                ->description('From paid orders')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->color('success'),
+            Stat::make('Total Revenue', '৳' . number_format($totalRevenue, 0))
+                ->description($revenueDesc)
+                ->descriptionIcon($thisMonth >= $lastMonth ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($thisMonth >= $lastMonth ? 'success' : 'danger'),
 
             Stat::make('Total Orders', number_format($totalOrders))
-                ->description($pendingOrders . ' pending')
-                ->descriptionIcon('heroicon-m-clock')
+                ->description($todayOrders . ' today · ' . $pendingOrders . ' pending')
+                ->descriptionIcon('heroicon-m-shopping-bag')
                 ->color($pendingOrders > 0 ? 'warning' : 'success'),
+
+            Stat::make('Avg. Order Value', '৳' . number_format($aov, 0))
+                ->description('Per paid order')
+                ->descriptionIcon('heroicon-m-calculator')
+                ->color('info'),
 
             Stat::make('Active Products', number_format($totalProducts))
                 ->description($lowStock . ' low stock')
@@ -39,9 +70,14 @@ class StatsOverview extends BaseWidget
                 ->color($lowStock > 0 ? 'danger' : 'primary'),
 
             Stat::make('Customers', number_format($totalUsers))
-                ->description('Active accounts')
+                ->description($newCustomers . ' new this month')
                 ->descriptionIcon('heroicon-m-users')
                 ->color('info'),
+
+            Stat::make('Pending Returns', \App\Models\ReturnRequest::where('status', 'pending')->count())
+                ->description('Awaiting review')
+                ->descriptionIcon('heroicon-m-arrow-uturn-left')
+                ->color(\App\Models\ReturnRequest::where('status', 'pending')->count() > 0 ? 'warning' : 'success'),
         ];
     }
 }

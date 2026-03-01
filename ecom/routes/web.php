@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\ReportExportController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
@@ -67,5 +68,10 @@ Route::middleware('auth')->group(function () {
 
 // Public result page — user lands here after gateway redirect (no auth needed)
 Route::get('/payment/result/{orderNumber}', [PaymentController::class, 'result'])->name('payment.result');
+
+// Admin CSV export — requires Filament admin session
+Route::get('/admin/reports/export', [ReportExportController::class, 'export'])
+    ->middleware(['web', \Filament\Http\Middleware\Authenticate::class])
+    ->name('admin.reports.export');
 
 require __DIR__.'/auth.php';
