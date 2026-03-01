@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
 use Filament\Forms;
@@ -15,6 +16,13 @@ use Filament\Tables\Table;
 
 class ReviewResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_reviews';
+    protected static string $editPermission   = 'approve_reviews';
+    protected static string $createPermission = '';
+    protected static string $deletePermission = 'delete_reviews';
+
     protected static ?string $model = Review::class;
     protected static ?string $navigationIcon = 'heroicon-o-star';
     protected static ?string $navigationGroup = 'Commerce';

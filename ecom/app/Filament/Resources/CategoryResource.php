@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Forms;
@@ -12,6 +13,13 @@ use Filament\Tables\Table;
 
 class CategoryResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_categories';
+    protected static string $createPermission = 'create_categories';
+    protected static string $editPermission   = 'edit_categories';
+    protected static string $deletePermission = 'delete_categories';
+
     protected static ?string $model = Category::class;
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
     protected static ?string $navigationGroup = 'Catalog';

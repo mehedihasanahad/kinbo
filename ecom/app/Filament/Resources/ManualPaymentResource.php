@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\ManualPaymentResource\Pages;
 use App\Mail\PaymentRejected;
 use App\Mail\PaymentVerified;
@@ -19,6 +20,13 @@ use Illuminate\Support\Facades\Mail;
 
 class ManualPaymentResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_payments';
+    protected static string $editPermission   = 'verify_payments';
+    protected static string $createPermission = '';
+    protected static string $deletePermission = '';
+
     protected static ?string $model = ManualPayment::class;
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationGroup = 'Commerce';

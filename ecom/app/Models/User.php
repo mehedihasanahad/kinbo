@@ -73,26 +73,35 @@ class User extends Authenticatable implements FilamentUser
             ->where('model_type', self::class);
     }
 
-    public function hasRole(string $role): bool
+    public function hasRole(string|array $role): bool
     {
-        return $this->roles()->where('name', $role)->exists();
+        $roles = is_array($role) ? $role : [$role];
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super_admin');
     }
 
     public function hasPermission(string $permission): bool
     {
+        // super_admin bypasses all permission checks
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
         if ($this->permissions()->where('name', $permission)->exists()) {
             return true;
         }
-        foreach ($this->roles as $role) {
-            if ($role->permissions()->where('name', $permission)->exists()) {
-                return true;
-            }
-        }
-        return false;
+        // Load roles with their permissions in one query
+        return $this->roles()
+            ->whereHas('permissions', fn ($q) => $q->where('name', $permission))
+            ->exists();
     }
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasRole('admin');
+        return $this->is_active
+            && $this->hasRole(['super_admin', 'admin', 'staff']);
     }
 }

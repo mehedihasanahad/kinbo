@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -15,6 +16,14 @@ use Filament\Infolists\Infolist;
 
 class OrderResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_orders';
+    protected static string $editPermission   = 'update_order_status';
+    // Orders cannot be created or deleted from admin
+    protected static string $createPermission = '';
+    protected static string $deletePermission = 'cancel_orders';
+
     protected static ?string $model = Order::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
     protected static ?string $navigationGroup = 'Commerce';

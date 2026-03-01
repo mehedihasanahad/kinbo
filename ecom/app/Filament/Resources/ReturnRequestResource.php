@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\ReturnRequestResource\Pages;
 use App\Mail\ReturnApproved;
 use App\Mail\ReturnRejected;
@@ -17,6 +18,14 @@ use Illuminate\Support\Facades\Mail;
 
 class ReturnRequestResource extends Resource
 {
+    use HasResourcePermissions;
+
+    // Returns are viewed and managed under order permissions
+    protected static string $viewPermission   = 'view_orders';
+    protected static string $editPermission   = 'update_order_status';
+    protected static string $createPermission = '';
+    protected static string $deletePermission = '';
+
     protected static ?string $model = ReturnRequest::class;
     protected static ?string $navigationIcon = 'heroicon-o-arrow-uturn-left';
     protected static ?string $navigationGroup = 'Commerce';

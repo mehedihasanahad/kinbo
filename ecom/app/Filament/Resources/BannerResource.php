@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\BannerResource\Pages;
 use App\Models\Banner;
 use Filament\Forms;
@@ -12,6 +13,14 @@ use Filament\Tables\Table;
 
 class BannerResource extends Resource
 {
+    use HasResourcePermissions;
+
+    // Banners are catalog content — editor-level access
+    protected static string $viewPermission   = 'view_products';
+    protected static string $createPermission = 'create_products';
+    protected static string $editPermission   = 'edit_products';
+    protected static string $deletePermission = 'delete_products';
+
     protected static ?string $model = Banner::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-photo';

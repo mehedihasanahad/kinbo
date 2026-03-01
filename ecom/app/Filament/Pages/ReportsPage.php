@@ -18,6 +18,12 @@ class ReportsPage extends Page
     protected static ?string $title           = 'Reports & Analytics';
     protected static ?int    $navigationSort  = 5;
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        return $user && ($user->isSuperAdmin() || $user->hasPermission('view_reports'));
+    }
+
     protected static string $view = 'filament.pages.reports-page';
 
     // Filter state — bound via statePath('filters')

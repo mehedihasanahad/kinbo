@@ -21,6 +21,12 @@ class SettingsPage extends Page
 
     protected static string $view = 'filament.pages.settings-page';
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        return $user && ($user->isSuperAdmin() || $user->hasPermission('edit_settings'));
+    }
+
     // Form state
     public array $general  = [];
     public array $contact  = [];

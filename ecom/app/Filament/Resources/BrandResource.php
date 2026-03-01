@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use Filament\Forms;
@@ -12,6 +13,13 @@ use Filament\Tables\Table;
 
 class BrandResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_brands';
+    protected static string $createPermission = 'create_brands';
+    protected static string $editPermission   = 'edit_brands';
+    protected static string $deletePermission = 'delete_brands';
+
     protected static ?string $model = Brand::class;
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
     protected static ?string $navigationGroup = 'Catalog';

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Category;
 use App\Models\Coupon;
@@ -14,6 +15,13 @@ use Filament\Tables\Table;
 
 class CouponResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_coupons';
+    protected static string $createPermission = 'create_coupons';
+    protected static string $editPermission   = 'edit_coupons';
+    protected static string $deletePermission = 'delete_coupons';
+
     protected static ?string $model = Coupon::class;
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
     protected static ?string $navigationGroup = 'Commerce';

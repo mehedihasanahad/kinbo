@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\ShippingZoneResource\Pages;
 use App\Models\ShippingZone;
 use Filament\Forms;
@@ -12,6 +13,13 @@ use Filament\Tables\Table;
 
 class ShippingZoneResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_shipping';
+    protected static string $createPermission = 'manage_shipping';
+    protected static string $editPermission   = 'manage_shipping';
+    protected static string $deletePermission = 'manage_shipping';
+
     protected static ?string $model = ShippingZone::class;
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
     protected static ?string $navigationGroup = 'Settings';

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Brand;
 use App\Models\Category;
@@ -15,6 +16,13 @@ use Filament\Tables\Table;
 
 class ProductResource extends Resource
 {
+    use HasResourcePermissions;
+
+    protected static string $viewPermission   = 'view_products';
+    protected static string $createPermission = 'create_products';
+    protected static string $editPermission   = 'edit_products';
+    protected static string $deletePermission = 'delete_products';
+
     protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationGroup = 'Catalog';
