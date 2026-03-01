@@ -51,12 +51,15 @@ class SettingsPage extends Page
         ];
 
         $this->payment = [
-            'bkash_merchant_number'  => Setting::get('bkash_merchant_number', env('BKASH_MERCHANT_NUMBER', '')),
-            'bkash_merchant_name'    => Setting::get('bkash_merchant_name', env('BKASH_MERCHANT_NAME', '')),
-            'nagad_merchant_number'  => Setting::get('nagad_merchant_number', env('NAGAD_MERCHANT_NUMBER', '')),
-            'nagad_merchant_name'    => Setting::get('nagad_merchant_name', env('NAGAD_MERCHANT_NAME', '')),
-            'cod_enabled'            => Setting::get('cod_enabled', '1'),
-            'free_shipping_above'    => Setting::get('free_shipping_above', ''),
+            'bkash_merchant_number'     => Setting::get('bkash_merchant_number', env('BKASH_MERCHANT_NUMBER', '')),
+            'bkash_merchant_name'       => Setting::get('bkash_merchant_name', env('BKASH_MERCHANT_NAME', '')),
+            'nagad_merchant_number'     => Setting::get('nagad_merchant_number', env('NAGAD_MERCHANT_NUMBER', '')),
+            'nagad_merchant_name'       => Setting::get('nagad_merchant_name', env('NAGAD_MERCHANT_NAME', '')),
+            'sslcommerz_store_id'       => Setting::get('sslcommerz_store_id', ''),
+            'sslcommerz_store_password' => Setting::get('sslcommerz_store_password', ''),
+            'sslcommerz_is_live'        => Setting::get('sslcommerz_is_live', '0'),
+            'cod_enabled'               => Setting::get('cod_enabled', '1'),
+            'free_shipping_above'       => Setting::get('free_shipping_above', ''),
         ];
 
         $this->social = [
@@ -153,6 +156,17 @@ class SettingsPage extends Page
             Forms\Components\Section::make('Nagad')->schema([
                 Forms\Components\TextInput::make('nagad_merchant_number')->label('Merchant Number')->nullable(),
                 Forms\Components\TextInput::make('nagad_merchant_name')->label('Merchant Name')->nullable(),
+            ])->columns(2),
+
+            Forms\Components\Section::make('SSLCommerz')->schema([
+                Forms\Components\TextInput::make('sslcommerz_store_id')
+                    ->label('Store ID')->nullable(),
+                Forms\Components\TextInput::make('sslcommerz_store_password')
+                    ->label('Store Password')->password()->revealable()->nullable(),
+                Forms\Components\Toggle::make('sslcommerz_is_live')
+                    ->label('Live Mode (off = sandbox)')
+                    ->helperText('Enable only after testing on sandbox.')
+                    ->inline(false),
             ])->columns(2),
 
             Forms\Components\Section::make('Other')->schema([

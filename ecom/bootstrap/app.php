@@ -9,6 +9,14 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            // SSLCommerz callback routes — no session middleware so the redirect
+            // response does NOT send a Set-Cookie header that would overwrite the
+            // user's real session cookie and log them out.
+            \Illuminate\Support\Facades\Route::middleware([
+                \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            ])->group(base_path('routes/payment_callbacks.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [

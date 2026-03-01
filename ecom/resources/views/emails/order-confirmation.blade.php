@@ -21,6 +21,7 @@
             @if($order->payment_method === 'cod') Cash on Delivery
             @elseif($order->payment_method === 'bkash') bKash
             @elseif($order->payment_method === 'nagad') Nagad
+            @elseif($order->payment_method === 'sslcommerz') SSLCommerz (Online Payment)
             @else {{ ucfirst($order->payment_method) }}
             @endif
         </span>
@@ -94,7 +95,7 @@
     </p>
 </div>
 
-@if($order->payment_method !== 'cod')
+@if(in_array($order->payment_method, ['bkash', 'nagad']))
 <div class="card" style="background:#fffbeb;border-color:#fcd34d;margin-top:16px;">
     <p style="font-size:13px;color:#92400e;">
         <strong>Note:</strong> Your payment via {{ strtoupper($order->payment_method) }} is under review. We'll confirm and update your order status within 24 hours.

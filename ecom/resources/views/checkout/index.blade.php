@@ -277,6 +277,24 @@
                             </div>
                         @endif
 
+                        {{-- SSLCommerz --}}
+                        @if(in_array('sslcommerz', $paymentMethods))
+                            <label class="payment-card flex items-start gap-4 border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                                <input type="radio" name="payment_method" value="sslcommerz" class="mt-0.5 accent-primary-600"
+                                       {{ old('payment_method') === 'sslcommerz' ? 'checked' : '' }}
+                                       onchange="togglePaymentFields('sslcommerz')">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                        </svg>
+                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_sslcommerz') }}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">{{ __('front.sslcommerz_description') }}</p>
+                                </div>
+                            </label>
+                        @endif
+
                     </div>
                 </div>
 
@@ -539,7 +557,7 @@ function fetchShippingRate(district) {
 
 // Payment method toggle — show/hide panel AND enable/disable inputs to prevent duplicate name submission
 function togglePaymentFields(method) {
-    ['bkash', 'nagad'].forEach(m => {
+    ['bkash', 'nagad', 'sslcommerz'].forEach(m => {
         const panel = document.getElementById('fields-' + m);
         if (!panel) return;
         const active = m === method;

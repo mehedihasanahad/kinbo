@@ -139,8 +139,23 @@
 
     {{-- ── Add to Cart (outside the <a> tag) ── --}}
     <div class="px-4 pb-4">
-        @auth
-            @if($product->is_in_stock)
+        @php $hasVariants = $product->variants()->exists(); @endphp
+        @if(! $product->is_in_stock)
+            <button disabled
+                    class="w-full bg-gray-200 text-gray-400 text-xs font-semibold px-3 py-2 rounded-xl
+                           cursor-not-allowed flex items-center justify-center gap-1.5">
+                {{ __('front.out_of_stock') }}
+            </button>
+        @elseif($hasVariants)
+            {{-- Products with variants: go to detail page to choose options --}}
+            <a href="{{ route('product.show', $productSlug) }}"
+               class="block w-full text-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800
+                      text-white text-xs font-semibold px-3 py-2 rounded-xl
+                      transition-colors duration-150">
+                {{ __('front.select_options') }}
+            </a>
+        @else
+            @auth
                 <form method="POST" action="{{ route('cart.store') }}">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -158,19 +173,13 @@
                     </button>
                 </form>
             @else
-                <button disabled
-                        class="w-full bg-gray-200 text-gray-400 text-xs font-semibold px-3 py-2 rounded-xl
-                               cursor-not-allowed flex items-center justify-center gap-1.5">
-                    {{ __('front.out_of_stock') }}
-                </button>
-            @endif
-        @else
-            <a href="{{ route('login') }}"
-               class="block w-full text-center bg-primary-600 hover:bg-primary-700
-                      text-white text-xs font-semibold px-3 py-2 rounded-xl
-                      transition-colors duration-150">
-                {{ __('front.add_to_cart') }}
-            </a>
-        @endauth
+                <a href="{{ route('login') }}"
+                   class="block w-full text-center bg-primary-600 hover:bg-primary-700
+                          text-white text-xs font-semibold px-3 py-2 rounded-xl
+                          transition-colors duration-150">
+                    {{ __('front.add_to_cart') }}
+                </a>
+            @endauth
+        @endif
     </div>
 </div>

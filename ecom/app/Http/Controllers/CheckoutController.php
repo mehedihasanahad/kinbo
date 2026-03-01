@@ -46,6 +46,9 @@ class CheckoutController extends Controller
         if (Setting::get('nagad_merchant_number', '')) {
             $paymentMethods[] = 'nagad';
         }
+        if (Setting::get('sslcommerz_store_id', '')) {
+            $paymentMethods[] = 'sslcommerz';
+        }
 
         // Fallback: always show COD if nothing configured
         if (empty($paymentMethods)) {
@@ -152,10 +155,10 @@ class CheckoutController extends Controller
             'ship_district'    => 'required|string|max:100',
             'ship_zip'         => 'nullable|string|max:10',
             'shipping_rate_id' => 'nullable|exists:shipping_rates,id',
-            'payment_method'   => 'required|in:cod,bkash,nagad',
+            'payment_method'   => 'required|in:cod,bkash,nagad,sslcommerz',
             'notes'            => 'nullable|string|max:1000',
-            'sender_number'    => 'required_if:payment_method,bkash,nagad|nullable|string|max:20',
-            'transaction_id'   => 'required_if:payment_method,bkash,nagad|nullable|string|max:100',
+            'sender_number'    => 'required_if:payment_method,bkash,nagad|excluded_if:payment_method,sslcommerz|nullable|string|max:20',
+            'transaction_id'   => 'required_if:payment_method,bkash,nagad|excluded_if:payment_method,sslcommerz|nullable|string|max:100',
             'screenshot'       => 'nullable|image|max:2048',
         ]);
 
@@ -261,6 +264,8 @@ class CheckoutController extends Controller
                     'currency' => 'BDT',
                     'status'   => 'pending',
                 ]);
+            } elseif ($request->payment_method === 'sslcommerz') {
+                // PaymentTransaction created in PaymentController after gateway init succeeds
             } else {
                 // bkash or nagad manual payment
                 $screenshotPath = null;
@@ -299,6 +304,12 @@ class CheckoutController extends Controller
 
             return $order;
         });
+
+        // SSLCommerz: redirect to payment gateway (email sent after successful payment)
+        if ($request->payment_method === 'sslcommerz') {
+            session(['sslcommerz_order_id' => $order->id]);
+            return redirect()->route('payment.initiate');
+        }
 
         // Send order confirmation email
         try {

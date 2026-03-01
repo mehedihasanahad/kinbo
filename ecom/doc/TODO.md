@@ -72,25 +72,19 @@
 
 ## Priority 2 — Payments & Commerce
 
-### 2.1 SSLCommerz Payment Gateway ⚠ (model/table ready, no implementation)
+### 2.1 SSLCommerz Payment Gateway ✅ DONE
 
-- [ ] Install package: `sslcommerz/sslcommerz-laravel` or custom cURL
-- [ ] Add env vars: `SSLCOMMERZ_STORE_ID`, `SSLCOMMERZ_STORE_PASSWORD`, `SSLCOMMERZ_IS_LIVE`
-- [ ] `PaymentController` with: `initiate()`, `success()`, `fail()`, `cancel()`, `ipn()`
-- [ ] Routes (remove CSRF for IPN, use webhook signature instead):
-  ```
-  POST /payment/initiate
-  POST /payment/success
-  POST /payment/fail
-  POST /payment/cancel
-  POST /payment/ipn
-  ```
-- [ ] Session payload builder (customer info, order info, URLs)
-- [ ] IPN re-validation with SSLCommerz validation API (`val_id`)
-- [ ] Auto-update order payment status on IPN success
-- [ ] Transaction log stored in `payment_transactions` table
-- [ ] Sandbox ↔ Live toggle via `SSLCOMMERZ_IS_LIVE` config
-- [ ] "Pay Online (SSLCommerz)" option shown on checkout
+- [x] No third-party package — uses Laravel `Http` facade (`app/Services/SslCommerzService.php`)
+- [x] Credentials stored in admin Settings UI (Store ID, Store Password, Live toggle)
+- [x] `PaymentController` — `initiate()`, `success()`, `fail()`, `cancel()`
+- [x] Routes: `POST /payment/initiate` (auth), `POST /payment/success|fail|cancel` (CSRF-exempt)
+- [x] Session-based order handoff: `placeOrder()` stores `sslcommerz_order_id` in session → redirect to `initiate`
+- [x] Re-validation with SSLCommerz validation API (`val_id`) before confirming payment
+- [x] Transaction log stored in `payment_transactions` table
+- [x] Sandbox ↔ Live toggle via Settings page
+- [x] "Pay Online (Card / Mobile Banking)" option shown on checkout when Store ID is configured
+- [x] OrderConfirmation email sent after successful payment
+- [x] Translation keys added (EN + BN)
 
 ---
 
@@ -101,7 +95,7 @@
 - [ ] Route: `GET /orders/{order}/invoice` → `OrderController@invoice`
 - [ ] PDF generation with order details, items, totals, addresses
 - [ ] "Download Invoice" button on order detail page (`orders/show.blade.php`)
-- [ ] Admin: Download invoice from Filament `OrderResource`
+- [ ] Admin: Download invoice from Filament `OrderResource`-
 
 ---
 
@@ -123,13 +117,13 @@
 
 - [ ] `UserAddressController` — `index()`, `store()`, `update()`, `destroy()`, `setDefault()`
 - [ ] Routes under `middleware('auth')`:
-  ```
-  GET    /account/addresses
-  POST   /account/addresses
-  PUT    /account/addresses/{address}
-  DELETE /account/addresses/{address}
-  POST   /account/addresses/{address}/default
-  ```
+    ```
+    GET    /account/addresses
+    POST   /account/addresses
+    PUT    /account/addresses/{address}
+    DELETE /account/addresses/{address}
+    POST   /account/addresses/{address}/default
+    ```
 - [ ] Address list view (`resources/views/account/addresses/index.blade.php`)
 - [ ] Add/Edit address form (modal or inline)
 - [ ] "Set as Default" button
@@ -185,8 +179,8 @@
 ### 4.3 Inventory Management Enhancements ⚠
 
 - [ ] **Low stock alert**: admin notification when `stock <= low_stock_threshold`
-  - [ ] Add `low_stock_threshold` field to `products` table
-  - [ ] Queue job / scheduled command to check and notify
+    - [ ] Add `low_stock_threshold` field to `products` table
+    - [ ] Queue job / scheduled command to check and notify
 - [ ] **Stock audit log**: track every stock change with reason (order, manual edit, return)
 - [ ] Bulk stock update tool in `ProductResource`
 
@@ -228,13 +222,13 @@
 
 ## Packages to Install
 
-| Package | Purpose | Priority |
-|---|---|---|
-| `barryvdh/laravel-dompdf` | PDF invoice generation | P2 |
-| `laravel/socialite` | Google/Facebook OAuth | P3 |
-| `spatie/laravel-sitemap` | XML sitemap | P5 |
-| `intervention/image` | Image resize/WebP | P5 |
-| `sslcommerz/sslcommerz-laravel` | Payment gateway | P2 |
+| Package                         | Purpose                | Priority |
+| ------------------------------- | ---------------------- | -------- |
+| `barryvdh/laravel-dompdf`       | PDF invoice generation | P2       |
+| `laravel/socialite`             | Google/Facebook OAuth  | P3       |
+| `spatie/laravel-sitemap`        | XML sitemap            | P5       |
+| `intervention/image`            | Image resize/WebP      | P5       |
+| `sslcommerz/sslcommerz-laravel` | Payment gateway        | P2       |
 
 ---
 
@@ -265,27 +259,27 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 ## Quick Status Reference
 
-| Feature | Status | Priority |
-|---|---|---|
-| Wishlist (functionality) | ✅ Done | P1 |
-| Reviews — submit form | ✅ Done | P1 |
-| Email notifications | ✅ Done | P1 |
-| Product search & filters | ✅ Done | P1 |
-| Category page with filters | ✗ Not started | P1 |
-| SSLCommerz integration | ⚠ Partial | P2 |
-| Invoice PDF download | ✗ Not started | P2 |
-| Return / Refund flow | ✗ Not started | P2 |
-| Address book UI | ⚠ Partial | P3 |
-| Account dashboard hub | ⚠ Partial | P3 |
-| Social login (Google) | ✗ Not started | P3 |
-| Admin reports | ✗ Not started | P4 |
-| Staff role enforcement | ⚠ Partial | P4 |
-| Low stock alerts | ✗ Not started | P4 |
-| Courier tracking on orders | ⚠ Partial | P4 |
-| Open Graph / JSON-LD | ✗ Not started | P5 |
-| Sitemap generation | ✗ Not started | P5 |
-| Image optimization | ✗ Not started | P5 |
+| Feature                    | Status        | Priority |
+| -------------------------- | ------------- | -------- |
+| Wishlist (functionality)   | ✅ Done       | P1       |
+| Reviews — submit form      | ✅ Done       | P1       |
+| Email notifications        | ✅ Done       | P1       |
+| Product search & filters   | ✅ Done       | P1       |
+| Category page with filters | ✗ Not started | P1       |
+| SSLCommerz integration     | ✅ Done       | P2       |
+| Invoice PDF download       | ✗ Not started | P2       |
+| Return / Refund flow       | ✗ Not started | P2       |
+| Address book UI            | ⚠ Partial     | P3       |
+| Account dashboard hub      | ⚠ Partial     | P3       |
+| Social login (Google)      | ✗ Not started | P3       |
+| Admin reports              | ✗ Not started | P4       |
+| Staff role enforcement     | ⚠ Partial     | P4       |
+| Low stock alerts           | ✗ Not started | P4       |
+| Courier tracking on orders | ⚠ Partial     | P4       |
+| Open Graph / JSON-LD       | ✗ Not started | P5       |
+| Sitemap generation         | ✗ Not started | P5       |
+| Image optimization         | ✗ Not started | P5       |
 
 ---
 
-*Generated from analysis of `FEATURES.md` vs. current codebase state (2026-03-01).*
+_Generated from analysis of `FEATURES.md` vs. current codebase state (2026-03-01)._
