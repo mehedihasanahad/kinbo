@@ -479,8 +479,27 @@
                                     <p class="text-sm font-semibold text-gray-800 mb-1">{{ $review->title }}</p>
                                 @endif
                                 @if($review->body)
-                                    <p class="text-sm text-gray-600 leading-relaxed">{{ $review->body }}</p>
+                                    <p class="text-sm text-gray-600 leading-relaxed mb-3">{{ $review->body }}</p>
                                 @endif
+
+                                {{-- Helpful vote --}}
+                                @auth
+                                    @php $voted = in_array($review->id, $userVotedReviewIds); @endphp
+                                    <button type="button"
+                                            onclick="voteHelpful(this, {{ $review->id }})"
+                                            data-review-id="{{ $review->id }}"
+                                            data-voted="{{ $voted ? 'true' : 'false' }}"
+                                            data-url="{{ route('reviews.vote', $review->id) }}"
+                                            class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-colors
+                                                   {{ $voted ? 'border-primary-400 text-primary-600 bg-primary-50' : 'border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600' }}">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                                        </svg>
+                                        <span class="helpful-label">{{ __('front.helpful') }}</span>
+                                        <span class="helpful-count {{ $review->helpful_count > 0 ? '' : 'hidden' }}">({{ $review->helpful_count }})</span>
+                                    </button>
+                                @endauth
                             </div>
                         </div>
                     @endforeach
@@ -495,6 +514,109 @@
                     <p class="text-gray-400 text-sm">{{ __('front.no_reviews') }}</p>
                 </div>
             @endif
+
+            {{-- ── Write a Review form ──────────────────────────────────────── --}}
+            @auth
+                @if(!$hasReviewed)
+                    <div class="mt-10 pt-8 border-t border-gray-100">
+                        <h3 class="text-base font-semibold text-gray-900 mb-5">{{ __('front.write_review') }}</h3>
+
+                        {{-- Flash messages --}}
+                        @if(session('review_success'))
+                            <div class="mb-4 flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
+                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {{ session('review_success') }}
+                            </div>
+                        @endif
+                        @if(session('review_error'))
+                            <div class="mb-4 flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+                                {{ session('review_error') }}
+                            </div>
+                        @endif
+
+                        <form action="{{ route('reviews.store', $product->id) }}" method="POST" class="space-y-5">
+                            @csrf
+
+                            {{-- Star rating picker --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('front.review_rating') }} <span class="text-red-500">*</span></label>
+                                <div class="flex gap-1" id="star-picker">
+                                    @for($s = 1; $s <= 5; $s++)
+                                        <button type="button"
+                                                onclick="setRating({{ $s }})"
+                                                data-star="{{ $s }}"
+                                                class="star-btn text-gray-300 hover:text-amber-400 transition-colors">
+                                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0
+                                                         00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0
+                                                         00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54
+                                                         1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0
+                                                         00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0
+                                                         00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        </button>
+                                    @endfor
+                                </div>
+                                <input type="hidden" name="rating" id="rating-value" value="{{ old('rating') }}">
+                                @error('rating')
+                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Title --}}
+                            <div>
+                                <label for="review-title" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ __('front.review_title') }}
+                                </label>
+                                <input type="text" name="title" id="review-title"
+                                       value="{{ old('title') }}"
+                                       placeholder="{{ __('front.review_title_placeholder') }}"
+                                       maxlength="150"
+                                       class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800
+                                              focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition">
+                            </div>
+
+                            {{-- Body --}}
+                            <div>
+                                <label for="review-body" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ __('front.review_body') }} <span class="text-red-500">*</span>
+                                </label>
+                                <textarea name="body" id="review-body" rows="4"
+                                          placeholder="{{ __('front.review_body_placeholder') }}"
+                                          maxlength="2000"
+                                          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800
+                                                 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent
+                                                 transition resize-none">{{ old('body') }}</textarea>
+                                @error('body')
+                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white
+                                           font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {{ __('front.review_submit') }}
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <div class="mt-8 pt-6 border-t border-gray-100 text-sm text-gray-500 text-center">
+                        {{ __('front.review_already_submitted') }}
+                    </div>
+                @endif
+            @else
+                <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+                    <a href="{{ route('login') }}"
+                       class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                        {{ __('front.review_login_to_write') }}
+                    </a>
+                </div>
+            @endauth
 
         </div>
     </div>
@@ -599,6 +721,48 @@ function changeQty(delta) {
     if (formQty) formQty.value = val;
 }
 
+// ── Star rating picker ──
+function setRating(value) {
+    document.getElementById('rating-value').value = value;
+    document.querySelectorAll('#star-picker .star-btn').forEach(btn => {
+        const star = parseInt(btn.dataset.star);
+        btn.classList.toggle('text-amber-400', star <= value);
+        btn.classList.toggle('text-gray-300',  star > value);
+    });
+}
+
+// ── Helpful vote ──
+function voteHelpful(btn, reviewId) {
+    fetch(btn.dataset.url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+    })
+    .then(res => res.json())
+    .then(data => {
+        const voted = data.voted;
+        btn.dataset.voted = voted ? 'true' : 'false';
+        if (voted) {
+            btn.classList.add('border-primary-400', 'text-primary-600', 'bg-primary-50');
+            btn.classList.remove('border-gray-200', 'text-gray-500');
+        } else {
+            btn.classList.remove('border-primary-400', 'text-primary-600', 'bg-primary-50');
+            btn.classList.add('border-gray-200', 'text-gray-500');
+        }
+        const countEl = btn.querySelector('.helpful-count');
+        if (countEl) {
+            if (data.helpful_count > 0) {
+                countEl.textContent = '(' + data.helpful_count + ')';
+                countEl.classList.remove('hidden');
+            } else {
+                countEl.classList.add('hidden');
+            }
+        }
+    });
+}
+
 // ── Tab switching ──
 function switchTab(tab) {
     ['description', 'reviews'].forEach(t => {
@@ -615,6 +779,11 @@ function switchTab(tab) {
         }
     });
 }
+
+// Auto-open reviews tab if redirected back with a review flash or #reviews hash
+@if(session('review_success') || session('review_error'))
+document.addEventListener('DOMContentLoaded', () => switchTab('reviews'));
+@endif
 
 // ── Variant selection ──
 @if($variantOptions->isNotEmpty())

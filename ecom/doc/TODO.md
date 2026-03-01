@@ -24,16 +24,16 @@
 
 ---
 
-### 1.2 Reviews & Ratings — Frontend ⚠ (display exists, submission missing)
+### 1.2 Reviews & Ratings — Frontend ✅ DONE
 
-- [ ] Review submission form on product detail page (rating stars + title + body)
-- [ ] `ReviewController` — `store()` with validation
-- [ ] Route: `POST /products/{product}/reviews`
-- [ ] "Verified purchase only" gate: check if user has an order with this product
-- [ ] Success/error flash feedback after submission
-- [ ] Prevent duplicate reviews (one per user per product)
-- [ ] Helpful vote toggle (`POST /reviews/{review}/vote`)
-- [ ] Translation keys for review form labels in `lang/en/front.php` and `lang/bn/front.php`
+- [x] Review submission form on product detail page (star picker + title + body)
+- [x] `ReviewController` — `store()` with validation, `vote()` for helpful toggle
+- [x] Routes: `POST /products/{product}/reviews`, `POST /reviews/{review}/vote`
+- [x] Verified purchase detection (links `order_id` if user has a delivered order for this product)
+- [x] Success/error flash + auto-opens reviews tab on redirect
+- [x] Duplicate review prevention (checked in controller + "already reviewed" message in UI)
+- [x] Helpful vote toggle (AJAX, togglable, updates count in real time)
+- [x] Translation keys added (`helpful`, `review_rating`, `review_title/body`, `review_submit`, `review_submitted`, `review_already_submitted`, `review_login_to_write`)
 
 ---
 

@@ -71,6 +71,16 @@ class ProductController extends Controller
         $isWishlisted = auth()->check()
             && auth()->user()->wishlist()->where('product_id', $product->id)->exists();
 
+        $hasReviewed = auth()->check()
+            && $product->reviews()->where('user_id', auth()->id())->exists();
+
+        $userVotedReviewIds = auth()->check()
+            ? \App\Models\ReviewVote::where('user_id', auth()->id())
+                ->whereIn('review_id', $reviews->pluck('id'))
+                ->pluck('review_id')
+                ->toArray()
+            : [];
+
         return view('product.show', compact(
             'product',
             'currentTranslation',
@@ -81,6 +91,8 @@ class ProductController extends Controller
             'ratingCounts',
             'relatedProducts',
             'isWishlisted',
+            'hasReviewed',
+            'userVotedReviewIds',
         ));
     }
 }

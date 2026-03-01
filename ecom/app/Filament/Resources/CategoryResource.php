@@ -80,8 +80,7 @@ class CategoryResource extends Resource
                     ->getStateUsing(fn ($record) => $record->getTranslation('en')?->name ?? '—')
                     ->searchable(query: fn ($query, $search) =>
                         $query->whereHas('translations', fn ($q) =>
-                            $q->where('locale', 'en')->where('name', 'like', "%{$search}%")))
-                    ->sortable(),
+                            $q->where('locale', 'en')->where('name', 'like', "%{$search}%"))),
 
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label('Parent')
