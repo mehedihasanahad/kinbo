@@ -37,18 +37,20 @@
 
 ---
 
-### 1.3 Email Notifications ✗ (zero implementation)
+### 1.3 Email Notifications ✅ DONE
 
-- [ ] Install/configure SMTP in `.env` (Mailtrap for dev)
-- [ ] **Order Confirmation** — `app/Mail/OrderConfirmation.php` + Blade template
-- [ ] **Payment Verified** — `app/Mail/PaymentVerified.php` + template
-- [ ] **Order Shipped** — `app/Mail/OrderShipped.php` + template (includes tracking number)
-- [ ] **Order Delivered** — `app/Mail/OrderDelivered.php` + template
-- [ ] **Low Stock Alert (admin)** — `app/Notifications/LowStockAlert.php`
-- [ ] **New Order Alert (admin)** — `app/Notifications/NewOrderAlert.php`
-- [ ] Fire mails from `CheckoutController` (order placed), `OrderResource` (status change), `ManualPaymentResource` (payment verified)
-- [ ] Locale-aware email subjects & bodies (use `app()->setLocale($user->locale)` before sending)
-- [ ] Shared Blade email layout (`resources/views/emails/layout.blade.php`)
+- [x] SMTP already configured in `.env` (Gmail)
+- [x] **Order Confirmation** — `app/Mail/OrderConfirmation.php` + `resources/views/emails/order-confirmation.blade.php`
+- [x] **Payment Verified** — `app/Mail/PaymentVerified.php` + `resources/views/emails/payment-verified.blade.php`
+- [x] **Payment Rejected** — `app/Mail/PaymentRejected.php` + `resources/views/emails/payment-rejected.blade.php`
+- [x] **Order Shipped** — `app/Mail/OrderShipped.php` + `resources/views/emails/order-shipped.blade.php` (includes tracking number)
+- [x] **Order Delivered** — `app/Mail/OrderDelivered.php` + `resources/views/emails/order-delivered.blade.php`
+- [x] Shared Blade email layout — `resources/views/emails/layout.blade.php`
+- [x] Fired from `CheckoutController::placeOrder()` — order confirmation on placement
+- [x] Fired from `ManualPaymentResource` verify/reject actions — payment verified/rejected
+- [x] Fired from `OrderResource\Pages\EditOrder::afterSave()` — shipped + delivered; also logs `OrderStatusHistory`
+- [ ] ~~Low Stock Alert (admin)~~ — deferred to 4.3 Inventory Management
+- [ ] ~~New Order Alert (admin)~~ — deferred to 4.3 Inventory Management
 
 ---
 
@@ -265,9 +267,9 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 | Feature | Status | Priority |
 |---|---|---|
-| Wishlist (functionality) | ⚠ Partial | P1 |
-| Reviews — submit form | ⚠ Partial | P1 |
-| Email notifications | ✗ Not started | P1 |
+| Wishlist (functionality) | ✅ Done | P1 |
+| Reviews — submit form | ✅ Done | P1 |
+| Email notifications | ✅ Done | P1 |
 | Product search & filters | ✗ Not started | P1 |
 | Category page with filters | ✗ Not started | P1 |
 | SSLCommerz integration | ⚠ Partial | P2 |

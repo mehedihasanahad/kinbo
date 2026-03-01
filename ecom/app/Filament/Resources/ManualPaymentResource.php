@@ -3,6 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ManualPaymentResource\Pages;
+use App\Mail\PaymentRejected;
+use App\Mail\PaymentVerified;
 use App\Models\ManualPayment;
 use App\Models\Order;
 use Filament\Forms;
@@ -13,6 +15,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Mail;
 
 class ManualPaymentResource extends Resource
 {
@@ -152,6 +155,10 @@ class ManualPaymentResource extends Resource
                             'payment_status' => 'paid',
                             'status'         => 'processing',
                         ]);
+                        try {
+                            $order = $record->order->load(['items', 'user']);
+                            Mail::to($order->user->email)->send(new PaymentVerified($order));
+                        } catch (\Throwable) {}
                         Notification::make()->title('Payment verified & order moved to Processing')->success()->send();
                     }),
 
@@ -172,6 +179,10 @@ class ManualPaymentResource extends Resource
                             'rejection_reason' => $data['rejection_reason'],
                         ]);
                         $record->order->update(['payment_status' => 'failed']);
+                        try {
+                            $order = $record->order->load(['items', 'user']);
+                            Mail::to($order->user->email)->send(new PaymentRejected($order, $record));
+                        } catch (\Throwable) {}
                         Notification::make()->title('Payment rejected')->danger()->send();
                     }),
             ])

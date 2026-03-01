@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmation;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\ManualPayment;
@@ -13,6 +14,7 @@ use App\Models\Setting;
 use App\Models\ShippingZoneDistrict;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -297,6 +299,14 @@ class CheckoutController extends Controller
 
             return $order;
         });
+
+        // Send order confirmation email
+        try {
+            $order->load(['items', 'user']);
+            Mail::to($order->user->email)->send(new OrderConfirmation($order));
+        } catch (\Throwable) {
+            // Non-fatal – order is placed even if email fails
+        }
 
         return redirect()->route('checkout.confirmation', $order)->with('order_placed', true);
     }
