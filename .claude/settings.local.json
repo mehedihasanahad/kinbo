@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(__NEW_LINE_ec8550594610ba92__ cat)"
+      "Bash(php artisan migrate:status)"
     ]
   }
 }
