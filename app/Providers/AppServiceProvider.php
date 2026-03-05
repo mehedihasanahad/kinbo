@@ -10,6 +10,7 @@ use App\Observers\BannerObserver;
 use App\Observers\BrandObserver;
 use App\Observers\CategoryObserver;
 use App\Observers\ProductImageObserver;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,11 +30,15 @@ class AppServiceProvider extends ServiceProvider
         Category::observe(CategoryObserver::class);
 
         // Share google login flag with all views (needed in child views like auth/login)
-        View::share('googleLoginEnabled',
-            (bool) \App\Models\Setting::get('google_login_enabled', '0')
-            && \App\Models\Setting::get('google_client_id', '') !== ''
-            && \App\Models\Setting::get('google_client_secret', '') !== ''
-        );
+        if (Schema::hasTable('settings')) {
+            View::share('googleLoginEnabled',
+                (bool) \App\Models\Setting::get('google_login_enabled', '0')
+                && \App\Models\Setting::get('google_client_id', '') !== ''
+                && \App\Models\Setting::get('google_client_secret', '') !== ''
+            );
+        } else {
+            View::share('googleLoginEnabled', false);
+        }
 
         View::composer('layouts.app', function ($view) {
             $cartCount = auth()->check()
