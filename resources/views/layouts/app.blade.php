@@ -48,13 +48,11 @@
     $trackUrl = auth()->check() ? route('orders.index') : route('login');
 @endphp
 
-@if($announcementBarText)
 <div class="bg-primary-950 text-primary-100 text-xs py-2 hidden sm:block">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         <span>{!! $announcementBarText !!}</span>
         <div class="flex items-center gap-5">
             <a href="{{ $trackUrl }}" class="hover:text-white transition-colors">{{ __('front.track_order') }}</a>
-            <a href="#" class="hover:text-white transition-colors">{{ __('front.help') }}</a>
 
             {{-- Language switcher --}}
             <div class="flex items-center gap-1 border-l border-primary-800 pl-4">
@@ -70,7 +68,6 @@
         </div>
     </div>
 </div>
-@endif
 
 {{-- ── Main header ── --}}
 <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
@@ -114,18 +111,6 @@
 
             {{-- Nav actions --}}
             <div class="flex items-center gap-3">
-
-                {{-- Language switcher --}}
-                <div class="flex items-center gap-0.5">
-                    <a href="{{ route('lang.switch', 'en') }}"
-                       class="px-2 py-0.5 rounded text-xs font-semibold transition-colors {{ app()->getLocale() === 'en' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-primary-600' }}">
-                        EN
-                    </a>
-                    <a href="{{ route('lang.switch', 'bn') }}"
-                       class="px-2 py-0.5 rounded text-xs font-semibold transition-colors {{ app()->getLocale() === 'bn' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-primary-600' }}">
-                        বাং
-                    </a>
-                </div>
 
                 {{-- Mobile search toggle --}}
                 <button id="mobile-search-toggle"
