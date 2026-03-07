@@ -94,11 +94,9 @@
         <div class="product-card-body">
 
             {{-- Brand --}}
-            @if($product->brand)
-                <p class="text-xs text-primary-600 font-medium mb-0.5 truncate">
-                    {{ $product->brand->name }}
-                </p>
-            @endif
+            <p class="text-xs text-primary-600 font-medium mb-0.5 truncate min-h-4">
+                {{ $product->brand?->name ?? '' }}
+            </p>
 
             {{-- Product name — exactly 2 lines max, ellipsis after --}}
             <h4 class="product-card-name text-sm font-semibold text-gray-800 mb-2">
