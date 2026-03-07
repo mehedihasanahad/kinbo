@@ -433,7 +433,7 @@
         {{-- Description panel --}}
         <div id="panel-description" class="p-6 sm:p-8">
             @if($description)
-                <div class="prose prose-sm sm:prose max-w-none text-gray-700 leading-relaxed">
+                <div class="rich-text">
                     {!! $description !!}
                 </div>
             @else
