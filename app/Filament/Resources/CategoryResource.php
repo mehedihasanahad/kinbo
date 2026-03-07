@@ -109,6 +109,25 @@ class CategoryResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+
+                    Tables\Actions\BulkAction::make('activate')
+                        ->label('Set Active')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(fn ($records) => $records->each->update(['is_active' => true]))
+                        ->deselectRecordsAfterCompletion(),
+
+                    Tables\Actions\BulkAction::make('deactivate')
+                        ->label('Set Inactive')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->action(fn ($records) => $records->each->update(['is_active' => false]))
+                        ->deselectRecordsAfterCompletion(),
+                ]),
+            ])
             ->defaultSort('sort_order');
     }
 
