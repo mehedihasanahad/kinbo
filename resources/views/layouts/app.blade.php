@@ -114,6 +114,19 @@
 
             {{-- Nav actions --}}
             <div class="flex items-center gap-3">
+
+                {{-- Language switcher --}}
+                <div class="flex items-center gap-0.5">
+                    <a href="{{ route('lang.switch', 'en') }}"
+                       class="px-2 py-0.5 rounded text-xs font-semibold transition-colors {{ app()->getLocale() === 'en' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-primary-600' }}">
+                        EN
+                    </a>
+                    <a href="{{ route('lang.switch', 'bn') }}"
+                       class="px-2 py-0.5 rounded text-xs font-semibold transition-colors {{ app()->getLocale() === 'bn' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-primary-600' }}">
+                        বাং
+                    </a>
+                </div>
+
                 {{-- Mobile search toggle --}}
                 <button id="mobile-search-toggle"
                         type="button"
