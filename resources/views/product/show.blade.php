@@ -35,9 +35,7 @@
 @endphp
 
 @section('title', $metaTitle)
-@if($metaDesc)
-    @section('meta_description', $metaDesc)
-@endif
+@section('meta_description', $metaDesc)
 
 @php
     $ogImage = $product->primaryImage?->image_path
@@ -54,8 +52,8 @@
 @push('styles')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org/",
-    "@type": "Product",
+    "@@context": "https://schema.org/",
+    "@@type": "Product",
     "name": "{{ addslashes($productName) }}",
     "description": "{{ addslashes(strip_tags($ogDesc)) }}",
     "url": "{{ $productUrl }}",
@@ -65,25 +63,25 @@
     @endif
     @if($product->brand)
     "brand": {
-        "@type": "Brand",
+        "@@type": "Brand",
         "name": "{{ addslashes($product->brand->name) }}"
     },
     @endif
     "offers": {
-        "@type": "Offer",
+        "@@type": "Offer",
         "url": "{{ $productUrl }}",
         "priceCurrency": "{{ \App\Models\Setting::get('currency', 'BDT') }}",
         "price": "{{ number_format((float) $product->current_price, 2, '.', '') }}",
         "availability": "{{ $product->is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
         "seller": {
-            "@type": "Organization",
+            "@@type": "Organization",
             "name": "{{ addslashes(config('app.name')) }}"
         }
     }
-    @if($averageRating > 0)
+    @if($avgRating > 0)
     ,"aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "{{ number_format($averageRating, 1) }}",
+        "@@type": "AggregateRating",
+        "ratingValue": "{{ number_format($avgRating, 1) }}",
         "reviewCount": "{{ $reviews->count() }}"
     }
     @endif
@@ -118,7 +116,7 @@
                 </li>
             @endif
             <li><span class="text-gray-300">/</span></li>
-            <li class="text-gray-800 font-medium truncate max-w-[180px] sm:max-w-xs">{{ $productName }}</li>
+            <li class="text-gray-800 font-medium truncate max-w-45 sm:max-w-xs">{{ $productName }}</li>
         </ol>
     </div>
 </nav>
@@ -451,7 +449,7 @@
                 <div class="flex flex-col sm:flex-row gap-8 mb-10 pb-10 border-b border-gray-100">
 
                     {{-- Overall score --}}
-                    <div class="flex flex-col items-center justify-center text-center shrink-0 min-w-[120px]">
+                    <div class="flex flex-col items-center justify-center text-center shrink-0 min-w-30">
                         <p class="text-6xl font-extrabold text-gray-900">{{ number_format($avgRating, 1) }}</p>
                         <div class="flex gap-0.5 mt-2 mb-1">
                             @for($i = 1; $i <= 5; $i++)
