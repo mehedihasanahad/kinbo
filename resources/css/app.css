@@ -344,7 +344,7 @@
 /* ============================================================
    Rich Text / Product Description
 ============================================================ */
-.rich-text { color: #374151; line-height: 1.75; font-size: 0.95rem; }
+.rich-text { color: #374151; line-height: 1.75; font-size: 0.95rem; font-weight: 400; }
 .rich-text p  { margin-bottom: 0.75rem; }
 .rich-text ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
 .rich-text ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
