@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ReportExportController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\CartController;
@@ -29,6 +30,11 @@ Route::get('/faq',     [PageController::class, 'faq'])->name('page.faq');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('page.privacy');
 Route::get('/blog',    [PageController::class, 'blog'])->name('page.blog');
 Route::get('/blog/{slug}', [PageController::class, 'blogPost'])->name('page.blog.post');
+
+// Newsletter subscribe / confirm / unsubscribe
+Route::post('/subscribe', [SubscriberController::class, 'subscribe'])->name('subscribe.store');
+Route::get('/subscribe/confirm/{token}', [SubscriberController::class, 'confirm'])->name('subscribe.confirm');
+Route::get('/subscribe/unsubscribe/{token}', [SubscriberController::class, 'unsubscribe'])->name('subscribe.unsubscribe');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/search', [ShopController::class, 'category'])->name('shop.search');
 Route::get('/products', [ShopController::class, 'category'])->name('shop.category');

@@ -512,31 +512,6 @@
 </section>
 @endif
 
-{{-- ============================================================
-    10. NEWSLETTER / CTA SECTION
-============================================================ --}}
-<section class="bg-linear-to-r from-primary-700 via-primary-600 to-primary-800 text-white py-16 relative overflow-hidden">
-    <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute -top-24 -right-24 w-80 h-80 bg-white/5 rounded-full blur-2xl"></div>
-        <div class="absolute bottom-0 -left-16 w-60 h-60 bg-accent-500/10 rounded-full blur-2xl"></div>
-    </div>
-    <div class="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-3">{{ __('front.newsletter_title') }}</h2>
-        <p class="text-primary-200 mb-8">{{ __('front.newsletter_sub') }}</p>
-
-        <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="return false">
-            <input type="email"
-                   placeholder="{{ __('front.newsletter_placeholder') }}"
-                   class="flex-1 px-5 py-3 rounded-full text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-white/50 placeholder-gray-400">
-            <button type="submit"
-                    class="bg-accent-500 hover:bg-accent-400 text-white font-bold px-7 py-3 rounded-full transition-colors text-sm whitespace-nowrap shadow-lg">
-                {{ __('front.newsletter_btn') }}
-            </button>
-        </form>
-        <p class="text-primary-300 text-xs mt-4">{{ __('front.newsletter_note') }}</p>
-    </div>
-</section>
-
 @endsection
 
 @push('scripts')

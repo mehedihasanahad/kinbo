@@ -319,6 +319,14 @@ return [
     'delete'                    => 'Delete',
     'optional'                  => 'optional',
 
+    // Newsletter subscribe
+    'subscribe_check_email'       => 'Almost there! Check your email and click the confirmation link.',
+    'subscribe_already'           => 'You are already subscribed. Thank you!',
+    'subscribe_confirmed'         => 'Your subscription is confirmed! Welcome to our newsletter.',
+    'subscribe_unsubscribed'      => 'You have been unsubscribed. You will no longer receive emails from us.',
+    'subscribe_email_placeholder' => 'Enter your email address',
+    'subscribe_btn'               => 'Subscribe',
+
     // Static pages
     'page_about_title'       => 'About Us',
     'page_about_badge'       => 'Our Story',

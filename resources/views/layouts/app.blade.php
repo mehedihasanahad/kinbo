@@ -269,14 +269,26 @@
             <div>
                 <h4 class="text-white font-semibold mb-4">{{ __('front.newsletter_footer') }}</h4>
                 <p class="text-sm mb-3">{{ __('front.newsletter_footer_sub') }}</p>
-                <div class="flex gap-2">
-                    <input type="email"
-                           placeholder="{{ __('front.footer_email_placeholder') }}"
-                           class="flex-1 text-sm px-3 py-2 rounded-lg bg-primary-900 border border-primary-800 text-white placeholder-primary-500 focus:outline-none focus:border-primary-500">
-                    <button class="bg-accent-600 hover:bg-accent-500 text-white text-sm px-4 py-2 rounded-lg transition-colors font-semibold">
-                        {{ __('front.footer_go') }}
-                    </button>
-                </div>
+                <form class="subscribe-form" data-url="{{ route('subscribe.store') }}">
+                    @csrf
+                    <div class="flex gap-2">
+                        <input type="email" name="email" required
+                               placeholder="{{ __('front.subscribe_email_placeholder') }}"
+                               class="subscribe-input flex-1 text-sm px-3 py-2 rounded-lg bg-primary-900 border border-primary-800 text-white placeholder-primary-500 focus:outline-none focus:border-primary-500">
+                        <button type="submit"
+                                class="subscribe-btn bg-accent-600 hover:bg-accent-500 text-white text-sm px-4 py-2 rounded-lg transition-colors font-semibold whitespace-nowrap flex items-center justify-center" style="min-width:90px">
+                            <span class="subscribe-btn-label">{{ __('front.subscribe_btn') }}</span>
+                            <svg class="subscribe-spinner" style="display:none;width:16px;height:16px;animation:subscribe-spin .8s linear infinite" fill="none" viewBox="0 0 24 24">
+                                <circle style="opacity:.3" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                                <path style="opacity:.9" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="subscribe-feedback mt-2 items-center gap-2 text-xs rounded-lg px-3 py-2" style="display:none">
+                        <svg class="subscribe-feedback-icon w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+                        <span class="subscribe-feedback-text"></span>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -363,6 +375,94 @@ function toggleWishlist(btn, productId) {
             !toggleBtn.contains(e.target)) {
             searchBar.classList.add('hidden');
         }
+    });
+})();
+</script>
+
+{{-- Subscribe spinner keyframe --}}
+<style>@keyframes subscribe-spin{to{transform:rotate(360deg)}}</style>
+
+{{-- Newsletter subscribe AJAX --}}
+<script>
+(function () {
+    var MSGS = {
+        check_email:        '{{ __('front.subscribe_check_email') }}',
+        already_subscribed: '{{ __('front.subscribe_already') }}',
+        error:              'Something went wrong. Please try again.',
+    };
+
+    var ICON_OK   = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+    var ICON_WARN = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/>';
+    var ICON_ERR  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+
+    function showFeedback(form, type, msg) {
+        var fb   = form.querySelector('.subscribe-feedback');
+        var icon = form.querySelector('.subscribe-feedback-icon');
+        var text = form.querySelector('.subscribe-feedback-text');
+        if (!fb) return;
+
+        fb.style.display = 'flex';
+        fb.className = 'subscribe-feedback mt-2 items-center gap-2 text-xs rounded-lg px-3 py-2 '
+            + (type === 'success' ? 'bg-emerald-900/60 text-emerald-300'
+             : type === 'warn'    ? 'bg-amber-900/60 text-amber-300'
+             :                      'bg-red-900/60 text-red-300');
+
+        if (icon) icon.innerHTML = type === 'success' ? ICON_OK : type === 'warn' ? ICON_WARN : ICON_ERR;
+        if (text) text.textContent = msg;
+    }
+
+    function setLoading(form, loading) {
+        var btn     = form.querySelector('.subscribe-btn');
+        var label   = form.querySelector('.subscribe-btn-label');
+        var spinner = form.querySelector('.subscribe-spinner');
+        var input   = form.querySelector('.subscribe-input');
+
+        if (btn)     btn.disabled = loading;
+        if (input)   input.disabled = loading;
+        if (label)   label.style.display  = loading ? 'none' : '';
+        if (spinner) spinner.style.display = loading ? 'block' : 'none';
+    }
+
+    document.querySelectorAll('.subscribe-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var emailEl = form.querySelector('[name="email"]');
+            var token   = (form.querySelector('[name="_token"]') || {}).value || '';
+            var email   = emailEl ? emailEl.value.trim() : '';
+
+            if (!email) return;
+
+            setLoading(form, true);
+
+            fetch(form.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept':       'application/json',
+                },
+                body: JSON.stringify({ email: email }),
+            })
+            .then(function (r) {
+                if (!r.ok) throw new Error('server');
+                return r.json();
+            })
+            .then(function (data) {
+                if (data.status === 'already_subscribed') {
+                    showFeedback(form, 'warn', MSGS.already_subscribed);
+                } else {
+                    showFeedback(form, 'success', MSGS.check_email);
+                    if (emailEl) emailEl.value = '';
+                }
+            })
+            .catch(function () {
+                showFeedback(form, 'error', MSGS.error);
+            })
+            .finally(function () {
+                setLoading(form, false);
+            });
+        });
     });
 })();
 </script>

@@ -319,6 +319,14 @@ return [
     'delete'                    => 'মুছুন',
     'optional'                  => 'ঐচ্ছিক',
 
+    // Newsletter subscribe
+    'subscribe_check_email'       => 'প্রায় হয়ে গেল! ইমেইল চেক করুন এবং কনফার্মেশন লিংকে ক্লিক করুন।',
+    'subscribe_already'           => 'আপনি ইতিমধ্যে সাবস্ক্রাইব করেছেন। ধন্যবাদ!',
+    'subscribe_confirmed'         => 'আপনার সাবস্ক্রিপশন নিশ্চিত হয়েছে! আমাদের নিউজলেটারে স্বাগতম।',
+    'subscribe_unsubscribed'      => 'আপনাকে আনসাবস্ক্রাইব করা হয়েছে। আমরা আর ইমেইল পাঠাব না।',
+    'subscribe_email_placeholder' => 'আপনার ইমেইল ঠিকানা দিন',
+    'subscribe_btn'               => 'সাবস্ক্রাইব',
+
     // Static pages
     'page_about_title'       => 'আমাদের সম্পর্কে',
     'page_about_badge'       => 'আমাদের গল্প',
