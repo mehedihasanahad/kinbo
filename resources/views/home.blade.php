@@ -30,14 +30,6 @@
                         {{-- Text content --}}
                         <div class="hero-slide-content">
                             <div class="max-w-2xl">
-
-                                {{-- Optional badge chip --}}
-                                <span class="inline-block bg-accent-500/25 text-accent-200 text-xs font-bold
-                                             px-4 py-1.5 rounded-full mb-4 tracking-widest uppercase
-                                             backdrop-blur-sm border border-accent-400/20">
-                                    {{ __('front.hero_badge') }}
-                                </span>
-
                                 <h1 class="hero-slide-title">
                                     {!! nl2br(e($banner->title)) !!}
                                 </h1>
