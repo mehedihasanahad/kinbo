@@ -143,7 +143,7 @@ class ProductResource extends Resource
             ])->columns(3),
 
             Forms\Components\Section::make('Product Images')
-                ->description('First image marked as primary will be used as the main thumbnail.')
+                ->description('First image marked as primary will be used as the main thumbnail. Recommended: square images (1:1 ratio), minimum 800×800px.')
                 ->schema([
                     Forms\Components\Repeater::make('images')
                         ->relationship('images')

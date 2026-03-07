@@ -317,7 +317,8 @@
 }
 
 .product-card-image {
-    height: 210px;
+    aspect-ratio: 1 / 1;
+    width: 100%;
     flex-shrink: 0;
 }
 
