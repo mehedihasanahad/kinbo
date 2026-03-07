@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ReportExportController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\CartController;
@@ -19,6 +20,15 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Static pages
+Route::get('/about',   [PageController::class, 'about'])->name('page.about');
+Route::get('/contact', [PageController::class, 'contact'])->name('page.contact');
+Route::post('/contact', [PageController::class, 'contactSend'])->name('page.contact.send');
+Route::get('/faq',     [PageController::class, 'faq'])->name('page.faq');
+Route::get('/privacy', [PageController::class, 'privacy'])->name('page.privacy');
+Route::get('/blog',    [PageController::class, 'blog'])->name('page.blog');
+Route::get('/blog/{slug}', [PageController::class, 'blogPost'])->name('page.blog.post');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/search', [ShopController::class, 'category'])->name('shop.search');
 Route::get('/products', [ShopController::class, 'category'])->name('shop.category');

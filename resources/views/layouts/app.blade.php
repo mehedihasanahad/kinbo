@@ -253,19 +253,17 @@
             <div>
                 <h4 class="text-white font-semibold mb-4">{{ __('front.quick_links') }}</h4>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.about_us') }}</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.contact') }}</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.blog') }}</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.careers') }}</a></li>
+                    <li><a href="{{ route('page.about') }}" class="hover:text-white transition-colors">{{ __('front.about_us') }}</a></li>
+                    <li><a href="{{ route('page.contact') }}" class="hover:text-white transition-colors">{{ __('front.contact') }}</a></li>
+                    <li><a href="{{ route('page.blog') }}" class="hover:text-white transition-colors">{{ __('front.blog') }}</a></li>
                 </ul>
             </div>
             <div>
                 <h4 class="text-white font-semibold mb-4">{{ __('front.customer_care') }}</h4>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.track_my_order') }}</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.returns_exchanges') }}</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.faq') }}</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">{{ __('front.privacy_policy') }}</a></li>
+                    <li><a href="{{ route('orders.index') }}" class="hover:text-white transition-colors">{{ __('front.track_my_order') }}</a></li>
+                    <li><a href="{{ route('page.faq') }}" class="hover:text-white transition-colors">{{ __('front.faq') }}</a></li>
+                    <li><a href="{{ route('page.privacy') }}" class="hover:text-white transition-colors">{{ __('front.privacy_policy') }}</a></li>
                 </ul>
             </div>
             <div>

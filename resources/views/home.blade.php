@@ -69,12 +69,6 @@
                                 {{-- Trust micro-badges (hidden on smallest screens to keep it clean) --}}
                                 <div class="hidden sm:flex flex-wrap gap-5 mt-7 text-sm text-primary-200">
                                     <span class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-accent-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                        </svg>
-                                        {{ __('front.hero_rated') }}
-                                    </span>
-                                    <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                         </svg>
@@ -95,12 +89,12 @@
             @empty
                 {{-- ── Fallback static slide when no banners in DB ── --}}
                 <div class="swiper-slide">
-                    <div class="hero-slide-inner bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800">
+                    <div class="hero-slide-inner bg-linear-to-br from-primary-950 via-primary-900 to-primary-800">
 
                         {{-- Decorative blobs --}}
-                        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary-700/15 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute -top-40 -right-40 w-150 h-150 bg-primary-700/15 rounded-full blur-3xl pointer-events-none"></div>
                         <div class="absolute bottom-0 -left-32 w-96 h-96 bg-accent-500/8 rounded-full blur-3xl pointer-events-none"></div>
-                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary-600/5 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-100 bg-primary-600/5 rounded-full blur-3xl pointer-events-none"></div>
 
                         <div class="hero-slide-content">
                             <div class="max-w-2xl">
@@ -129,12 +123,6 @@
                                     </a>
                                 </div>
                                 <div class="hidden sm:flex flex-wrap gap-5 mt-7 text-sm text-primary-300">
-                                    <span class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-accent-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                        </svg>
-                                        {{ __('front.hero_rated') }}
-                                    </span>
                                     <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -305,7 +293,7 @@
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-        <div class="relative bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl p-8 text-white overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow">
+        <div class="relative bg-linear-to-r from-orange-500 to-red-500 rounded-3xl p-8 text-white overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow">
             <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/10 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
             <div class="absolute top-4 right-4 w-20 h-20 bg-white/5 rounded-full"></div>
             <p class="text-orange-100 text-xs font-bold uppercase tracking-widest mb-2">{{ __('front.flash_sale_badge') }}</p>
@@ -316,7 +304,7 @@
             </a>
         </div>
 
-        <div class="relative bg-gradient-to-r from-primary-600 to-primary-800 rounded-3xl p-8 text-white overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow">
+        <div class="relative bg-linear-to-r from-primary-600 to-primary-800 rounded-3xl p-8 text-white overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow">
             <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/10 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
             <div class="absolute top-4 right-4 w-20 h-20 bg-white/5 rounded-full"></div>
             <p class="text-primary-200 text-xs font-bold uppercase tracking-widest mb-2">{{ __('front.new_in_badge') }}</p>
@@ -374,7 +362,7 @@
                     </div>
                     <div class="p-4">
                         <p class="text-xs text-gray-400 mb-1 truncate">{{ $product->brand?->name }}</p>
-                        <h4 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2 min-h-[2.5rem]">
+                        <h4 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2 min-h-10">
                             {{ $t?->name ?? $product->sku }}
                         </h4>
                         <div class="flex items-center justify-between gap-2">
@@ -527,7 +515,7 @@
 {{-- ============================================================
     10. NEWSLETTER / CTA SECTION
 ============================================================ --}}
-<section class="bg-gradient-to-r from-primary-700 via-primary-600 to-primary-800 text-white py-16 relative overflow-hidden">
+<section class="bg-linear-to-r from-primary-700 via-primary-600 to-primary-800 text-white py-16 relative overflow-hidden">
     <div class="absolute inset-0 pointer-events-none">
         <div class="absolute -top-24 -right-24 w-80 h-80 bg-white/5 rounded-full blur-2xl"></div>
         <div class="absolute bottom-0 -left-16 w-60 h-60 bg-accent-500/10 rounded-full blur-2xl"></div>
