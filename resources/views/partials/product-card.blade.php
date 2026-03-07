@@ -19,7 +19,7 @@
             @if($product->primaryImage)
                 <img src="{{ asset('storage/' . $product->primaryImage->path) }}"
                      alt="{{ $productName }}"
-                     class="w-full h-full object-cover object-center
+                     class="w-full h-full object-contain object-center
                             group-hover:scale-105 transition-transform duration-500">
             @else
                 <div class="w-full h-full flex items-center justify-center bg-gray-100">

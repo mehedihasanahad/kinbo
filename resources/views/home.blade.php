@@ -327,47 +327,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach($onSaleProducts as $product)
-                @php
-                    $t = $product->getTranslation(app()->getLocale()) ?? $product->getTranslation('en');
-                    $discount = $product->price > 0
-                        ? round((($product->price - $product->sale_price) / $product->price) * 100)
-                        : 0;
-                @endphp
-                <div class="bg-white rounded-2xl overflow-hidden border border-red-100 hover:shadow-lg transition-shadow group">
-                    <div class="relative h-48 flex items-center justify-center bg-gray-50 overflow-hidden">
-                        @if($product->primaryImage)
-                            <img src="{{ asset('storage/' . $product->primaryImage->path) }}"
-                                 alt="{{ $t?->name ?? $product->sku }}"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        @else
-                            <div class="w-20 h-20 bg-gray-200 rounded-xl flex items-center justify-center">
-                                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                            </div>
-                        @endif
-                        @if($discount > 0)
-                            <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                -{{ $discount }}%
-                            </span>
-                        @endif
-                    </div>
-                    <div class="p-4">
-                        <p class="text-xs text-gray-400 mb-1 truncate">{{ $product->brand?->name }}</p>
-                        <h4 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2 min-h-10">
-                            {{ $t?->name ?? $product->sku }}
-                        </h4>
-                        <div class="flex items-center justify-between gap-2">
-                            <div>
-                                <span class="text-red-600 font-bold">৳{{ number_format($product->sale_price, 0) }}</span>
-                                <span class="text-gray-400 text-xs line-through ml-1">৳{{ number_format($product->price, 0) }}</span>
-                            </div>
-                            <button class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-3 rounded-xl transition-colors whitespace-nowrap">
-                                {{ __('front.add_to_cart') }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                @include('partials.product-card', ['product' => $product])
             @endforeach
         </div>
     </div>
