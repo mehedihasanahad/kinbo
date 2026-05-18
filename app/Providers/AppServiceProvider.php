@@ -51,10 +51,19 @@ class AppServiceProvider extends ServiceProvider
 
             $announcementBarText = \App\Models\Setting::get('announcement_bar_text', '');
 
+            $navCategories = \App\Models\Category::active()
+                ->root()
+                ->inNav()
+                ->with('translations')
+                ->orderBy('sort_order')
+                ->take(8)
+                ->get();
+
             $view->with(compact(
                 'cartCount',
                 'wishlistCount',
-                'announcementBarText'
+                'announcementBarText',
+                'navCategories'
             ));
         });
     }

@@ -41,7 +41,13 @@ class CategoryResource extends Resource
                     ->numeric()->integer()->default(0),
 
                 Forms\Components\Toggle::make('is_active')->default(true)->inline(false),
-            ])->columns(3),
+
+                Forms\Components\Toggle::make('show_in_nav')
+                    ->label('Show in Nav')
+                    ->helperText('Display in main navigation menu')
+                    ->default(false)
+                    ->inline(false),
+            ])->columns(4),
 
             Forms\Components\Section::make('Translation (English)')->schema([
                 Forms\Components\TextInput::make('translation_name')
@@ -98,7 +104,9 @@ class CategoryResource extends Resource
                     ->label('Products')
                     ->counts('products'),
 
-                Tables\Columns\IconColumn::make('is_active')->boolean(),
+                Tables\Columns\IconColumn::make('is_active')->boolean()->label('Active'),
+
+                Tables\Columns\IconColumn::make('show_in_nav')->boolean()->label('In Nav'),
 
                 Tables\Columns\TextColumn::make('sort_order')->sortable(),
             ])

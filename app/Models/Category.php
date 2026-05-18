@@ -11,12 +11,13 @@ class Category extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['parent_id', 'image', 'sort_order', 'is_active'];
+    protected $fillable = ['parent_id', 'image', 'sort_order', 'is_active', 'show_in_nav'];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
+            'is_active'   => 'boolean',
+            'show_in_nav' => 'boolean',
         ];
     }
 
@@ -53,6 +54,11 @@ class Category extends Model
     public function scopeRoot($query)
     {
         return $query->whereNull('parent_id');
+    }
+
+    public function scopeInNav($query)
+    {
+        return $query->where('show_in_nav', true);
     }
 
     public function getTranslation(string $locale = 'en'): ?CategoryTranslation

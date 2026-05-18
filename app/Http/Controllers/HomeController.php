@@ -32,11 +32,11 @@ class HomeController extends Controller
             ->take(12)
             ->get();
 
-        $newArrivals = Product::active()
+        $newArrivals = Product::featured()
             ->inStock()
             ->with(['primaryImage', 'translations', 'brand'])
-            ->latest()
-            ->take(12)
+            ->orderBy('sort_order')
+            ->take(4)
             ->get();
 
         $onSaleProducts = Product::active()
@@ -44,7 +44,7 @@ class HomeController extends Controller
             ->whereNotNull('sale_price')
             ->with(['primaryImage', 'translations', 'brand'])
             ->orderByRaw('((price - sale_price) / price) DESC')
-            ->take(4)
+            ->take(12)
             ->get();
 
         $brands = Brand::active()
