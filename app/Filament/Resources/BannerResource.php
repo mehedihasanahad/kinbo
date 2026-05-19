@@ -57,7 +57,7 @@ class BannerResource extends Resource
                 ])->columns(2),
 
             Forms\Components\Section::make('Banner Image')
-                ->description('This single image is used on all screen sizes. Use a wide landscape image — it will be cropped responsively on mobile.')
+                ->description('Upload a high-resolution image (minimum 1920 × 700 px). It will be auto-cropped to exactly 1920 × 700 px and displayed on all screen sizes.')
                 ->schema([
                     Forms\Components\FileUpload::make('image')
                         ->label('Banner Image')
@@ -74,20 +74,20 @@ class BannerResource extends Resource
                         ->imageResizeTargetHeight('700')
                         ->imageResizeMode('cover')
                         ->imageResizeUpscale(false)
-                        ->helperText('📐 Recommended: 1920 × 700 px  |  Aspect ratio 16:5.8  |  JPEG / PNG / WebP  |  Max 4 MB. The image auto-scales on all screen sizes.')
+                        ->helperText('📐 Required: 1920 × 700 px minimum | Aspect ratio 2.74:1 | JPEG / PNG / WebP | Max 4 MB — auto-cropped to 1920 × 700 px on upload.')
                         ->rules([
                             'required',
                             'image',
                             'mimes:jpeg,jpg,png,webp',
                             'max:4096',
-                            'dimensions:min_width=800,min_height=300,max_width=5000,max_height=2000',
+                            'dimensions:min_width=1920,min_height=700,max_width=8000,max_height=4000',
                         ])
                         ->validationMessages([
                             'required'   => 'A banner image is required.',
                             'image'      => 'The file must be a valid image.',
                             'mimes'      => 'Only JPEG, PNG, and WebP images are accepted.',
                             'max'        => 'The image must not exceed 4 MB.',
-                            'dimensions' => 'Image must be at least 800 × 300 px and no larger than 5000 × 2000 px.',
+                            'dimensions' => 'Image must be at least 1920 × 700 px. Please upload a higher-resolution image.',
                         ])
                         ->columnSpanFull(),
                 ])
@@ -143,12 +143,14 @@ class BannerResource extends Resource
                     ->sortable()
                     ->limit(40),
 
-                Tables\Columns\BadgeColumn::make('locale')
-                    ->colors([
-                        'primary' => 'all',
-                        'success' => 'en',
-                        'warning' => 'bn',
-                    ])
+                Tables\Columns\TextColumn::make('locale')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'all' => 'primary',
+                        'en'  => 'success',
+                        'bn'  => 'warning',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'all' => 'All',
                         'en'  => 'English',

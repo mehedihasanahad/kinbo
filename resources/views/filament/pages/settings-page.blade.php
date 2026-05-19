@@ -57,6 +57,18 @@
             {{ $this->oauthForm }}
         </x-filament::section>
 
+        {{-- Homepage --}}
+        <x-filament::section class="mt-6">
+            <x-slot name="heading">Homepage</x-slot>
+            <x-slot name="description">Control the promotional banner displayed between New Arrivals and Best Deals.</x-slot>
+
+            {{ $this->homepageImageForm }}
+
+            <div class="mt-6">
+                {{ $this->homepageForm }}
+            </div>
+        </x-filament::section>
+
         <div class="mt-6 flex justify-end">
             <x-filament::button type="submit" size="lg">
                 Save Settings

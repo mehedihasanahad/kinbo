@@ -328,11 +328,11 @@
 </main>
 
 {{-- ── Footer ── --}}
-<footer class="bg-gray-950 text-gray-400">
+<footer class="bg-gray-950 text-gray-400 pb-16 lg:pb-0">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
-            {{-- Brand --}}
+            {{-- Col 1: Brand --}}
             <div class="sm:col-span-2 lg:col-span-1">
                 <a href="{{ route('home') }}" class="inline-block mb-3">
                     <img src="{{ asset('images/youthcollection-logo.png') }}"
@@ -365,19 +365,18 @@
                 </div>
             </div>
 
-            {{-- Newsletter --}}
+            {{-- Col 2: Newsletter --}}
             <div>
                 <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-4">Newsletter</h4>
                 <p class="text-xs leading-relaxed mb-4">Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
                 <form class="subscribe-form" data-url="{{ route('subscribe.store') }}">
                     @csrf
-                    <div class="flex gap-2">
+                    <div class="flex">
                         <input type="email" name="email" required
                                placeholder="Enter your email"
-                               class="subscribe-input flex-1 text-xs px-3 py-2.5 rounded bg-gray-900 border border-gray-800 text-white placeholder-gray-600 focus:outline-none focus:border-primary-600 transition-colors">
+                               class="subscribe-input flex-1 min-w-0 text-xs px-3 py-2.5 rounded-l bg-gray-900 border border-primary-600 border-r-0 text-white placeholder-gray-600 focus:outline-none transition-colors">
                         <button type="submit"
-                                class="subscribe-btn bg-primary-600 hover:bg-primary-700 text-white text-xs px-4 py-2.5 rounded font-bold uppercase tracking-wider whitespace-nowrap flex items-center justify-center transition-colors"
-                                style="min-width:90px">
+                                class="subscribe-btn shrink-0 bg-primary-600 hover:bg-primary-700 text-white text-xs px-3 py-2.5 rounded-r font-bold uppercase tracking-wider flex items-center justify-center transition-colors">
                             <span class="subscribe-btn-label">Subscribe</span>
                             <svg class="subscribe-spinner" style="display:none;width:14px;height:14px;animation:subscribe-spin .8s linear infinite" fill="none" viewBox="0 0 24 24">
                                 <circle style="opacity:.3" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
@@ -392,33 +391,21 @@
                 </form>
             </div>
 
-            {{-- Quick Links --}}
+            {{-- Col 3: Quick Links (merged essential links) --}}
             <div>
                 <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-4">Quick Links</h4>
                 <ul class="space-y-2.5 text-xs">
                     <li><a href="{{ route('page.about') }}" class="hover:text-white transition-colors">About Us</a></li>
+                    <li><a href="{{ route('shop.category', ['sort' => 'newest']) }}" class="hover:text-white transition-colors">New Arrivals</a></li>
                     <li><a href="#" class="hover:text-white transition-colors">Size Guide</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Delivery Info</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Exchange &amp; Returns</a></li>
-                    <li><a href="{{ route('page.privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Terms &amp; Conditions</a></li>
-                </ul>
-            </div>
-
-            {{-- Customer Service --}}
-            <div>
-                <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-4">Customer Service</h4>
-                <ul class="space-y-2.5 text-xs">
-                    <li><a href="{{ route('page.faq') }}" class="hover:text-white transition-colors">Help Center</a></li>
                     <li><a href="{{ $trackUrl }}" class="hover:text-white transition-colors">Track Your Order</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Return Policy</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Shipping Policy</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Payment Methods</a></li>
-                    <li><a href="{{ route('page.faq') }}" class="hover:text-white transition-colors">FAQ</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Exchange &amp; Returns</a></li>
+                    <li><a href="{{ route('page.faq') }}" class="hover:text-white transition-colors">Help Center</a></li>
+                    <li><a href="{{ route('page.privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a></li>
                 </ul>
             </div>
 
-            {{-- Contact --}}
+            {{-- Col 4: Contact --}}
             <div>
                 <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-4">Contact Us</h4>
                 <ul class="space-y-3.5 text-xs">

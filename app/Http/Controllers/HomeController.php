@@ -60,6 +60,17 @@ class HomeController extends Controller
             ->take(9)
             ->get();
 
+        $promoImg    = Setting::get('promo_banner_image', '');
+        $promoBanner = [
+            'enabled'     => (bool) Setting::get('promo_banner_enabled', '1'),
+            'image'       => $promoImg ? asset('storage/' . $promoImg) : null,
+            'label'       => Setting::get('promo_banner_label', 'Up To'),
+            'headline'    => Setting::get('promo_banner_headline', '20% OFF'),
+            'subtext'     => Setting::get('promo_banner_subtext', 'On New Collection'),
+            'button_text' => Setting::get('promo_banner_button_text', 'Shop Now'),
+            'button_url'  => Setting::get('promo_banner_button_url', ''),
+        ];
+
         return view('home', compact(
             'settings',
             'banners',
@@ -69,6 +80,7 @@ class HomeController extends Controller
             'onSaleProducts',
             'brands',
             'testimonials',
+            'promoBanner',
         ));
     }
 }

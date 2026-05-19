@@ -842,10 +842,17 @@ function switchTab(tab) {
     });
 }
 
-// Auto-open reviews tab if redirected back with a review flash or #reviews hash
-@if(session('review_success') || session('review_error'))
-document.addEventListener('DOMContentLoaded', () => switchTab('reviews'));
-@endif
+// Auto-open reviews tab if session flash or #reviews hash is present
+document.addEventListener('DOMContentLoaded', () => {
+    const openReviews = @json(session('review_success') || session('review_error'))
+        || window.location.hash === '#reviews';
+    if (openReviews) switchTab('reviews');
+});
+
+// Also handle the rating link click — switch tab before scrolling
+document.querySelectorAll('a[href="#reviews"]').forEach(link => {
+    link.addEventListener('click', () => switchTab('reviews'));
+});
 
 // ── Variant selection ──
 @if($variantOptions->isNotEmpty())

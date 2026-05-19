@@ -33,6 +33,18 @@ new Swiper('.category-swiper', {
     },
 });
 
+new Swiper('.reviews-swiper', {
+    slidesPerView: 1.2,
+    spaceBetween: 14,
+    grabCursor: true,
+    breakpoints: {
+        480:  { slidesPerView: 2,   spaceBetween: 14 },
+        640:  { slidesPerView: 2.5, spaceBetween: 16 },
+        1024: { slidesPerView: 3,   spaceBetween: 16 },
+        1280: { slidesPerView: 4,   spaceBetween: 18 },
+    },
+});
+
 new Swiper('#heroSwiper', {
     slidesPerView: 1,
     speed: 600,

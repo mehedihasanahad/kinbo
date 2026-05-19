@@ -34,10 +34,12 @@ class SettingsPage extends Page
     public array $policy   = [];
     public array $social   = [];
     public array $oauth    = [];
+    public array $homepage = [];
 
     // Branding — kept flat (no statePath) so FileUpload can store files properly
-    public ?array $site_logo    = [];
-    public ?array $site_favicon = [];
+    public ?array $site_logo          = [];
+    public ?array $site_favicon       = [];
+    public ?array $promo_banner_image = [];
 
     public function mount(): void
     {
@@ -89,6 +91,15 @@ class SettingsPage extends Page
             'google_client_secret' => Setting::get('google_client_secret', ''),
         ];
 
+        $this->homepage = [
+            'promo_banner_enabled'     => (bool) Setting::get('promo_banner_enabled', '1'),
+            'promo_banner_label'       => Setting::get('promo_banner_label', 'Up To'),
+            'promo_banner_headline'    => Setting::get('promo_banner_headline', '20% OFF'),
+            'promo_banner_subtext'     => Setting::get('promo_banner_subtext', 'On New Collection'),
+            'promo_banner_button_text' => Setting::get('promo_banner_button_text', 'Shop Now'),
+            'promo_banner_button_url'  => Setting::get('promo_banner_button_url', ''),
+        ];
+
         // Hydrate flat FileUpload properties from stored paths.
         // Filament v3 FileUpload expects [path => path] when loading existing files.
         $logoPath    = Setting::get('site_logo', '');
@@ -96,11 +107,14 @@ class SettingsPage extends Page
 
         $this->site_logo    = $logoPath    ? [$logoPath    => $logoPath]    : [];
         $this->site_favicon = $faviconPath ? [$faviconPath => $faviconPath] : [];
+
+        $promoImagePath = Setting::get('promo_banner_image', '');
+        $this->promo_banner_image = $promoImagePath ? [$promoImagePath => $promoImagePath] : [];
     }
 
     protected function getForms(): array
     {
-        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'policyForm', 'socialForm', 'oauthForm'];
+        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'policyForm', 'socialForm', 'oauthForm', 'homepageForm', 'homepageImageForm'];
     }
 
     public function brandingForm(Form $form): Form
@@ -235,6 +249,81 @@ class SettingsPage extends Page
         ])->statePath('social')->columns(2);
     }
 
+    public function homepageImageForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\FileUpload::make('promo_banner_image')
+                ->label('Promo Banner Image')
+                ->image()
+                ->disk('public')
+                ->visibility('public')
+                ->directory('banners')
+                ->imagePreviewHeight('160')
+                ->maxSize(3072)
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                ->nullable()
+                ->helperText('📐 Must be exactly 1200 × 450 px | JPEG / PNG / WebP | Max 3 MB.')
+                ->rules([
+                    'nullable',
+                    'image',
+                    'mimes:jpeg,jpg,png,webp',
+                    'max:3072',
+                    'dimensions:width=1200,height=450',
+                ])
+                ->validationMessages([
+                    'image'      => 'The file must be a valid image.',
+                    'mimes'      => 'Only JPEG, PNG, and WebP images are accepted.',
+                    'max'        => 'The image must not exceed 3 MB.',
+                    'dimensions' => 'Image must be exactly 1200 × 450 px.',
+                ]),
+        ]);
+        // No statePath — binds directly to $this->promo_banner_image
+    }
+
+    public function homepageForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Section::make('Promo Banner')->schema([
+                Forms\Components\Toggle::make('promo_banner_enabled')
+                    ->label('Show Promo Banner')
+                    ->helperText('Display the promotional banner on the home page.')
+                    ->inline(false)
+                    ->live()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('promo_banner_label')
+                    ->label('Label (small text above headline)')
+                    ->maxLength(50)
+                    ->nullable()
+                    ->placeholder('Up To')
+                    ->visible(fn ($get) => $get('promo_banner_enabled')),
+                Forms\Components\TextInput::make('promo_banner_headline')
+                    ->label('Headline')
+                    ->maxLength(50)
+                    ->nullable()
+                    ->placeholder('20% OFF')
+                    ->visible(fn ($get) => $get('promo_banner_enabled')),
+                Forms\Components\TextInput::make('promo_banner_subtext')
+                    ->label('Sub-text (below headline)')
+                    ->maxLength(100)
+                    ->nullable()
+                    ->placeholder('On New Collection')
+                    ->visible(fn ($get) => $get('promo_banner_enabled')),
+                Forms\Components\TextInput::make('promo_banner_button_text')
+                    ->label('Button Label')
+                    ->maxLength(50)
+                    ->nullable()
+                    ->placeholder('Shop Now')
+                    ->visible(fn ($get) => $get('promo_banner_enabled')),
+                Forms\Components\TextInput::make('promo_banner_button_url')
+                    ->label('Button URL')
+                    ->url()
+                    ->nullable()
+                    ->placeholder('Leave blank to link to discounted products')
+                    ->visible(fn ($get) => $get('promo_banner_enabled')),
+            ])->columns(2),
+        ])->statePath('homepage');
+    }
+
     public function oauthForm(Form $form): Form
     {
         return $form->schema([
@@ -264,17 +353,20 @@ class SettingsPage extends Page
     {
         $this->generalForm->validate();
         $this->contactForm->validate();
+        $this->homepageImageForm->validate();
 
         // Persist branding files manually.
         // $this->site_logo is either:
         //   - [uuid => TemporaryUploadedFile]  — a new upload waiting to be stored
         //   - ['settings/file.png' => 'settings/file.png']  — an already-stored file (no action needed)
         //   - []  — cleared / no image
-        $logoPath    = $this->storeOrKeep($this->site_logo,    'settings');
-        $faviconPath = $this->storeOrKeep($this->site_favicon, 'settings');
+        $logoPath       = $this->storeOrKeep($this->site_logo,          'settings');
+        $faviconPath    = $this->storeOrKeep($this->site_favicon,       'settings');
+        $promoImagePath = $this->storeOrKeep($this->promo_banner_image, 'banners');
 
-        Setting::set('site_logo',    $logoPath,    'branding');
-        Setting::set('site_favicon', $faviconPath, 'branding');
+        Setting::set('site_logo',         $logoPath,       'branding');
+        Setting::set('site_favicon',      $faviconPath,    'branding');
+        Setting::set('promo_banner_image', $promoImagePath, 'homepage');
 
         foreach ($this->general as $key => $value) {
             Setting::set($key, $value, 'general');
@@ -293,6 +385,9 @@ class SettingsPage extends Page
         }
         foreach ($this->oauth as $key => $value) {
             Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'oauth');
+        }
+        foreach ($this->homepage as $key => $value) {
+            Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'homepage');
         }
 
         Cache::forget('settings.public');

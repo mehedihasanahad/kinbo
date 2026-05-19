@@ -83,12 +83,12 @@
 {{-- ============================================================
     3. SHOP BY CATEGORY
 ============================================================ --}}
-<section id="categories" class="py-16">
+<section id="categories" class="py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div class="text-center mb-10">
-            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-widest">Shop By Category</h2>
-            <div class="w-10 h-0.5 bg-primary-600 mx-auto mt-3"></div>
+        <div class="text-left lg:text-center mb-6">
+            <h2 class="text-lg font-black text-gray-900 uppercase leading-none">Shop By Category</h2>
+            <div class="hidden lg:block w-10 h-0.5 bg-primary-600 mt-3 lg:mx-auto"></div>
         </div>
 
         @if($categories->isNotEmpty())
@@ -131,19 +131,36 @@
 {{-- ============================================================
     4. NEW ARRIVALS — 2-column layout
 ============================================================ --}}
-<section id="new-arrivals" class="py-16 bg-gray-50/60">
+<section id="new-arrivals" class="py-10 bg-gray-50/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row gap-10 items-start">
 
             {{-- Left: text + CTA --}}
-            <div class="lg:w-56 shrink-0 lg:sticky lg:top-24">
-                <p class="text-primary-600 text-xs font-bold uppercase tracking-widest mb-1">New</p>
-                <h2 class="text-5xl font-black text-gray-900 uppercase leading-none mb-4">Arrivals</h2>
-                <p class="text-sm text-gray-500 leading-relaxed mb-7">Discover our latest modest fashion pieces, designed for comfort and elegance.</p>
-                <a href="{{ route('shop.category', ['sort' => 'newest']) }}"
-                   class="inline-block border border-gray-900 text-gray-900 text-[11px] font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-gray-900 hover:text-white transition-colors duration-200">
-                    View All
-                </a>
+            <div class="lg:w-56 shrink-0 lg:sticky lg:top-24 w-full">
+
+                {{-- Mobile: one-line header row --}}
+                <div class="flex items-center justify-between lg:hidden mb-4">
+                    <div>
+                        <p class="text-primary-600 text-[10px] font-bold uppercase tracking-widest leading-none mb-0.5">New</p>
+                        <h2 class="text-lg font-black text-gray-900 uppercase leading-none">Arrivals</h2>
+                    </div>
+                    <a href="{{ route('shop.category', ['sort' => 'newest']) }}"
+                       class="text-primary-600 text-[11px] font-bold uppercase tracking-widest hover:text-primary-700 transition-colors">
+                        View All
+                    </a>
+                </div>
+
+                {{-- Desktop: stacked column --}}
+                <div class="hidden lg:block">
+                    <p class="text-primary-600 text-xs font-bold uppercase tracking-widest mb-1">New</p>
+                    <h2 class="text-5xl font-black text-gray-900 uppercase leading-none mb-4">Arrivals</h2>
+                    <p class="text-sm text-gray-500 leading-relaxed mb-7">Discover our latest modest fashion pieces, designed for comfort and elegance.</p>
+                    <a href="{{ route('shop.category', ['sort' => 'newest']) }}"
+                       class="inline-block border border-gray-900 text-gray-900 text-[11px] font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-gray-900 hover:text-white transition-colors duration-200">
+                        View All
+                    </a>
+                </div>
+
             </div>
 
             {{-- Right: 1×4 product grid --}}
@@ -238,41 +255,70 @@
 </section>
 
 {{-- ============================================================
-    5. PROMO BANNER — full-width dark
+    5. PROMO BANNER — contained, admin-configurable
 ============================================================ --}}
-<section class="relative bg-gray-900 overflow-hidden">
-    {{-- Background image (first banner, low opacity) --}}
-    @if($banners->isNotEmpty())
-        <div class="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
-            <img src="{{ asset('storage/' . $banners->first()->image) }}"
-                 alt=""
-                 class="absolute right-0 top-0 h-full w-auto object-cover object-top opacity-25">
-            <div class="absolute inset-0 bg-gradient-to-l from-transparent to-gray-900"></div>
-        </div>
-    @else
-        <div class="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
-            <div class="absolute -right-20 top-1/2 -translate-y-1/2 w-96 h-96 bg-primary-900/30 rounded-full blur-3xl"></div>
-        </div>
-    @endif
+@if($promoBanner['enabled'])
+<section class="py-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative bg-gray-900 overflow-hidden rounded-xl" style="aspect-ratio:1200/450;">
 
-    <div class="relative z-10 max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 py-20">
-        <p class="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2">Up To</p>
-        <h2 class="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-none mb-3">20% OFF</h2>
-        <p class="text-gray-300 text-xs uppercase tracking-widest font-semibold mb-9">On New Collection</p>
-        <a href="{{ route('shop.category', ['sort' => 'discount']) }}"
-           class="inline-block bg-primary-600 hover:bg-primary-700 text-white text-[11px] font-bold uppercase tracking-widest px-8 py-3.5 transition-colors duration-200">
-            Shop Now
-        </a>
+            @if($promoBanner['image'])
+                <img src="{{ $promoBanner['image'] }}"
+                     alt=""
+                     class="absolute inset-0 w-full h-full object-cover object-center">
+                <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/50 to-transparent"></div>
+            @elseif($banners->isNotEmpty())
+                <div class="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
+                    <img src="{{ asset('storage/' . $banners->first()->image) }}"
+                         alt=""
+                         class="absolute right-0 top-0 h-full w-auto object-cover object-top opacity-20">
+                    <div class="absolute inset-0 bg-gradient-to-l from-transparent to-gray-900"></div>
+                </div>
+            @else
+                <div class="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
+                    <div class="absolute -right-20 top-1/2 -translate-y-1/2 w-96 h-96 bg-primary-900/30 rounded-full blur-3xl"></div>
+                </div>
+            @endif
+
+            <div class="absolute inset-0 flex flex-col justify-center px-6 sm:px-10 lg:px-16">
+                @if($promoBanner['label'])
+                    <p class="text-gray-300 text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold mb-0.5 sm:mb-1">{{ $promoBanner['label'] }}</p>
+                @endif
+                <h2 class="text-xl sm:text-3xl lg:text-5xl font-black text-white leading-none mb-0.5 sm:mb-2">{{ $promoBanner['headline'] }}</h2>
+                @if($promoBanner['subtext'])
+                    <p class="text-gray-300 text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold mb-2 sm:mb-5">{{ $promoBanner['subtext'] }}</p>
+                @endif
+                @if($promoBanner['button_text'])
+                    @php $promoUrl = $promoBanner['button_url'] ?: route('shop.category', ['sort' => 'discount']); @endphp
+                    <a href="{{ $promoUrl }}"
+                       class="inline-block bg-primary-600 hover:bg-primary-700 text-white text-[8px] sm:text-[10px] font-bold uppercase tracking-widest px-3 sm:px-6 py-1.5 sm:py-2.5 transition-colors duration-200 self-start">
+                        {{ $promoBanner['button_text'] }}
+                    </a>
+                @endif
+            </div>
+
+        </div>
     </div>
 </section>
+@endif
 
 {{-- ============================================================
     6. BEST DEALS
 ============================================================ --}}
-<section class="py-16 bg-gray-50/60">
+<section class="py-10 bg-gray-50/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div class="text-center mb-10">
+        {{-- Mobile: title left + View All right --}}
+        <div class="flex items-center justify-between lg:hidden mb-6">
+            <h2 class="text-lg font-black text-gray-900 uppercase leading-none">Best Deals</h2>
+            <a href="{{ route('shop.category', ['sort' => 'discount']) }}"
+               class="text-primary-600 text-[11px] font-bold uppercase tracking-widest hover:text-primary-700 transition-colors">
+                View All
+            </a>
+        </div>
+
+        {{-- Desktop: centered heading --}}
+        <div class="hidden lg:block text-center mb-6">
             <h2 class="text-lg font-bold text-gray-900 uppercase tracking-widest">Best Deals</h2>
             <div class="w-10 h-0.5 bg-primary-600 mx-auto mt-3"></div>
         </div>
@@ -351,7 +397,7 @@
                 <div class="swiper-button-next best-deals-swiper-next"></div>
             </div>
 
-            <div class="text-center mt-8">
+            <div class="hidden lg:block text-center mt-8">
                 <a href="{{ route('shop.category', ['sort' => 'discount']) }}"
                    class="inline-block border border-gray-900 text-gray-900 text-[11px] font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-gray-900 hover:text-white transition-colors duration-200">
                     View All
@@ -363,6 +409,73 @@
 
     </div>
 </section>
+
+{{-- ============================================================
+    7. CUSTOMER REVIEWS
+============================================================ --}}
+@if($testimonials->isNotEmpty())
+<section class="py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {{-- Mobile: title left --}}
+        <div class="flex items-center justify-between lg:hidden mb-6">
+            <h2 class="text-lg font-black text-gray-900 uppercase leading-none">Reviews</h2>
+        </div>
+
+        {{-- Desktop: centered heading --}}
+        <div class="hidden lg:block text-center mb-6">
+            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-widest">Customer Reviews</h2>
+            <div class="w-10 h-0.5 bg-primary-600 mx-auto mt-3"></div>
+        </div>
+
+        <div class="swiper reviews-swiper">
+            <div class="swiper-wrapper">
+                @foreach($testimonials as $review)
+                    @php
+                        $rPt = $review->product?->getTranslation(app()->getLocale())
+                            ?? $review->product?->getTranslation('en');
+                    @endphp
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-3 h-full">
+
+                            {{-- Stars --}}
+                            <div class="flex gap-0.5">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg class="w-3 h-3 {{ $i <= $review->rating ? 'text-amber-400' : 'text-gray-200' }}"
+                                         fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                @endfor
+                            </div>
+
+                            {{-- Review text --}}
+                            <p class="text-gray-600 text-[12px] leading-relaxed flex-1"
+                               style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+                                {{ $review->comment }}
+                            </p>
+
+                            {{-- User + Product --}}
+                            <div class="flex items-center gap-2.5 mt-auto pt-3 border-t border-gray-50">
+                                <div class="w-7 h-7 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-[10px] font-bold uppercase shrink-0">
+                                    {{ mb_substr($review->user->name, 0, 1) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-semibold text-gray-800 leading-none truncate">{{ $review->user->name }}</p>
+                                    @if($rPt?->name)
+                                        <p class="text-[10px] text-gray-400 leading-none mt-0.5 truncate">{{ $rPt->name }}</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+    </div>
+</section>
+@endif
 
 @endsection
 
