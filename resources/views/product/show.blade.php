@@ -284,22 +284,63 @@
                     <script id="variants-data" type="application/json">{!! $variantsJson !!}</script>
 
                     @foreach($variantOptions as $optionName => $values)
+                        @php
+                            $isColorOption = in_array(strtolower($optionName), ['color', 'colour']);
+                            $isSizeOption  = strtolower($optionName) === 'size';
+                        @endphp
                         <div>
                             <p class="text-sm font-semibold text-gray-700 mb-2">{{ $optionName }}</p>
                             <div class="flex flex-wrap gap-2" data-option="{{ $optionName }}">
                                 @foreach($values->unique('option_value') as $val)
-                                    <button type="button"
-                                            onclick="selectVariantOption('{{ $optionName }}', '{{ $val['option_value'] }}', this)"
-                                            class="variant-pill px-4 py-2 text-sm border-2 rounded-lg font-medium transition-all duration-150
-                                                   border-gray-200 text-gray-700 hover:border-primary-400 hover:text-primary-700
-                                                   {{ ! $val['is_active'] || $val['stock'] <= 0 ? 'opacity-40 cursor-not-allowed line-through' : '' }}"
-                                            data-option-name="{{ $optionName }}"
-                                            data-option-value="{{ $val['option_value'] }}"
-                                            {{ ! $val['is_active'] || $val['stock'] <= 0 ? 'disabled' : '' }}>
-                                        {{ $val['option_value'] }}
-                                    </button>
+                                    @if($isColorOption)
+                                        <button type="button"
+                                                onclick="selectVariantOption('{{ $optionName }}', '{{ $val['option_value'] }}', this)"
+                                                class="variant-color-swatch w-8 h-8 rounded-full ring-1 ring-gray-300 ring-offset-2 transition-all duration-150
+                                                       {{ ! $val['is_active'] || $val['stock'] <= 0 ? 'opacity-40 cursor-not-allowed' : 'hover:ring-primary-500 hover:ring-2' }}"
+                                                style="background-color: {{ $val['option_value'] }};"
+                                                title="{{ $val['option_value'] }}"
+                                                data-option-name="{{ $optionName }}"
+                                                data-option-value="{{ $val['option_value'] }}"
+                                                {{ ! $val['is_active'] || $val['stock'] <= 0 ? 'disabled' : '' }}>
+                                        </button>
+                                    @else
+                                        <button type="button"
+                                                onclick="selectVariantOption('{{ $optionName }}', '{{ $val['option_value'] }}', this)"
+                                                class="variant-pill px-4 py-2 text-sm border-2 rounded-lg font-medium transition-all duration-150
+                                                       border-gray-200 text-gray-700 hover:border-primary-400 hover:text-primary-700
+                                                       {{ ! $val['is_active'] || $val['stock'] <= 0 ? 'opacity-40 cursor-not-allowed line-through' : '' }}"
+                                                data-option-name="{{ $optionName }}"
+                                                data-option-value="{{ $val['option_value'] }}"
+                                                {{ ! $val['is_active'] || $val['stock'] <= 0 ? 'disabled' : '' }}>
+                                            {{ $val['option_value'] }}
+                                        </button>
+                                    @endif
                                 @endforeach
+
+                                {{-- Custom Size button — only in the Size group when product has custom_size_enabled --}}
+                                @if($isSizeOption && $product->custom_size_enabled)
+                                    <button type="button"
+                                            onclick="selectVariantOption('{{ $optionName }}', '__custom__', this)"
+                                            class="variant-pill px-4 py-2 text-sm border-2 rounded-lg font-medium transition-all duration-150
+                                                   border-primary-200 text-primary-700 hover:border-primary-400"
+                                            data-option-name="{{ $optionName }}"
+                                            data-option-value="__custom__">
+                                        ✏ Custom Size
+                                    </button>
+                                @endif
                             </div>
+
+                            {{-- Custom size input — shown when customer clicks the Custom Size button --}}
+                            @if($isSizeOption && $product->custom_size_enabled)
+                                <div id="custom-size-box" class="mt-3 hidden">
+                                    <label class="text-xs font-semibold text-gray-600 mb-1 block">Enter your measurements</label>
+                                    <input type="text"
+                                           id="custom-size-input"
+                                           placeholder="e.g. Bust 38, Waist 30, Hip 40"
+                                           class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors">
+                                    <p class="text-[11px] text-gray-400 mt-1">We'll tailor this item to your measurements.</p>
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -332,10 +373,11 @@
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="variant_id" id="selected-variant-id" value="">
                         <input type="hidden" name="quantity" id="form-quantity" value="1">
+                        <input type="hidden" name="custom_size" id="form-custom-size" value="">
                         <button type="submit"
-                                {{ ! $product->is_in_stock ? 'disabled' : '' }}
+                                @if($variantOptions->isNotEmpty() || ! $product->is_in_stock) disabled @endif
                                 class="w-full flex items-center justify-center gap-2
-                                       {{ $product->is_in_stock
+                                       {{ $product->is_in_stock && $variantOptions->isEmpty()
                                             ? 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800 cursor-pointer'
                                             : 'bg-gray-300 cursor-not-allowed' }}
                                        text-white font-semibold px-7 py-3 rounded-xl transition-colors duration-150 text-sm">
@@ -346,6 +388,11 @@
                             </svg>
                             {{ __('front.add_to_cart') }}
                         </button>
+                        @if($variantOptions->isNotEmpty())
+                            <p id="variant-hint" class="text-xs text-amber-600 mt-1.5 text-center">
+                                {{ __('front.select_options_hint', [], app()->getLocale()) ?: 'Please select options before adding to cart.' }}
+                            </p>
+                        @endif
                     </form>
                 @else
                     <a href="{{ route('login') }}"
@@ -858,19 +905,34 @@ document.querySelectorAll('a[href="#reviews"]').forEach(link => {
 @if($variantOptions->isNotEmpty())
 const variantsData = JSON.parse(document.getElementById('variants-data').textContent);
 const selectedOptions = {};
+const totalOptionGroups = {{ $variantOptions->count() }};
 
 function findBestVariant() {
-    // 1. Exact match — all selected options match the variant's options
+    // Exclude __custom__ — it has no real variant row to match
+    const effectiveOptions = Object.fromEntries(
+        Object.entries(selectedOptions).filter(([, v]) => v !== '__custom__')
+    );
+    const effectiveKeys = Object.keys(effectiveOptions);
+
+    if (effectiveKeys.length === 0) {
+        return variantsData.find(v => v.stock > 0) || variantsData[0];
+    }
+
+    // 1. Exact match on non-custom options
     const exact = variantsData.find(v =>
-        v.options.every(o => selectedOptions[o.name] === o.value)
+        effectiveKeys.every(name =>
+            v.options.some(o => o.name === name && o.value === effectiveOptions[name])
+        )
     );
     if (exact) return exact;
 
-    // 2. Partial match — find the variant that matches the most currently-selected options
+    // 2. Partial match — variant satisfying the most non-custom selected options
     let best = null;
     let bestScore = 0;
     for (const v of variantsData) {
-        const score = v.options.filter(o => selectedOptions[o.name] === o.value).length;
+        const score = effectiveKeys.filter(name =>
+            v.options.some(o => o.name === name && o.value === effectiveOptions[name])
+        ).length;
         if (score > 0 && score > bestScore) {
             bestScore = score;
             best = v;
@@ -879,7 +941,7 @@ function findBestVariant() {
     return best;
 }
 
-function applyVariant(variant) {
+function applyVariant(variant, allSelected = true) {
     const inStock = variant.stock > 0;
 
     // Update price
@@ -920,11 +982,12 @@ function applyVariant(variant) {
     const variantIdInput = document.getElementById('selected-variant-id');
     if (variantIdInput) variantIdInput.value = variant.id;
 
-    // Disable/enable the ATC submit button
+    // Disable/enable the ATC submit button — only enable when all groups selected AND in stock
     const atcBtn = document.querySelector('#atc-form button[type="submit"]');
     if (atcBtn) {
-        atcBtn.disabled = !inStock;
-        if (!inStock) {
+        const canAdd = allSelected && inStock;
+        atcBtn.disabled = !canAdd;
+        if (!canAdd) {
             atcBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700', 'active:bg-primary-800', 'cursor-pointer');
             atcBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
         } else {
@@ -932,6 +995,10 @@ function applyVariant(variant) {
             atcBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
         }
     }
+
+    // Hide the "select options" hint only when all groups are selected
+    const hint = document.getElementById('variant-hint');
+    if (hint) hint.style.display = allSelected ? 'none' : '';
 
     // Update main image when variant selected
     switchMainImageForVariant(variant.id, variant.images);
@@ -964,17 +1031,69 @@ function switchMainImageForVariant(variantId, variantImages) {
 function selectVariantOption(optionName, optionValue, btn) {
     selectedOptions[optionName] = optionValue;
 
-    // Highlight selected pill, reset others in the same group
+    // Reset all buttons in this group, then highlight the selected one
     document.querySelectorAll(`[data-option-name="${optionName}"]`).forEach(b => {
-        b.classList.remove('border-primary-600', 'bg-primary-50', 'text-primary-700');
-        b.classList.add('border-gray-200', 'text-gray-700');
+        if (b.classList.contains('variant-color-swatch')) {
+            b.classList.remove('ring-primary-600', 'ring-2');
+            b.classList.add('ring-gray-300', 'ring-1');
+        } else {
+            b.classList.remove('border-primary-600', 'bg-primary-50', 'text-primary-700');
+            b.classList.add('border-gray-200', 'text-gray-700');
+        }
     });
-    btn.classList.add('border-primary-600', 'bg-primary-50', 'text-primary-700');
-    btn.classList.remove('border-gray-200', 'text-gray-700');
 
+    if (btn.classList.contains('variant-color-swatch')) {
+        btn.classList.remove('ring-gray-300', 'ring-1');
+        btn.classList.add('ring-primary-600', 'ring-2');
+    } else {
+        btn.classList.add('border-primary-600', 'bg-primary-50', 'text-primary-700');
+        btn.classList.remove('border-gray-200', 'text-gray-700');
+    }
+
+    // Show/hide custom size input box
+    const customBox = document.getElementById('custom-size-box');
+    if (customBox) {
+        if (optionValue === '__custom__') {
+            customBox.classList.remove('hidden');
+        } else {
+            customBox.classList.add('hidden');
+            const formCustomSize = document.getElementById('form-custom-size');
+            if (formCustomSize) formCustomSize.value = '';
+        }
+    }
+
+    const allSelected = Object.keys(selectedOptions).length >= totalOptionGroups;
     const matched = findBestVariant();
-    if (matched) applyVariant(matched);
+    if (matched) applyVariant(matched, allSelected);
 }
+
+// Sync custom size text to hidden field; require it on submit when __custom__ is chosen
+document.addEventListener('DOMContentLoaded', function () {
+    const customInput   = document.getElementById('custom-size-input');
+    const formCustomSize = document.getElementById('form-custom-size');
+
+    if (customInput && formCustomSize) {
+        customInput.addEventListener('input', function () {
+            formCustomSize.value = customInput.value.trim();
+        });
+    }
+
+    const atcForm = document.getElementById('atc-form');
+    if (atcForm) {
+        atcForm.addEventListener('submit', function (e) {
+            const hasCustom = Object.values(selectedOptions).includes('__custom__');
+            if (hasCustom && !formCustomSize?.value.trim()) {
+                e.preventDefault();
+                if (customInput) {
+                    customInput.focus();
+                    customInput.classList.add('border-red-400', 'ring-1', 'ring-red-400');
+                    setTimeout(() => customInput.classList.remove('border-red-400', 'ring-1', 'ring-red-400'), 2000);
+                }
+            }
+        });
+    }
+});
+
 @endif
 </script>
 @endpush

@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductTranslation;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -184,6 +185,12 @@ class ProductResource extends Resource
             Forms\Components\Section::make('Variants')
                 ->description('Add size, colour, or any other variants. Each variant has its own SKU, price modifier, stock and named options.')
                 ->schema([
+                    Forms\Components\Toggle::make('custom_size_enabled')
+                        ->label('Custom Size Enabled')
+                        ->helperText('When on, a "Custom Size" button appears in the Size variant group on the product page — customers enter their own measurements.')
+                        ->default(false)
+                        ->inline(false),
+
                     Forms\Components\Repeater::make('variants')
                         ->relationship('variants')
                         ->schema([
@@ -227,12 +234,26 @@ class ProductResource extends Resource
                                         ->label('Name')
                                         ->placeholder('Size')
                                         ->required()
-                                        ->maxLength(50),
+                                        ->maxLength(50)
+                                        ->live(onBlur: true),
+
                                     Forms\Components\TextInput::make('option_value')
                                         ->label('Value')
                                         ->placeholder('M')
                                         ->required()
-                                        ->maxLength(100),
+                                        ->maxLength(100)
+                                        ->visible(fn (Get $get): bool => ! \in_array(
+                                            strtolower((string) ($get('option_name') ?? '')),
+                                            ['color', 'colour'],
+                                        )),
+
+                                    Forms\Components\ColorPicker::make('option_value')
+                                        ->label('Color')
+                                        ->required()
+                                        ->visible(fn (Get $get): bool => \in_array(
+                                            strtolower((string) ($get('option_name') ?? '')),
+                                            ['color', 'colour'],
+                                        )),
                                 ])
                                 ->columns(2)
                                 ->addActionLabel('Add Option')

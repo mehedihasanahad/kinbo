@@ -23,8 +23,9 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity'   => 'integer|min:1|max:999',
+            'product_id'  => 'required|exists:products,id',
+            'quantity'    => 'integer|min:1|max:999',
+            'custom_size' => 'nullable|string|max:255',
         ]);
 
         $variantId = $request->variant_id ?: null;
@@ -35,6 +36,11 @@ class CartController extends Controller
             $stock = $variant->stock;
         } else {
             $product = Product::findOrFail($request->product_id);
+
+            if ($product->variants()->where('is_active', true)->exists()) {
+                return back()->with('cart_error', __('front.select_variant_first'));
+            }
+
             $stock = $product->stock;
         }
 
@@ -59,13 +65,19 @@ class CartController extends Controller
             $qty = $canAdd;
         }
 
+        $customSize = $request->input('custom_size') ?: null;
+
         if ($existing) {
             $existing->increment('quantity', $qty);
+            if ($customSize !== null) {
+                $existing->update(['custom_size' => $customSize]);
+            }
         } else {
             auth()->user()->cartItems()->create([
-                'product_id' => $request->product_id,
-                'variant_id' => $variantId,
-                'quantity'   => $qty,
+                'product_id'  => $request->product_id,
+                'variant_id'  => $variantId,
+                'quantity'    => $qty,
+                'custom_size' => $customSize,
             ]);
         }
 

@@ -87,6 +87,9 @@
                                     @if($item->variant && $item->variant->label)
                                         <p class="text-xs text-gray-500 mt-0.5">{{ $item->variant->label }}</p>
                                     @endif
+                                    @if($item->custom_size)
+                                        <p class="text-xs text-primary-600 mt-0.5">Custom size: {{ $item->custom_size }}</p>
+                                    @endif
                                 </div>
                             </div>
 
