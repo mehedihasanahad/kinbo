@@ -2,11 +2,9 @@
 
 @section('content')
 <p class="greeting">Hi {{ $order->user->name }},</p>
-<p style="font-size:15px;color:#374151;margin-bottom:20px;">
-    We're sorry to inform you that your order <strong>{{ $order->order_number }}</strong> has been cancelled.
-</p>
+<p class="lead">We're sorry to inform you that your order <strong>{{ $order->order_number }}</strong> has been cancelled.</p>
 
-<div class="card" style="background:#fff1f2;border-color:#fecdd3;">
+<div class="card card-danger">
     <div class="card-row">
         <span class="label">Order Number</span>
         <span class="value">{{ $order->order_number }}</span>
@@ -26,21 +24,19 @@
 </div>
 
 @if($order->payment_status === 'paid')
-<div class="card" style="background:#fffbeb;border-color:#fcd34d;margin-top:16px;">
-    <p style="font-size:13px;color:#92400e;">
-        <strong>Refund Notice:</strong> Since your payment was already processed, a refund will be initiated within 3–5 business days. Please contact us if you have any questions.
-    </p>
+<div class="notice notice-warning">
+    <strong>Refund Notice:</strong> Since your payment was already processed, a refund will be initiated within 3–5 business days. Please contact us if you have any questions.
 </div>
 @endif
 
-<p style="font-size:14px;color:#374151;margin-top:20px;">
+<p style="font-size:14px;color:#374151;margin-top:20px;line-height:1.7;">
     If you did not request this cancellation or have any concerns, please reach out to our support team right away.
 </p>
 
 <div style="text-align:center;margin-top:24px;">
-    <a href="{{ url('/products') }}" class="btn" style="background:#6b7280;">Continue Shopping</a>
+    <a href="{{ url('/products') }}" class="btn btn-gray">Continue Shopping</a>
 </div>
 
 <hr class="divider">
-<p style="font-size:13px;color:#6b7280;">We hope to serve you again. Thank you for choosing {{ config('app.name') }}.</p>
+<p class="help-text">We hope to serve you again. Thank you for choosing {{ config('app.name') }}.</p>
 @endsection

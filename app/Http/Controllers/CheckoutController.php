@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmation;
+use App\Models\CartItem;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\ManualPayment;
@@ -12,15 +13,18 @@ use App\Models\OrderStatusHistory;
 use App\Models\PaymentTransaction;
 use App\Models\Setting;
 use App\Models\ShippingZoneDistrict;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
     public function index()
     {
-        $cartItems = auth()->user()->cartItems()
+        $cartItems = $this->cartItems()
             ->with(['product.translations', 'product.primaryImage', 'variant.options'])
             ->get();
 
@@ -30,7 +34,9 @@ class CheckoutController extends Controller
 
         $subtotal = $cartItems->sum('line_total');
 
-        $addresses = auth()->user()->addresses()->latest()->get();
+        $addresses = auth()->check()
+            ? auth()->user()->addresses()->latest()->get()
+            : collect();
 
         // All districts for shipping dropdown (sorted alphabetically)
         $districts = ShippingZoneDistrict::orderBy('district_name')->pluck('district_name')->unique()->values();
@@ -75,7 +81,7 @@ class CheckoutController extends Controller
     {
         $request->validate(['district' => 'required|string']);
 
-        $subtotal = auth()->user()->cartItems()
+        $subtotal = $this->cartItems()
             ->with(['product', 'variant'])
             ->get()
             ->sum('line_total');
@@ -111,14 +117,14 @@ class CheckoutController extends Controller
     {
         $request->validate(['coupon_code' => 'required|string|max:50']);
 
-        $subtotal = auth()->user()->cartItems()
+        $subtotal = $this->cartItems()
             ->with(['product', 'variant'])
             ->get()
             ->sum('line_total');
 
         $coupon = Coupon::active()->where('code', strtoupper($request->coupon_code))->first();
 
-        if (! $coupon || ! $coupon->isValidFor($subtotal, auth()->id())) {
+        if (! $coupon || ! $coupon->isValidFor($subtotal, auth()->id() ?? 0)) {
             if ($request->expectsJson()) {
                 return response()->json(['success' => false, 'message' => __('front.coupon_invalid')], 422);
             }
@@ -147,20 +153,49 @@ class CheckoutController extends Controller
 
     public function placeOrder(Request $request)
     {
-        $request->validate([
-            'ship_name'        => 'required|string|max:191',
-            'ship_phone'       => 'required|string|max:20',
-            'ship_address'     => 'required|string',
-            'ship_city'        => 'required|string|max:100',
-            'ship_district'    => 'required|string|max:100',
-            'ship_zip'         => 'nullable|string|max:10',
-            'shipping_rate_id' => 'nullable|exists:shipping_rates,id',
-            'payment_method'   => 'required|in:cod,bkash,nagad,sslcommerz',
-            'notes'            => 'nullable|string|max:1000',
-            'sender_number'    => 'required_if:payment_method,bkash,nagad|excluded_if:payment_method,sslcommerz|nullable|string|max:20',
-            'transaction_id'   => 'required_if:payment_method,bkash,nagad|excluded_if:payment_method,sslcommerz|nullable|string|max:100',
-            'screenshot'       => 'nullable|image|max:2048',
-        ]);
+        $rules = [];
+
+        if (! auth()->check()) {
+            $rules['email'] = ['required', 'email:rfc', 'max:191'];
+        }
+
+        $rules['ship_name']        = ['required', 'string', 'max:191'];
+        $rules['ship_phone']       = ['required', 'string', 'regex:/^(\+?880|0)1[3-9]\d{8}$/'];
+        $rules['ship_address']     = ['required', 'string'];
+        $rules['ship_city']        = ['required', 'string', 'max:100'];
+        $rules['ship_district']    = ['required', 'string', 'max:100'];
+        $rules['ship_zip']         = ['nullable', 'string', 'max:10'];
+        $rules['notes']            = ['nullable', 'string', 'max:1000'];
+        $rules['shipping_rate_id'] = ['nullable', 'exists:shipping_rates,id'];
+        $rules['payment_method']   = ['required', 'in:cod,bkash,nagad,sslcommerz'];
+        $rules['sender_number']    = ['required_if:payment_method,bkash,nagad', 'excluded_if:payment_method,sslcommerz', 'nullable', 'string', 'max:20'];
+        $rules['transaction_id']   = ['required_if:payment_method,bkash,nagad', 'excluded_if:payment_method,sslcommerz', 'nullable', 'string', 'max:100'];
+        $rules['screenshot']       = ['nullable', 'image', 'max:2048'];
+
+        $messages = [
+            'ship_phone.regex' => __('front.phone_invalid'),
+        ];
+
+        $request->validate($rules, $messages);
+
+        // Auto-register or login guest users before order placement
+        if (! auth()->check()) {
+            $sessionId = session()->getId();
+
+            $user = User::firstOrCreate(
+                ['email' => $request->email],
+                [
+                    'name'     => $request->ship_name,
+                    'password' => Hash::make(Str::random(16)),
+                ]
+            );
+
+            auth()->login($user);
+
+            // Migrate guest session cart to the user account
+            CartItem::where('session_id', $sessionId)
+                ->update(['user_id' => $user->id, 'session_id' => null]);
+        }
 
         $cartItems = auth()->user()->cartItems()
             ->with(['product', 'variant.options'])
@@ -320,6 +355,15 @@ class CheckoutController extends Controller
         }
 
         return redirect()->route('checkout.confirmation', $order)->with('order_placed', true);
+    }
+
+    private function cartItems()
+    {
+        if (auth()->check()) {
+            return CartItem::where('user_id', auth()->id());
+        }
+
+        return CartItem::where('session_id', session()->getId());
     }
 
     public function confirmation(Order $order)

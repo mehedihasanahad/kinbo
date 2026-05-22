@@ -1,10 +1,8 @@
 @extends('emails.layout')
 
-@section('subject', 'Order Confirmed – ' . $order->order_number)
-
 @section('content')
 <p class="greeting">Hi {{ $order->user->name }},</p>
-<p style="font-size:15px;color:#374151;margin-bottom:20px;">Thank you for your order! We've received it and it's currently being reviewed. Here's a summary:</p>
+<p class="lead">Thank you for your order! We've received it and it's currently being reviewed. Here's a summary:</p>
 
 <div class="card">
     <div class="card-row">
@@ -86,7 +84,7 @@
 
 <p class="section-title" style="margin-top:24px;">Shipping To</p>
 <div class="card">
-    <p style="font-size:14px;line-height:1.8;">
+    <p style="font-size:14px;line-height:1.9;padding:6px 0;">
         <strong>{{ $order->ship_name }}</strong><br>
         {{ $order->ship_phone }}<br>
         {{ $order->ship_address }}<br>
@@ -96,10 +94,8 @@
 </div>
 
 @if(in_array($order->payment_method, ['bkash', 'nagad']))
-<div class="card" style="background:#fffbeb;border-color:#fcd34d;margin-top:16px;">
-    <p style="font-size:13px;color:#92400e;">
-        <strong>Note:</strong> Your payment via {{ strtoupper($order->payment_method) }} is under review. We'll confirm and update your order status within 24 hours.
-    </p>
+<div class="notice notice-warning" style="margin-top:16px;">
+    <strong>Note:</strong> Your payment via {{ strtoupper($order->payment_method) }} is under review. We'll confirm and update your order status within 24 hours.
 </div>
 @endif
 
@@ -108,5 +104,5 @@
 </div>
 
 <hr class="divider">
-<p style="font-size:13px;color:#6b7280;">If you have any questions, please contact our support team. We're happy to help!</p>
+<p class="help-text">If you have any questions, please contact our support team. We're happy to help!</p>
 @endsection

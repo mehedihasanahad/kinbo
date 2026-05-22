@@ -11,7 +11,7 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cartItems = auth()->user()->cartItems()
+        $cartItems = $this->cartQuery()
             ->with(['product.translations', 'product.primaryImage', 'variant.options'])
             ->get();
 
@@ -29,7 +29,7 @@ class CartController extends Controller
         ]);
 
         $variantId = $request->variant_id ?: null;
-        $qty = (int) $request->get('quantity', 1);
+        $qty = (int) $request->input('quantity', 1);
 
         if ($variantId) {
             $variant = ProductVariant::findOrFail($variantId);
@@ -48,7 +48,7 @@ class CartController extends Controller
             return back()->with('cart_error', __('front.insufficient_stock'));
         }
 
-        $existing = auth()->user()->cartItems()
+        $existing = $this->cartQuery()
             ->where('product_id', $request->product_id)
             ->where('variant_id', $variantId)
             ->first();
@@ -61,7 +61,6 @@ class CartController extends Controller
             if ($canAdd <= 0) {
                 return back()->with('cart_error', __('front.stock_limit_reached'));
             }
-            // Cap to maximum available
             $qty = $canAdd;
         }
 
@@ -73,12 +72,24 @@ class CartController extends Controller
                 $existing->update(['custom_size' => $customSize]);
             }
         } else {
-            auth()->user()->cartItems()->create([
+            $data = [
                 'product_id'  => $request->product_id,
                 'variant_id'  => $variantId,
                 'quantity'    => $qty,
                 'custom_size' => $customSize,
-            ]);
+            ];
+
+            if (auth()->check()) {
+                $data['user_id'] = auth()->id();
+            } else {
+                $data['session_id'] = session()->getId();
+            }
+
+            CartItem::create($data);
+        }
+
+        if ($request->boolean('buy_now')) {
+            return redirect()->route('checkout.index');
         }
 
         return back()->with('cart_success', __('front.added_to_cart'));
@@ -86,28 +97,43 @@ class CartController extends Controller
 
     public function update(Request $request, CartItem $cartItem)
     {
-        abort_if($cartItem->user_id !== auth()->id(), 403);
+        $this->authorizeItem($cartItem);
 
         $request->validate(['quantity' => 'required|integer|min:1|max:999']);
 
-        // Cap quantity to available stock
         $stock = $cartItem->variant
             ? $cartItem->variant->stock
             : $cartItem->product->stock;
 
-        $qty = min((int) $request->quantity, $stock);
-
-        $cartItem->update(['quantity' => $qty]);
+        $cartItem->update(['quantity' => min((int) $request->quantity, $stock)]);
 
         return back();
     }
 
     public function destroy(CartItem $cartItem)
     {
-        abort_if($cartItem->user_id !== auth()->id(), 403);
+        $this->authorizeItem($cartItem);
 
         $cartItem->delete();
 
         return back()->with('cart_success', __('front.item_removed'));
+    }
+
+    private function cartQuery()
+    {
+        if (auth()->check()) {
+            return CartItem::where('user_id', auth()->id());
+        }
+
+        return CartItem::where('session_id', session()->getId());
+    }
+
+    private function authorizeItem(CartItem $cartItem): void
+    {
+        if (auth()->check()) {
+            abort_if($cartItem->user_id !== auth()->id(), 403);
+        } else {
+            abort_if($cartItem->session_id !== session()->getId(), 403);
+        }
     }
 }

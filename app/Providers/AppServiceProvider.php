@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('layouts.app', function ($view) {
             $cartCount = auth()->check()
                 ? auth()->user()->cartItems()->sum('quantity')
-                : 0;
+                : \App\Models\CartItem::where('session_id', session()->getId())->sum('quantity');
 
             $wishlistCount = auth()->check()
                 ? auth()->user()->wishlist()->count()

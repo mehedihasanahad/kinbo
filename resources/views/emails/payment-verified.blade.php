@@ -2,9 +2,7 @@
 
 @section('content')
 <p class="greeting">Hi {{ $order->user->name }},</p>
-<p style="font-size:15px;color:#374151;margin-bottom:20px;">
-    Great news! Your payment for order <strong>{{ $order->order_number }}</strong> has been verified. Your order is now being processed and will be shipped soon.
-</p>
+<p class="lead">Great news! Your payment for order <strong>{{ $order->order_number }}</strong> has been verified. Your order is now being processed and will be shipped soon.</p>
 
 <div class="card">
     <div class="card-row">
@@ -25,7 +23,7 @@
     </div>
 </div>
 
-<p style="font-size:14px;color:#374151;margin-top:20px;">
+<p style="font-size:14px;color:#374151;margin-top:20px;line-height:1.7;">
     We will notify you once your order has been shipped. You can track your order status anytime from your account.
 </p>
 
@@ -34,5 +32,5 @@
 </div>
 
 <hr class="divider">
-<p style="font-size:13px;color:#6b7280;">Thank you for shopping with us!</p>
+<p class="help-text">Thank you for shopping with us!</p>
 @endsection

@@ -347,40 +347,78 @@
             @endif
 
             {{-- Quantity + Actions --}}
-            <div class="flex flex-wrap items-center gap-3 pt-1">
+            <div class="flex flex-col gap-3 pt-1">
 
-                {{-- Qty Selector --}}
-                @if($product->is_in_stock)
-                    <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-                        <button type="button" onclick="changeQty(-1)"
-                                class="w-11 h-11 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-lg font-bold">
-                            −
-                        </button>
-                        <input id="qty-input" type="number" value="1" min="1" max="{{ $product->stock }}"
-                               oninput="syncQty(this)"
-                               class="w-14 h-11 text-center text-sm font-semibold text-gray-900 border-x border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 bg-white">
-                        <button type="button" onclick="changeQty(1)"
-                                class="w-11 h-11 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-lg font-bold">
-                            +
-                        </button>
-                    </div>
-                @endif
+                {{-- Row 1: Qty selector + Wishlist --}}
+                <div class="flex items-center gap-3">
+                    @if($product->is_in_stock)
+                        <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+                            <button type="button" onclick="changeQty(-1)"
+                                    class="w-11 h-11 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-lg font-bold">
+                                −
+                            </button>
+                            <input id="qty-input" type="number" value="1" min="1" max="{{ $product->stock }}"
+                                   oninput="syncQty(this)"
+                                   class="w-14 h-11 text-center text-sm font-semibold text-gray-900 border-x border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 bg-white">
+                            <button type="button" onclick="changeQty(1)"
+                                    class="w-11 h-11 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-lg font-bold">
+                                +
+                            </button>
+                        </div>
+                    @endif
 
-                {{-- Add to Cart --}}
-                @auth
-                    <form method="POST" action="{{ route('cart.store') }}" class="flex-1 sm:flex-none" id="atc-form">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="variant_id" id="selected-variant-id" value="">
-                        <input type="hidden" name="quantity" id="form-quantity" value="1">
-                        <input type="hidden" name="custom_size" id="form-custom-size" value="">
+                    {{-- Wishlist --}}
+                    @auth
+                        <button type="button"
+                                id="wishlist-detail-btn"
+                                onclick="toggleWishlist(this, {{ $product->id }})"
+                                data-product-id="{{ $product->id }}"
+                                data-wishlisted="{{ $isWishlisted ? 'true' : 'false' }}"
+                                data-store-url="{{ route('wishlist.store') }}"
+                                data-destroy-url="{{ route('wishlist.destroy', $product->id) }}"
+                                title="{{ $isWishlisted ? __('front.remove_from_wishlist') : __('front.add_to_wishlist') }}"
+                                class="wishlist-btn w-12 h-12 flex items-center justify-center border-2 rounded-xl transition-all duration-150
+                                       {{ $isWishlisted ? 'border-red-400 text-red-500' : 'border-gray-200 text-gray-400 hover:border-red-400 hover:text-red-500' }}">
+                            <svg class="w-5 h-5" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
+                                         00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                    @else
+                        <a href="{{ route('login') }}"
+                           title="{{ __('front.add_to_wishlist') }}"
+                           class="w-12 h-12 flex items-center justify-center border-2 border-gray-200 rounded-xl
+                                  text-gray-400 hover:border-red-400 hover:text-red-500 transition-all duration-150">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
+                                         00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </a>
+                    @endauth
+                </div>
+
+                {{-- Row 2 & 3: Add to Cart + Buy Now --}}
+                <form method="POST" action="{{ route('cart.store') }}" class="w-full" id="atc-form">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="variant_id" id="selected-variant-id" value="">
+                    <input type="hidden" name="quantity" id="form-quantity" value="1">
+                    <input type="hidden" name="custom_size" id="form-custom-size" value="">
+                    <input type="hidden" name="buy_now" id="buy-now-flag" value="0">
+
+                    <div class="flex flex-col gap-2">
+                        {{-- Add to Cart — 50% --}}
                         <button type="submit"
+                                id="atc-btn"
+                                onclick="document.getElementById('buy-now-flag').value='0'"
                                 @if($variantOptions->isNotEmpty() || ! $product->is_in_stock) disabled @endif
-                                class="w-full flex items-center justify-center gap-2
+                                class="w-full sm:w-1/2 flex items-center justify-center gap-2 bg-gray-900
                                        {{ $product->is_in_stock && $variantOptions->isEmpty()
-                                            ? 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800 cursor-pointer'
-                                            : 'bg-gray-300 cursor-not-allowed' }}
-                                       text-white font-semibold px-7 py-3 rounded-xl transition-colors duration-150 text-sm">
+                                            ? 'hover:bg-black active:bg-black cursor-pointer'
+                                            : 'opacity-50 cursor-not-allowed' }}
+                                       text-white font-semibold py-3 rounded-xl transition-all duration-150 text-sm">
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
@@ -388,58 +426,32 @@
                             </svg>
                             {{ __('front.add_to_cart') }}
                         </button>
-                        @if($variantOptions->isNotEmpty())
-                            <p id="variant-hint" class="text-xs text-amber-600 mt-1.5 text-center">
-                                {{ __('front.select_options_hint', [], app()->getLocale()) ?: 'Please select options before adding to cart.' }}
-                            </p>
-                        @endif
-                    </form>
-                @else
-                    <a href="{{ route('login') }}"
-                       class="flex-1 sm:flex-none flex items-center justify-center gap-2
-                              {{ $product->is_in_stock
-                                   ? 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800'
-                                   : 'bg-gray-300 pointer-events-none' }}
-                              text-white font-semibold px-7 py-3 rounded-xl transition-colors duration-150 text-sm">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
-                                     1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        {{ __('front.add_to_cart') }}
-                    </a>
-                @endauth
 
-                {{-- Wishlist --}}
-                @auth
-                    <button type="button"
-                            id="wishlist-detail-btn"
-                            onclick="toggleWishlist(this, {{ $product->id }})"
-                            data-product-id="{{ $product->id }}"
-                            data-wishlisted="{{ $isWishlisted ? 'true' : 'false' }}"
-                            data-store-url="{{ route('wishlist.store') }}"
-                            data-destroy-url="{{ route('wishlist.destroy', $product->id) }}"
-                            title="{{ $isWishlisted ? __('front.remove_from_wishlist') : __('front.add_to_wishlist') }}"
-                            class="wishlist-btn w-12 h-12 flex items-center justify-center border-2 rounded-xl transition-all duration-150
-                                   {{ $isWishlisted ? 'border-red-400 text-red-500' : 'border-gray-200 text-gray-400 hover:border-red-400 hover:text-red-500' }}">
-                        <svg class="w-5 h-5" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
-                                     00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
-                    </button>
-                @else
-                    <a href="{{ route('login') }}"
-                       title="{{ __('front.add_to_wishlist') }}"
-                       class="w-12 h-12 flex items-center justify-center border-2 border-gray-200 rounded-xl
-                              text-gray-400 hover:border-red-400 hover:text-red-500 transition-all duration-150">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
-                                     00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
-                    </a>
-                @endauth
+                        {{-- Buy Now — 50% --}}
+                        <button type="submit"
+                                id="buy-now-btn"
+                                onclick="document.getElementById('buy-now-flag').value='1'"
+                                @if($variantOptions->isNotEmpty() || ! $product->is_in_stock) disabled @endif
+                                class="w-full sm:w-1/2 flex items-center justify-center gap-2 bg-primary-600
+                                       {{ $product->is_in_stock && $variantOptions->isEmpty()
+                                            ? 'hover:bg-primary-700 active:bg-primary-800 cursor-pointer'
+                                            : 'opacity-50 cursor-not-allowed' }}
+                                       text-white font-semibold py-3 rounded-xl transition-colors duration-150 text-sm">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            {{ __('front.buy_now') }}
+                        </button>
+                    </div>
+
+                    @if($variantOptions->isNotEmpty())
+                        <p id="variant-hint" class="text-xs text-amber-600 mt-1.5 text-center sm:text-left">
+                            {{ __('front.select_options_hint') }}
+                        </p>
+                    @endif
+                </form>
+
             </div>
 
             {{-- SKU / Weight meta --}}
@@ -982,18 +994,27 @@ function applyVariant(variant, allSelected = true) {
     const variantIdInput = document.getElementById('selected-variant-id');
     if (variantIdInput) variantIdInput.value = variant.id;
 
-    // Disable/enable the ATC submit button — only enable when all groups selected AND in stock
-    const atcBtn = document.querySelector('#atc-form button[type="submit"]');
+    // Disable/enable the ATC and Buy Now buttons — only enable when all groups selected AND in stock
+    const canAdd = allSelected && inStock;
+
+    const atcBtn = document.getElementById('atc-btn');
     if (atcBtn) {
-        const canAdd = allSelected && inStock;
         atcBtn.disabled = !canAdd;
-        if (!canAdd) {
-            atcBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700', 'active:bg-primary-800', 'cursor-pointer');
-            atcBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
-        } else {
-            atcBtn.classList.add('bg-primary-600', 'hover:bg-primary-700', 'active:bg-primary-800', 'cursor-pointer');
-            atcBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
-        }
+        atcBtn.classList.toggle('opacity-50', !canAdd);
+        atcBtn.classList.toggle('cursor-not-allowed', !canAdd);
+        atcBtn.classList.toggle('hover:bg-black', canAdd);
+        atcBtn.classList.toggle('active:bg-black', canAdd);
+        atcBtn.classList.toggle('cursor-pointer', canAdd);
+    }
+
+    const buyNowBtn = document.getElementById('buy-now-btn');
+    if (buyNowBtn) {
+        buyNowBtn.disabled = !canAdd;
+        buyNowBtn.classList.toggle('opacity-50', !canAdd);
+        buyNowBtn.classList.toggle('cursor-not-allowed', !canAdd);
+        buyNowBtn.classList.toggle('hover:bg-primary-700', canAdd);
+        buyNowBtn.classList.toggle('active:bg-primary-800', canAdd);
+        buyNowBtn.classList.toggle('cursor-pointer', canAdd);
     }
 
     // Hide the "select options" hint only when all groups are selected

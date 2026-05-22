@@ -2,11 +2,9 @@
 
 @section('content')
 <p class="greeting">Hi {{ $order->user->name }},</p>
-<p style="font-size:15px;color:#374151;margin-bottom:20px;">
-    Your order <strong>{{ $order->order_number }}</strong> has been delivered! We hope you love your purchase.
-</p>
+<p class="lead">Your order <strong>{{ $order->order_number }}</strong> has been delivered! We hope you love your purchase.</p>
 
-<div class="card" style="background:#f0fdf4;border-color:#bbf7d0;">
+<div class="card">
     <div class="card-row">
         <span class="label">Order Number</span>
         <span class="value">{{ $order->order_number }}</span>
@@ -25,7 +23,7 @@
     </div>
 </div>
 
-<p style="font-size:14px;color:#374151;margin-top:20px;">
+<p style="font-size:14px;color:#374151;margin-top:20px;line-height:1.7;">
     Enjoying your purchase? We'd love to hear what you think! Leave a review to help other shoppers.
 </p>
 
@@ -34,7 +32,5 @@
 </div>
 
 <hr class="divider">
-<p style="font-size:13px;color:#6b7280;">
-    If there's any issue with your order, you can raise a return or contact us within 7 days of delivery.
-</p>
+<p class="help-text">If there's any issue with your order, you can raise a return or contact us within 7 days of delivery.</p>
 @endsection

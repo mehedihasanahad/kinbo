@@ -28,16 +28,6 @@
         </div>
     @endif
 
-    @if($errors->any())
-        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-4 text-sm">
-            <ul class="list-disc list-inside space-y-1">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     {{-- Outer grid: left (form) + right (summary). Right column is OUTSIDE <form> to avoid nested forms. --}}
     <div class="lg:grid lg:grid-cols-3 lg:gap-10">
 
@@ -77,16 +67,30 @@
 
                     {{-- Address form fields --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                        {{-- Email — guests only --}}
+                        @guest
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.email') }} <span class="text-red-500">*</span></label>
+                            <input type="email" name="email" value="{{ old('email') }}"
+                                   placeholder="your@email.com"
+                                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('email') border-red-400 @enderror">
+                            @error('email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                            <p class="text-xs text-gray-400 mt-1">We'll create or sign in to your account automatically.</p>
+                        </div>
+                        @endguest
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_name') }} <span class="text-red-500">*</span></label>
-                            <input type="text" name="ship_name" value="{{ old('ship_name', auth()->user()->name) }}" id="field-ship_name"
+                            <input type="text" name="ship_name" value="{{ old('ship_name', auth()->user()?->name) }}" id="field-ship_name"
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_name') border-red-400 @enderror">
                             @error('ship_name')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_phone') }} <span class="text-red-500">*</span></label>
-                            <input type="text" name="ship_phone" value="{{ old('ship_phone', auth()->user()->phone ?? '') }}" id="field-ship_phone"
+                            <input type="text" name="ship_phone" value="{{ old('ship_phone', auth()->user()?->phone ?? '') }}" id="field-ship_phone"
+                                   placeholder="01712345678"
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_phone') border-red-400 @enderror">
                             @error('ship_phone')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                         </div>
@@ -296,6 +300,9 @@
                         @endif
 
                     </div>
+                    @error('payment_method')
+                        <p class="text-xs text-red-500 mt-2">{{ $message }}</p>
+                    @enderror
                 </div>
 
             </div>{{-- end left steps --}}
@@ -568,21 +575,8 @@ function togglePaymentFields(method) {
     });
 }
 
-// Guard submit: require shipping rate selected
-document.getElementById('checkout-form').addEventListener('submit', function (e) {
-    const rateId = document.getElementById('shipping-rate-id').value;
-    const unavailable = !document.getElementById('shipping-rates').classList.contains('hidden');
-    if (!rateId) {
-        e.preventDefault();
-        // Scroll to shipping section and flash it
-        const ratesEl = document.getElementById('shipping-unavailable').classList.contains('hidden')
-            ? document.getElementById('shipping-placeholder')
-            : document.getElementById('shipping-unavailable');
-        ratesEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        ratesEl.classList.add('ring-2', 'ring-red-400');
-        setTimeout(() => ratesEl.classList.remove('ring-2', 'ring-red-400'), 2000);
-        return;
-    }
+// Disable button on submit to prevent double-clicks
+document.getElementById('checkout-form').addEventListener('submit', function () {
     const btn = document.getElementById('place-order-btn');
     btn.disabled = true;
     btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';

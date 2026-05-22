@@ -1,20 +1,22 @@
-<x-mail::message>
-# Confirm Your Subscription
+@extends('emails.layout')
 
-Thank you for subscribing to **{{ $appName }}** newsletters!
+@section('content')
+<p class="greeting">Thank you for subscribing!</p>
+<p class="lead">
+    Welcome to <strong>{{ $appName }}</strong>! Please confirm your email address to start receiving our latest deals, new arrivals, and exclusive offers.
+</p>
 
-Please click the button below to confirm your email address and start receiving our latest deals, new arrivals, and exclusive offers.
+<div style="text-align:center;margin:32px 0;">
+    <a href="{{ $confirmUrl }}" class="btn">Confirm Subscription</a>
+</div>
 
-<x-mail::button :url="$confirmUrl" color="primary">
-Confirm Subscription
-</x-mail::button>
+<div class="notice notice-info">
+    This link will expire in <strong>48 hours</strong>. If you did not subscribe, you can safely ignore this email.
+</div>
 
-This link will expire in **48 hours**. If you did not subscribe, you can safely ignore this email.
-
----
-
-<small>Don't want to receive emails from us? <a href="{{ $unsubscribeUrl }}">Unsubscribe here</a>.</small>
-
-Thanks,
-**{{ $appName }} Team**
-</x-mail::message>
+<hr class="divider">
+<p class="help-text">
+    Don't want to receive emails from us?
+    <a href="{{ $unsubscribeUrl }}" style="color:#c4155c;text-decoration:none;font-weight:600;">Unsubscribe here</a>.
+</p>
+@endsection

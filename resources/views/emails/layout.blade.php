@@ -6,54 +6,100 @@
     <title>{{ $subject ?? config('app.name') }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f4f5; color: #18181b; line-height: 1.6; }
-        .wrapper { max-width: 600px; margin: 32px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-        .header { background: #059669; padding: 28px 36px; text-align: center; }
-        .header h1 { color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
-        .header p { color: rgba(255,255,255,.85); font-size: 13px; margin-top: 4px; }
-        .body { padding: 32px 36px; }
-        .greeting { font-size: 16px; margin-bottom: 20px; }
-        .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
-        .card-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f9f1f5; color: #18181b; line-height: 1.6; }
+        .wrapper { max-width: 600px; margin: 32px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(196,21,92,.10); }
+
+        /* Header */
+        .header { background: #c4155c; padding: 32px 36px; text-align: center; }
+        .header-brand { display: inline-block; border-bottom: 1px solid rgba(255,255,255,.3); padding-bottom: 12px; margin-bottom: 10px; }
+        .header h1 { color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        .header p { color: rgba(255,255,255,.8); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; }
+
+        /* Body */
+        .body { padding: 36px 36px 28px; }
+        .greeting { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 12px; }
+        .lead { font-size: 15px; color: #374151; margin-bottom: 20px; line-height: 1.7; }
+
+        /* Info Card */
+        .card { background: #fdf2f8; border: 1px solid #f9a8d4; border-radius: 10px; padding: 4px 20px; margin: 20px 0; }
+        .card-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #fce7f3; font-size: 14px; }
         .card-row:last-child { border-bottom: none; }
-        .card-row .label { color: #6b7280; }
-        .card-row .value { font-weight: 600; color: #111827; }
-        .card-row .value.total { color: #059669; font-size: 16px; }
-        .table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .table th { background: #f3f4f6; text-align: left; padding: 10px 12px; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb; }
-        .table td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; color: #374151; vertical-align: top; }
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .card-row .label { color: #9ca3af; }
+        .card-row .value { font-weight: 600; color: #111827; text-align: right; }
+        .card-row .value.total { color: #c4155c; font-size: 16px; }
+
+        /* Neutral card (no color tint) */
+        .card-neutral { background: #f9fafb; border-color: #e5e7eb; }
+        .card-neutral .card-row { border-bottom-color: #f3f4f6; }
+
+        /* Danger card */
+        .card-danger { background: #fff1f2; border-color: #fecdd3; }
+        .card-danger .card-row { border-bottom-color: #ffe4e6; }
+
+        /* Warning notice */
+        .notice { border-radius: 10px; padding: 14px 20px; margin: 16px 0; font-size: 13px; line-height: 1.6; }
+        .notice-warning { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+        .notice-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+
+        /* Table */
+        .table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 4px 0; }
+        .table th { background: #fdf2f8; text-align: left; padding: 10px 14px; font-weight: 700; color: #9d174d; border-bottom: 2px solid #f9a8d4; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+        .table td { padding: 10px 14px; border-bottom: 1px solid #fce7f3; color: #374151; vertical-align: top; }
+        .table tbody tr:last-child td { border-bottom: none; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
         .badge-success { background: #dcfce7; color: #15803d; }
         .badge-warning { background: #fef9c3; color: #a16207; }
         .badge-info { background: #dbeafe; color: #1d4ed8; }
         .badge-danger { background: #fee2e2; color: #dc2626; }
-        .btn { display: inline-block; background: #059669; color: #ffffff !important; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 20px 0; }
-        .btn:hover { background: #047857; }
-        .divider { border: none; border-top: 1px solid #e5e7eb; margin: 24px 0; }
-        .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #6b7280; margin-bottom: 12px; }
-        .footer { background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 20px 36px; text-align: center; font-size: 12px; color: #9ca3af; }
-        .footer a { color: #059669; text-decoration: none; }
+        .badge-pink { background: #fce7f3; color: #be185d; }
+
+        /* CTA Button */
+        .btn { display: inline-block; background: #c4155c; color: #ffffff !important; text-decoration: none; padding: 13px 32px; border-radius: 8px; font-weight: 700; font-size: 14px; letter-spacing: .3px; margin: 20px 0; }
+        .btn-gray { background: #6b7280 !important; }
+        .btn-danger { background: #dc2626 !important; }
+
+        /* Misc */
+        .divider { border: none; border-top: 1px solid #fce7f3; margin: 24px 0; }
+        .section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #be185d; margin-bottom: 12px; }
+        .help-text { font-size: 13px; color: #6b7280; line-height: 1.7; }
+
+        /* Footer */
+        .footer { background: #1a0a14; padding: 24px 36px; text-align: center; }
+        .footer-links { margin-bottom: 10px; }
+        .footer-links a { color: #f9a8d4; text-decoration: none; font-size: 13px; font-weight: 600; margin: 0 10px; }
+        .footer p { font-size: 12px; color: #9ca3af; margin-top: 6px; }
+        .footer .copyright { color: #6b7280; font-size: 11px; margin-top: 10px; }
     </style>
 </head>
 <body>
 <div class="wrapper">
+
+    {{-- Header --}}
     <div class="header">
-        <h1>{{ config('app.name') }}</h1>
-        <p>Your trusted online store in Bangladesh</p>
+        <div class="header-brand">
+            <h1>{{ config('app.name') }}</h1>
+        </div>
+        <p>Premium Modest Fashion</p>
     </div>
+
+    {{-- Body --}}
     <div class="body">
         @yield('content')
     </div>
+
+    {{-- Footer --}}
     <div class="footer">
-        <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-        <p style="margin-top:6px;">
-            <a href="{{ url('/') }}">Visit Store</a> &nbsp;|&nbsp;
+        <div class="footer-links">
+            <a href="{{ url('/') }}">Visit Store</a>
             <a href="{{ url('/orders') }}">My Orders</a>
-        </p>
-        <p style="margin-top:8px; font-size:11px; color:#d1d5db;">
-            You received this email because you have an account or placed an order on {{ config('app.name') }}.
-        </p>
+            <a href="{{ url('/contact') }}">Contact Us</a>
+        </div>
+        <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+        <p class="copyright">You received this email because you have an account or placed an order on {{ config('app.name') }}.</p>
     </div>
+
 </div>
 </body>
 </html>

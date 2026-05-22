@@ -42,8 +42,6 @@
         <span class="text-gray-300">
             @if($announcementBarText)
                 {!! $announcementBarText !!}
-            @else
-                Free Delivery on orders over ৳1999
             @endif
         </span>
         <div class="flex items-center gap-4 text-xs">
@@ -194,7 +192,7 @@
                 </a>
 
                 {{-- Cart — desktop only --}}
-                <a href="{{ auth()->check() ? route('cart.index') : route('login') }}"
+                <a href="{{ route('cart.index') }}"
                    class="hidden lg:flex text-gray-600 hover:text-primary-600 transition-colors p-1.5 relative" aria-label="Cart">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -647,7 +645,7 @@ function toggleWishlist(btn, productId) {
         </a>
 
         {{-- Cart --}}
-        <a href="{{ auth()->check() ? route('cart.index') : route('login') }}"
+        <a href="{{ route('cart.index') }}"
            class="flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-colors {{ request()->routeIs('cart.*') ? 'text-primary-600' : 'text-gray-400' }}">
             <div class="relative">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

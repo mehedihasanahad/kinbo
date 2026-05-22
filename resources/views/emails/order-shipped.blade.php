@@ -2,9 +2,7 @@
 
 @section('content')
 <p class="greeting">Hi {{ $order->user->name }},</p>
-<p style="font-size:15px;color:#374151;margin-bottom:20px;">
-    Your order is on its way! 🚚 Here are the shipping details for order <strong>{{ $order->order_number }}</strong>:
-</p>
+<p class="lead">Your order is on its way! Here are the shipping details for order <strong>{{ $order->order_number }}</strong>.</p>
 
 <div class="card">
     <div class="card-row">
@@ -55,5 +53,5 @@
 </div>
 
 <hr class="divider">
-<p style="font-size:13px;color:#6b7280;">Estimated delivery: please allow a few business days depending on your location. Thank you for your patience!</p>
+<p class="help-text">Estimated delivery: please allow a few business days depending on your location. Thank you for your patience!</p>
 @endsection
