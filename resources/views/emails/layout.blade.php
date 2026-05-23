@@ -13,7 +13,7 @@
         .header { background: #c4155c; padding: 32px 36px; text-align: center; }
         .header-brand { display: inline-block; border-bottom: 1px solid rgba(255,255,255,.3); padding-bottom: 12px; margin-bottom: 10px; }
         .header h1 { color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-        .header p { color: rgba(255,255,255,.8); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; }
+        .header p { color: rgba(255,255,255,.8); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; text-align: center; }
 
         /* Body */
         .body { padding: 36px 36px 28px; }
@@ -81,7 +81,7 @@
         <div class="header-brand">
             <h1>{{ config('app.name') }}</h1>
         </div>
-        <p>Premium Modest Fashion</p>
+        <p style="text-align:center;">Premium Modest Fashion</p>
     </div>
 
     {{-- Body --}}

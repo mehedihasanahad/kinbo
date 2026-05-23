@@ -12,6 +12,7 @@
 </div>
 
 {{-- Content --}}
+@php $contactEmail = \App\Models\Setting::get('contact_email', 'support@' . parse_url(config('app.url'), PHP_URL_HOST)); @endphp
 <div class="bg-white">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div class="privacy-content">
@@ -21,10 +22,10 @@
             <p>These Terms of Service ("Terms", "Terms of Service") govern your use of our website located at <strong>youthcollections.com</strong> (together or individually "Service") operated by {{ config('app.name') }}.</p>
             <p>Our Privacy Policy also governs your use of our Service and explains how we collect, safeguard and disclose information that results from your use of our web pages.</p>
             <p>Your agreement with us includes these Terms and our Privacy Policy ("Agreements"). You acknowledge that you have read and understood Agreements, and agree to be bound of them.</p>
-            <p>If you do not agree with (or cannot comply with) Agreements, then you may not use the Service, but please let us know by emailing at <a href="mailto:support@youthcollections.com">support@youthcollections.com</a> so we can try to find a solution. These Terms apply to all visitors, users and others who wish to access or use Service.</p>
+            <p>If you do not agree with (or cannot comply with) Agreements, then you may not use the Service, but please let us know by emailing at <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a> so we can try to find a solution. These Terms apply to all visitors, users and others who wish to access or use Service.</p>
 
             <h2>2. Communications</h2>
-            <p>By using our Service, you agree to subscribe to newsletters, marketing or promotional materials and other information we may send. However, you may opt out of receiving any, or all, of these communications from us by following the unsubscribe link or by emailing at <a href="mailto:support@youthcollections.com">support@youthcollections.com</a>.</p>
+            <p>By using our Service, you agree to subscribe to newsletters, marketing or promotional materials and other information we may send. However, you may opt out of receiving any, or all, of these communications from us by following the unsubscribe link or by emailing at <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.</p>
 
             <h2>3. Purchases</h2>
             <p>If you wish to purchase any product or service made available through Service ("Purchase"), you may be asked to supply certain information relevant to your Purchase including but not limited to, your credit or debit card number, the expiration date of your card, your billing address, and your shipping information.</p>
@@ -86,7 +87,7 @@
 
             <h2>12. Copyright Policy</h2>
             <p>We respect the intellectual property rights of others. It is our policy to respond to any claim that Content posted on Service infringes on the copyright or other intellectual property rights ("Infringement") of any person or entity.</p>
-            <p>If you are a copyright owner, or authorized on behalf of one, and you believe that the copyrighted work has been copied in a way that constitutes copyright infringement, please submit your claim via email to <a href="mailto:support@youthcollections.com">support@youthcollections.com</a>, with the subject line: "Copyright Infringement" and include in your claim a detailed description of the alleged Infringement as detailed below, under "DMCA Notice and Procedure for Copyright Infringement Claims".</p>
+            <p>If you are a copyright owner, or authorized on behalf of one, and you believe that the copyrighted work has been copied in a way that constitutes copyright infringement, please submit your claim via email to <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>, with the subject line: "Copyright Infringement" and include in your claim a detailed description of the alleged Infringement as detailed below, under "DMCA Notice and Procedure for Copyright Infringement Claims".</p>
             <p>You may be held accountable for damages (including costs and attorneys' fees) for misrepresentation or bad-faith claims on the infringement of any Content found on and/or through Service on your copyright.</p>
 
             <h2>13. DMCA Notice and Procedure for Copyright Infringement Claims</h2>
@@ -99,10 +100,10 @@
                 <li>A statement by you that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law.</li>
                 <li>A statement by you, made under penalty of perjury, that the above information in your notice is accurate and that you are the copyright owner or authorized to act on the copyright owner's behalf.</li>
             </ul>
-            <p>You can contact our Copyright Agent via email at <a href="mailto:support@youthcollections.com">support@youthcollections.com</a>.</p>
+            <p>You can contact our Copyright Agent via email at <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.</p>
 
             <h2>14. Error Reporting and Feedback</h2>
-            <p>You may provide us either directly at <a href="mailto:support@youthcollections.com">support@youthcollections.com</a> or via third party sites and tools with information and feedback concerning errors, suggestions for improvements, ideas, problems, complaints, and other matters related to our Service ("Feedback"). You acknowledge and agree that: (i) you shall not retain, acquire or assert any intellectual property right or other right, title or interest in or to the Feedback; (ii) Company may have development ideas similar to the Feedback; (iii) Feedback does not contain confidential information or proprietary information from you or any third party; and (iv) Company is not under any obligation of confidentiality with respect to the Feedback. In the event the transfer of the ownership to the Feedback is not possible due to applicable mandatory laws, you grant Company and its affiliates an exclusive, transferable, irrevocable, free-of-charge, sub-licensable, unlimited and perpetual right to use (including copy, modify, create derivative works, publish, distribute and commercialize) Feedback in any manner and for any purpose.</p>
+            <p>You may provide us either directly at <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a> or via third party sites and tools with information and feedback concerning errors, suggestions for improvements, ideas, problems, complaints, and other matters related to our Service ("Feedback"). You acknowledge and agree that: (i) you shall not retain, acquire or assert any intellectual property right or other right, title or interest in or to the Feedback; (ii) Company may have development ideas similar to the Feedback; (iii) Feedback does not contain confidential information or proprietary information from you or any third party; and (iv) Company is not under any obligation of confidentiality with respect to the Feedback. In the event the transfer of the ownership to the Feedback is not possible due to applicable mandatory laws, you grant Company and its affiliates an exclusive, transferable, irrevocable, free-of-charge, sub-licensable, unlimited and perpetual right to use (including copy, modify, create derivative works, publish, distribute and commercialize) Feedback in any manner and for any purpose.</p>
 
             <h2>15. Links To Other Web Sites</h2>
             <p>Our Service may contain links to third party web sites or services that are not owned or controlled by {{ config('app.name') }}.</p>
@@ -144,7 +145,7 @@
             <p>BY USING SERVICE OR OTHER SERVICES PROVIDED BY US, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE AND AGREE TO BE BOUND BY THEM.</p>
 
             <h2>24. Contact Us</h2>
-            <p>Please send your feedback, comments, requests for technical support by email: <a href="mailto:support@youthcollections.com">support@youthcollections.com</a>.</p>
+            <p>Please send your feedback, comments, requests for technical support by email: <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.</p>
 
         </div>
     </div>

@@ -76,6 +76,11 @@ class AppServiceProvider extends ServiceProvider
             $siteEmail   = \App\Models\Setting::get('contact_email', '');
             $siteAddress = \App\Models\Setting::get('contact_address', '');
 
+            $facebookUrl  = \App\Models\Setting::get('facebook_url', '');
+            $instagramUrl = \App\Models\Setting::get('instagram_url', '');
+            $twitterUrl   = \App\Models\Setting::get('twitter_url', '');
+            $youtubeUrl   = \App\Models\Setting::get('youtube_url', '');
+
             $view->with(compact(
                 'cartCount',
                 'wishlistCount',
@@ -84,7 +89,11 @@ class AppServiceProvider extends ServiceProvider
                 'whatsappNumber',
                 'sitePhone',
                 'siteEmail',
-                'siteAddress'
+                'siteAddress',
+                'facebookUrl',
+                'instagramUrl',
+                'twitterUrl',
+                'youtubeUrl'
             ));
         });
     }

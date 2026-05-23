@@ -36,6 +36,9 @@
 
 @section('title', $metaTitle)
 @section('meta_description', $metaDesc)
+@if($currentTranslation?->meta_keywords)
+@section('meta_keywords', $currentTranslation->meta_keywords)
+@endif
 
 @php
     $ogImage = $product->primaryImage?->image_path

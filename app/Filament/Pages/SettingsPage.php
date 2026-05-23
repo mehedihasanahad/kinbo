@@ -31,10 +31,10 @@ class SettingsPage extends Page
     public array $general  = [];
     public array $contact  = [];
     public array $payment  = [];
-    public array $policy   = [];
     public array $social   = [];
     public array $oauth    = [];
     public array $homepage = [];
+    public array $seo      = [];
 
     // Branding — kept flat (no statePath) so FileUpload can store files properly
     public ?array $site_logo          = [];
@@ -48,8 +48,6 @@ class SettingsPage extends Page
             'site_tagline'          => Setting::get('site_tagline', ''),
             'site_description'      => Setting::get('site_description', ''),
             'default_locale'        => Setting::get('default_locale', 'en'),
-            'currency'              => Setting::get('currency', 'BDT'),
-            'currency_symbol'       => Setting::get('currency_symbol', '৳'),
             'announcement_bar_text' => Setting::get('announcement_bar_text', ''),
         ];
 
@@ -70,14 +68,8 @@ class SettingsPage extends Page
             'sslcommerz_store_password' => Setting::get('sslcommerz_store_password', ''),
             'sslcommerz_is_live'        => (bool) Setting::get('sslcommerz_is_live', '0'),
             'cod_enabled'               => (bool) Setting::get('cod_enabled', '1'),
-            'free_shipping_above'       => Setting::get('free_shipping_above', ''),
         ];
 
-        $this->policy = [
-            'returns_enabled'      => (bool) Setting::get('returns_enabled', '1'),
-            'return_window_days'   => Setting::get('return_window_days', '7'),
-            'refund_days'          => Setting::get('refund_days', '5'),
-        ];
 
         $this->social = [
             'facebook_url'  => Setting::get('facebook_url', ''),
@@ -90,6 +82,13 @@ class SettingsPage extends Page
             'google_login_enabled' => (bool) Setting::get('google_login_enabled', '0'),
             'google_client_id'     => Setting::get('google_client_id', ''),
             'google_client_secret' => Setting::get('google_client_secret', ''),
+        ];
+
+        $this->seo = [
+            'meta_title'       => Setting::get('meta_title', ''),
+            'meta_description' => Setting::get('meta_description', ''),
+            'meta_keywords'    => Setting::get('meta_keywords', ''),
+            'robots_txt'       => Setting::get('robots_txt', "User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: " . url('/sitemap.xml')),
         ];
 
         $this->homepage = [
@@ -115,7 +114,7 @@ class SettingsPage extends Page
 
     protected function getForms(): array
     {
-        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'policyForm', 'socialForm', 'oauthForm', 'homepageForm', 'homepageImageForm'];
+        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'socialForm', 'oauthForm', 'homepageForm', 'homepageImageForm', 'seoForm'];
     }
 
     public function brandingForm(Form $form): Form
@@ -154,9 +153,6 @@ class SettingsPage extends Page
             Forms\Components\TextInput::make('site_name')->required()->maxLength(100),
             Forms\Components\TextInput::make('site_tagline')->maxLength(191)->nullable(),
             Forms\Components\Textarea::make('site_description')->rows(2)->nullable()->columnSpanFull(),
-            Forms\Components\TextInput::make('currency')->maxLength(10)->default('BDT'),
-            Forms\Components\TextInput::make('currency_symbol')->maxLength(5)->default('৳'),
-
             Forms\Components\Section::make('Announcement Bar')->schema([
                 Forms\Components\TextInput::make('announcement_bar_text')
                     ->label('Announcement Text')
@@ -221,39 +217,10 @@ class SettingsPage extends Page
 
             Forms\Components\Section::make('Other')->schema([
                 Forms\Components\Toggle::make('cod_enabled')->label('Cash on Delivery Enabled')->default(true)->inline(false),
-                Forms\Components\TextInput::make('free_shipping_above')
-                    ->numeric()->prefix('৳')->nullable()->label('Free Shipping Above'),
             ])->columns(2),
         ])->statePath('payment');
     }
 
-    public function policyForm(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Section::make('Return & Refund Policy')->schema([
-                Forms\Components\Toggle::make('returns_enabled')
-                    ->label('Allow Returns')
-                    ->helperText('When disabled, customers cannot submit return requests.')
-                    ->inline(false),
-                Forms\Components\TextInput::make('return_window_days')
-                    ->label('Return Window (days)')
-                    ->numeric()
-                    ->minValue(1)
-                    ->maxValue(90)
-                    ->suffix('days')
-                    ->helperText('Number of days after delivery a customer can request a return.')
-                    ->required(),
-                Forms\Components\TextInput::make('refund_days')
-                    ->label('Refund Processing Time (days)')
-                    ->numeric()
-                    ->minValue(1)
-                    ->maxValue(30)
-                    ->suffix('days')
-                    ->helperText('Shown to customers in the approval email: "Refund within X business days."')
-                    ->required(),
-            ])->columns(3),
-        ])->statePath('policy');
-    }
 
     public function socialForm(Form $form): Form
     {
@@ -340,6 +307,62 @@ class SettingsPage extends Page
         ])->statePath('homepage');
     }
 
+    public function seoForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Section::make('Search Engine Defaults')
+                ->description('Fallback meta tags used on pages that do not set their own SEO fields.')
+                ->schema([
+                    Forms\Components\TextInput::make('meta_title')
+                        ->label('Default Meta Title')
+                        ->maxLength(70)
+                        ->helperText('Recommended: 50–70 characters.')
+                        ->columnSpanFull(),
+                    Forms\Components\Textarea::make('meta_description')
+                        ->label('Default Meta Description')
+                        ->rows(2)
+                        ->maxLength(160)
+                        ->helperText('Recommended: 120–160 characters.')
+                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('meta_keywords')
+                        ->label('Default Keywords')
+                        ->maxLength(500)
+                        ->helperText('Comma-separated, e.g. hijab, modest fashion, abaya')
+                        ->columnSpanFull(),
+                ])->columns(1),
+
+            Forms\Components\Section::make('Open Graph / Social Sharing')
+                ->description('Default image shown when pages are shared on Facebook, WhatsApp, Twitter etc.')
+                ->schema([
+                    Forms\Components\FileUpload::make('og_image_upload')
+                        ->label('Default OG Image')
+                        ->image()
+                        ->disk('public')
+                        ->visibility('public')
+                        ->directory('settings')
+                        ->imagePreviewHeight('120')
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                        ->maxSize(2048)
+                        ->nullable()
+                        ->helperText('Recommended: 1200×630px, max 2 MB. Used when no page-specific OG image is set.')
+                        ->dehydrated(false)
+                        ->afterStateHydrated(function ($set) {
+                            $path = Setting::get('og_image', '');
+                            $set('og_image_upload', $path ? [$path => $path] : []);
+                        }),
+                ])->columns(1),
+
+            Forms\Components\Section::make('Robots.txt')
+                ->schema([
+                    Forms\Components\Textarea::make('robots_txt')
+                        ->label('robots.txt Content')
+                        ->rows(8)
+                        ->columnSpanFull()
+                        ->helperText('Served at /robots.txt. Changes take effect immediately.'),
+                ])->columns(1),
+        ])->statePath('seo');
+    }
+
     public function oauthForm(Form $form): Form
     {
         return $form->schema([
@@ -393,9 +416,7 @@ class SettingsPage extends Page
         foreach ($this->payment as $key => $value) {
             Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'payment');
         }
-        foreach ($this->policy as $key => $value) {
-            Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'policy');
-        }
+
         foreach ($this->social as $key => $value) {
             Setting::set($key, $value, 'social');
         }
@@ -404,6 +425,14 @@ class SettingsPage extends Page
         }
         foreach ($this->homepage as $key => $value) {
             Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'homepage');
+        }
+
+        $ogUpload = $this->seoForm->getRawState()['og_image_upload'] ?? [];
+        $ogImagePath = $this->storeOrKeep(is_array($ogUpload) ? $ogUpload : [], 'settings');
+        Setting::set('og_image', $ogImagePath, 'seo');
+
+        foreach ($this->seo as $key => $value) {
+            Setting::set($key, $value, 'seo');
         }
 
         Cache::forget('settings.public');

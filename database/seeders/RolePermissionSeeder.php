@@ -30,6 +30,8 @@ class RolePermissionSeeder extends Seeder
             'view_coupons', 'create_coupons', 'edit_coupons', 'delete_coupons',
             // Content (Banners, Blog Posts)
             'view_content', 'create_content', 'edit_content', 'delete_content',
+            // Contact
+            'view_contact',
             // Newsletter
             'manage_newsletter',
             // Users
@@ -74,6 +76,7 @@ class RolePermissionSeeder extends Seeder
             'view_reviews', 'approve_reviews',
             'view_shipping',
             'view_content',
+            'view_contact',
         ]);
 
         // Customer — no admin permissions

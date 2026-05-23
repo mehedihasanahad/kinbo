@@ -265,6 +265,40 @@ class ProductResource extends Resource
                             return $options ?: 'New Variant';
                         }),
                 ]),
+
+            Forms\Components\Section::make('SEO')
+                ->description('Controls how this product appears in search engines and when shared on social media.')
+                ->collapsed()
+                ->schema([
+                    Forms\Components\TextInput::make('translation_meta_title')
+                        ->label('Meta Title')
+                        ->maxLength(70)
+                        ->dehydrated(false)
+                        ->helperText('Recommended: 50–70 characters.')
+                        ->afterStateHydrated(function ($state, $record, $set) {
+                            $set('translation_meta_title', $record?->getTranslation('en')?->meta_title);
+                        })
+                        ->columnSpanFull(),
+                    Forms\Components\Textarea::make('translation_meta_description')
+                        ->label('Meta Description')
+                        ->rows(2)
+                        ->maxLength(160)
+                        ->dehydrated(false)
+                        ->helperText('Recommended: 120–160 characters.')
+                        ->afterStateHydrated(function ($state, $record, $set) {
+                            $set('translation_meta_description', $record?->getTranslation('en')?->meta_description);
+                        })
+                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('translation_meta_keywords')
+                        ->label('Keywords')
+                        ->maxLength(500)
+                        ->dehydrated(false)
+                        ->helperText('Comma-separated keywords, e.g. hijab, modest fashion, abaya')
+                        ->afterStateHydrated(function ($state, $record, $set) {
+                            $set('translation_meta_keywords', $record?->getTranslation('en')?->meta_keywords);
+                        })
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 

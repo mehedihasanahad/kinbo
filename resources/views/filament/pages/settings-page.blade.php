@@ -33,14 +33,6 @@
             {{ $this->paymentForm }}
         </x-filament::section>
 
-        {{-- Return & Refund Policy --}}
-        <x-filament::section class="mt-6">
-            <x-slot name="heading">Return & Refund Policy</x-slot>
-            <x-slot name="description">Control whether returns are allowed, the return window, and refund processing time.</x-slot>
-
-            {{ $this->policyForm }}
-        </x-filament::section>
-
         {{-- Social --}}
         <x-filament::section class="mt-6">
             <x-slot name="heading">Social Media</x-slot>
@@ -67,6 +59,14 @@
             <div class="mt-6">
                 {{ $this->homepageForm }}
             </div>
+        </x-filament::section>
+
+        {{-- SEO --}}
+        <x-filament::section class="mt-6">
+            <x-slot name="heading">SEO & Meta</x-slot>
+            <x-slot name="description">Default meta tags, Open Graph image, and robots.txt configuration.</x-slot>
+
+            {{ $this->seoForm }}
         </x-filament::section>
 
         <div class="mt-6 flex justify-start">

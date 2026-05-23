@@ -36,6 +36,7 @@ Route::post('/subscribe', [SubscriberController::class, 'subscribe'])->name('sub
 Route::get('/subscribe/confirm/{token}', [SubscriberController::class, 'confirm'])->name('subscribe.confirm');
 Route::get('/subscribe/unsubscribe/{token}', [SubscriberController::class, 'unsubscribe'])->name('subscribe.unsubscribe');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 Route::get('/search', [ShopController::class, 'category'])->name('shop.search');
 Route::get('/products', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('product.show');

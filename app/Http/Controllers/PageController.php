@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactFormSubmission;
 use App\Models\BlogPost;
+use App\Models\ContactSubmission;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class PageController extends Controller
 {
@@ -19,15 +23,21 @@ class PageController extends Controller
 
     public function contactSend(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name'    => 'required|string|max:100',
             'email'   => 'required|email|max:150',
             'subject' => 'required|string|max:150',
             'message' => 'required|string|min:10|max:2000',
         ]);
 
-        // TODO: send email via Mail::to() or store in DB when ready
-        // For now we just flash success and redirect back
+        $submission = ContactSubmission::create($validated);
+
+        $adminEmail = User::role('super_admin')->value('email');
+
+        if ($adminEmail) {
+            Mail::to($adminEmail)->send(new ContactFormSubmission($submission));
+        }
+
         return back()->with('contact_sent', true);
     }
 

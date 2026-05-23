@@ -24,6 +24,9 @@ class EditProduct extends EditRecord
             'slug'              => $data['translation_slug'] ?? \Str::slug($data['translation_name'] ?? ''),
             'short_description' => $data['translation_short_description'] ?? null,
             'description'       => $data['translation_description'] ?? null,
+            'meta_title'        => $data['translation_meta_title'] ?? null,
+            'meta_description'  => $data['translation_meta_description'] ?? null,
+            'meta_keywords'     => $data['translation_meta_keywords'] ?? null,
         ];
 
         $this->record->translations()->updateOrCreate(['locale' => 'en'], $enData);

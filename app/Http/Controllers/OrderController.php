@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
 
 class OrderController extends Controller
 {
@@ -26,14 +27,16 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    public function invoice(Order $order)
+    public function invoice(Order $order): Response
     {
         abort_if($order->user_id !== auth()->id(), 403);
 
-        $order->load(['items', 'manualPayment', 'coupon']);
+        $order->load(['items', 'manualPayment', 'coupon', 'shippingRate']);
 
-        $pdf = Pdf::loadView('orders.invoice', compact('order'))->setPaper('a4', 'portrait');
+        $output = Pdf::loadView('orders.invoice', compact('order'))
+            ->setPaper('a4', 'portrait')
+            ->output();
 
-        return $pdf->download('Invoice-' . $order->order_number . '.pdf');
+        return response($output)->header('Content-Type', 'application/pdf');
     }
 }

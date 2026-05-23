@@ -9,7 +9,14 @@
 @endphp
 
 <div class="product-card bg-white rounded-2xl overflow-hidden border border-gray-100
-            hover:border-primary-300 hover:shadow-xl transition-all duration-300 group">
+            hover:border-primary-300 hover:shadow-xl transition-all duration-300 group"
+     itemscope itemtype="https://schema.org/Product">
+
+    <meta itemprop="sku" content="{{ $product->sku }}">
+    @if($t?->short_description)
+        <meta itemprop="description" content="{{ strip_tags($t->short_description) }}">
+    @endif
+    <link itemprop="url" href="{{ route('product.show', $productSlug) }}">
 
     {{-- Clickable area: image + body ── --}}
     <a href="{{ route('product.show', $productSlug) }}" class="block">
@@ -19,6 +26,7 @@
             @if($product->primaryImage)
                 <img src="{{ asset('storage/' . $product->primaryImage->path) }}"
                      alt="{{ $productName }}"
+                     itemprop="image"
                      class="w-full h-full object-contain object-center
                             group-hover:scale-105 transition-transform duration-500">
             @else
@@ -94,7 +102,7 @@
         <div class="product-card-body">
 
             {{-- Product name — exactly 2 lines max, ellipsis after --}}
-            <h4 class="product-card-name text-sm font-semibold text-gray-800 mb-2">
+            <h4 class="product-card-name text-sm font-semibold text-gray-800 mb-2" itemprop="name">
                 {{ $productName }}
             </h4>
 
@@ -115,7 +123,12 @@
             </div>
 
             {{-- Price --}}
-            <div class="product-card-footer flex items-center justify-between gap-2">
+            <div class="product-card-footer flex items-center justify-between gap-2"
+                 itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="BDT">
+                <meta itemprop="price" content="{{ $currentPrice }}">
+                <meta itemprop="availability" content="https://schema.org/{{ $product->is_in_stock ? 'InStock' : 'OutOfStock' }}">
+                <link itemprop="url" href="{{ route('product.show', $productSlug) }}">
                 <div class="min-w-0">
                     <span class="text-base font-bold text-gray-900">
                         ৳{{ number_format($currentPrice, 0) }}

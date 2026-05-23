@@ -17,6 +17,49 @@
 @endphp
 
 @section('title', $catName . ' — ' . config('app.name'))
+@if($catMeta)
+@section('meta_description', $catMeta)
+@section('og_description', $catMeta)
+@endif
+@section('og_title', $catName . ' — ' . config('app.name'))
+
+@push('scripts')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "ItemList",
+    "name": "{{ addslashes($catName) }}",
+    "url": "{{ url()->current() }}",
+    "numberOfItems": {{ $products->total() }},
+    "itemListElement": [
+        @foreach($products as $i => $item)
+        @php
+            $t = $item->getTranslation(app()->getLocale()) ?? $item->getTranslation('en');
+            $slug = $t?->slug ?? $item->sku;
+            $img = $item->primaryImage ? asset('storage/'.$item->primaryImage->path) : null;
+        @endphp
+        {
+            "@@type": "ListItem",
+            "position": {{ $products->firstItem() + $i }},
+            "item": {
+                "@@type": "Product",
+                "name": "{{ addslashes($t?->name ?? $item->sku) }}",
+                "url": "{{ route('product.show', $slug) }}"
+                @if($img),"image": "{{ $img }}"@endif
+                @if($t?->short_description),"description": "{{ addslashes(strip_tags($t->short_description)) }}"@endif,
+                "offers": {
+                    "@@type": "Offer",
+                    "priceCurrency": "BDT",
+                    "price": "{{ $item->current_price }}",
+                    "availability": "https://schema.org/{{ $item->is_in_stock ? 'InStock' : 'OutOfStock' }}"
+                }
+            }
+        }{{ ! $loop->last ? ',' : '' }}
+        @endforeach
+    ]
+}
+</script>
+@endpush
 
 @section('content')
 
