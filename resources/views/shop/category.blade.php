@@ -75,9 +75,9 @@
                   d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
         </svg>
         {{ __('front.filter_toggle') }}
-        @if(count($brands) || $priceMin !== null || $priceMax !== null)
+        @if($priceMin !== null || $priceMax !== null)
             <span class="bg-primary-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                {{ count($brands) + ($priceMin !== null ? 1 : 0) + ($priceMax !== null ? 1 : 0) }}
+                {{ ($priceMin !== null ? 1 : 0) + ($priceMax !== null ? 1 : 0) }}
             </span>
         @endif
     </button>
@@ -163,31 +163,6 @@
                         </ul>
                     </div>
 
-                    {{-- ── Brand Filter ── --}}
-                    @if($availableBrands->isNotEmpty())
-                    <div class="bg-white rounded-2xl border border-gray-100 p-4">
-                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-                            {{ __('front.filter_brands') }}
-                        </h3>
-                        <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
-                            @foreach($availableBrands as $brand)
-                                <label class="flex items-center gap-2.5 cursor-pointer group">
-                                    <input type="checkbox"
-                                           name="brands[]"
-                                           value="{{ $brand->id }}"
-                                           {{ in_array($brand->id, $brands) ? 'checked' : '' }}
-                                           class="w-4 h-4 rounded border-gray-300 text-primary-600
-                                                  focus:ring-primary-500 focus:ring-offset-0 cursor-pointer
-                                                  accent-primary-600">
-                                    <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors leading-none">
-                                        {{ $brand->name }}
-                                    </span>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
                     {{-- ── Price Range ── --}}
                     <div class="bg-white rounded-2xl border border-gray-100 p-4">
                         <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
@@ -226,7 +201,7 @@
                     </div>
 
                     {{-- Reset link --}}
-                    @if(count($brands) || $priceMin !== null || $priceMax !== null || $sort !== 'newest')
+                    @if($priceMin !== null || $priceMax !== null || $sort !== 'newest')
                     <div class="text-center">
                         <a href="{{ $resetUrl }}"
                            class="text-xs text-gray-400 hover:text-red-500 transition-colors inline-flex items-center gap-1">
@@ -371,11 +346,6 @@
                             {{-- Details --}}
                             <div class="flex-1 min-w-0 flex flex-col justify-between">
                                 <div>
-                                    @if($product->brand)
-                                        <p class="text-xs text-primary-600 font-semibold mb-0.5 uppercase tracking-wide">
-                                            {{ $product->brand->name }}
-                                        </p>
-                                    @endif
                                     <h3 class="font-semibold text-gray-800 text-sm sm:text-base line-clamp-2 leading-snug">
                                         {{ $t?->name ?? $product->sku }}
                                     </h3>

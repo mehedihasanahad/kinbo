@@ -49,7 +49,7 @@ class CategoryResource extends Resource
                     ->inline(false),
             ])->columns(4),
 
-            Forms\Components\Section::make('Translation (English)')->schema([
+            Forms\Components\Section::make('Name & Description')->schema([
                 Forms\Components\TextInput::make('translation_name')
                     ->label('Name')->required()->maxLength(191)
                     ->dehydrated(false)

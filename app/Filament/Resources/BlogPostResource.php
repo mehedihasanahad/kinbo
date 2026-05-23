@@ -63,10 +63,8 @@ class BlogPostResource extends Resource
 
             Forms\Components\Section::make('Meta & Publishing')
                 ->schema([
-                    Forms\Components\Select::make('locale')
-                        ->options(['en' => 'English', 'bn' => 'বাংলা'])
-                        ->default('en')
-                        ->required(),
+                    Forms\Components\Hidden::make('locale')
+                        ->default('en'),
 
                     Forms\Components\TextInput::make('category')
                         ->maxLength(100)
@@ -115,7 +113,7 @@ class BlogPostResource extends Resource
                     ->limit(50),
 
                 Tables\Columns\BadgeColumn::make('locale')
-                    ->colors(['primary' => 'en', 'warning' => 'bn'])
+                    ->colors(['primary' => 'en'])
                     ->formatStateUsing(fn ($state) => strtoupper($state)),
 
                 Tables\Columns\TextColumn::make('category')
@@ -133,7 +131,7 @@ class BlogPostResource extends Resource
             ->defaultSort('published_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('locale')
-                    ->options(['en' => 'English', 'bn' => 'বাংলা']),
+                    ->options(['en' => 'English']),
                 Tables\Filters\TernaryFilter::make('is_published')
                     ->label('Published'),
             ])

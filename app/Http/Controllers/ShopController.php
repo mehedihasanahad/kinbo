@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\CategoryTranslation;
 use App\Models\Product;
@@ -46,13 +45,12 @@ class ShopController extends Controller
             $sort = 'newest';
         }
 
-        $brands   = array_filter(array_map('intval', (array) $request->query('brands', [])));
         $priceMin = is_numeric($request->query('price_min')) ? (float) $request->query('price_min') : null;
         $priceMax = is_numeric($request->query('price_max')) ? (float) $request->query('price_max') : null;
         $view     = in_array($request->query('view'), ['grid', 'list']) ? $request->query('view') : 'grid';
 
         // ── Product query ──────────────────────────────────────────────────────
-        $query = Product::active()->with(['primaryImage', 'translations', 'brand']);
+        $query = Product::active()->with(['primaryImage', 'translations']);
 
         if ($isSearch) {
             $query->whereHas('translations', function ($tq) use ($q) {
@@ -64,10 +62,6 @@ class ShopController extends Controller
         if ($category !== null) {
             $categoryIds = $category->children->pluck('id')->push($category->id)->toArray();
             $query->whereIn('category_id', $categoryIds);
-        }
-
-        if (! empty($brands)) {
-            $query->whereIn('brand_id', $brands);
         }
 
         if ($priceMin !== null) {
@@ -98,31 +92,12 @@ class ShopController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        $availableBrands = Brand::active()
-            ->whereHas('products', function ($bq) use ($category, $q) {
-                $bq->active();
-                if ($category !== null) {
-                    $categoryIds = $category->children->pluck('id')->push($category->id)->toArray();
-                    $bq->whereIn('category_id', $categoryIds);
-                }
-                if ($q !== '') {
-                    $bq->whereHas('translations', function ($tq) use ($q) {
-                        $tq->where('name', 'LIKE', '%' . $q . '%')
-                           ->orWhere('short_description', 'LIKE', '%' . $q . '%');
-                    });
-                }
-            })
-            ->orderBy('name')
-            ->get();
-
         return view('shop.category', compact(
             'category',
             'slug',
             'products',
             'sidebarCategories',
-            'availableBrands',
             'sort',
-            'brands',
             'priceMin',
             'priceMax',
             'view',

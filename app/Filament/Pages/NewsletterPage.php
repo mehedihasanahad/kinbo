@@ -50,7 +50,6 @@ class NewsletterPage extends Page
                         ->options([
                             ''   => 'All subscribers',
                             'en' => 'English subscribers only',
-                            'bn' => 'Bengali subscribers only',
                         ])
                         ->default('')
                         ->live()

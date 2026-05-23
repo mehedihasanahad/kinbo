@@ -97,9 +97,8 @@ class BannerResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('locale')
                         ->options([
-                            'all' => 'All Languages',
+                            'all' => 'All Visitors',
                             'en'  => 'English Only',
-                            'bn'  => 'Bengali Only',
                         ])
                         ->default('all')
                         ->required(),
@@ -148,13 +147,11 @@ class BannerResource extends Resource
                     ->color(fn ($state) => match ($state) {
                         'all' => 'primary',
                         'en'  => 'success',
-                        'bn'  => 'warning',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'all' => 'All',
                         'en'  => 'English',
-                        'bn'  => 'Bengali',
                         default => $state,
                     }),
 
@@ -184,7 +181,7 @@ class BannerResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
                 Tables\Filters\SelectFilter::make('locale')
-                    ->options(['all' => 'All', 'en' => 'English', 'bn' => 'Bengali']),
+                    ->options(['all' => 'All', 'en' => 'English']),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -154,8 +154,6 @@ class SettingsPage extends Page
             Forms\Components\TextInput::make('site_name')->required()->maxLength(100),
             Forms\Components\TextInput::make('site_tagline')->maxLength(191)->nullable(),
             Forms\Components\Textarea::make('site_description')->rows(2)->nullable()->columnSpanFull(),
-            Forms\Components\Select::make('default_locale')
-                ->options(['en' => 'English', 'bn' => 'Bengali'])->required(),
             Forms\Components\TextInput::make('currency')->maxLength(10)->default('BDT'),
             Forms\Components\TextInput::make('currency_symbol')->maxLength(5)->default('৳'),
 

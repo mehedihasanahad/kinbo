@@ -18,13 +18,13 @@ class EditCategory extends EditRecord
     protected function afterSave(): void
     {
         $data = $this->form->getRawState();
-        $this->record->translations()->updateOrCreate(
-            ['locale' => 'en'],
-            [
-                'name'        => $data['translation_name'] ?? '',
-                'slug'        => $data['translation_slug'] ?? \Str::slug($data['translation_name'] ?? ''),
-                'description' => $data['translation_description'] ?? null,
-            ]
-        );
+        $enData = [
+            'name'        => $data['translation_name'] ?? '',
+            'slug'        => $data['translation_slug'] ?? \Str::slug($data['translation_name'] ?? ''),
+            'description' => $data['translation_description'] ?? null,
+        ];
+
+        $this->record->translations()->updateOrCreate(['locale' => 'en'], $enData);
+        $this->record->translations()->updateOrCreate(['locale' => 'bn'], $enData);
     }
 }

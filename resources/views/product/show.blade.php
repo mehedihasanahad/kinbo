@@ -66,12 +66,6 @@
     @if($product->primaryImage?->image_path)
     "image": "{{ $ogImage }}",
     @endif
-    @if($product->brand)
-    "brand": {
-        "@@type": "Brand",
-        "name": "{{ addslashes($product->brand->name) }}"
-    },
-    @endif
     "offers": {
         "@@type": "Offer",
         "url": "{{ $productUrl }}",
@@ -222,13 +216,6 @@
 
         {{-- ── RIGHT: Product Info ──────────────────────────────────────────── --}}
         <div class="flex flex-col gap-5">
-
-            {{-- Brand --}}
-            @if($product->brand)
-                <p class="text-sm text-primary-600 font-semibold uppercase tracking-wide">
-                    {{ $product->brand->name }}
-                </p>
-            @endif
 
             {{-- Product name --}}
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">{{ $productName }}</h1>

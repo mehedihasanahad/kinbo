@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Banner;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
@@ -42,14 +41,8 @@ class HomeController extends Controller
         $onSaleProducts = Product::active()
             ->inStock()
             ->whereNotNull('sale_price')
-            ->with(['primaryImage', 'translations', 'brand'])
+            ->with(['primaryImage', 'translations'])
             ->orderByRaw('((price - sale_price) / price) DESC')
-            ->take(12)
-            ->get();
-
-        $brands = Brand::active()
-            ->whereNotNull('logo')
-            ->orderBy('name')
             ->take(12)
             ->get();
 
@@ -78,7 +71,6 @@ class HomeController extends Controller
             'featuredProducts',
             'newArrivals',
             'onSaleProducts',
-            'brands',
             'testimonials',
             'promoBanner',
         ));

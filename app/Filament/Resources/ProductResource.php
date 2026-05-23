@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductTranslation;
@@ -45,15 +44,9 @@ class ProductResource extends Resource
                         ->get()->mapWithKeys(fn ($c) => [$c->id => $c->getTranslation('en')?->name ?? 'Category #' . $c->id]))
                     ->searchable()
                     ->required(),
+            ])->columns(2),
 
-                Forms\Components\Select::make('brand_id')
-                    ->label('Brand')
-                    ->options(Brand::active()->pluck('name', 'id'))
-                    ->searchable()
-                    ->nullable(),
-            ])->columns(3),
-
-            Forms\Components\Section::make('Translation (English)')->schema([
+            Forms\Components\Section::make('Name & Description')->schema([
                 Forms\Components\TextInput::make('translation_name')
                     ->label('Name')
                     ->required()
@@ -87,42 +80,6 @@ class ProductResource extends Resource
                         $set('translation_description', $record?->getTranslation('en')?->description);
                     }),
             ])->columns(2),
-
-            Forms\Components\Section::make('Translation (Bengali / বাংলা)')
-                ->collapsed()
-                ->schema([
-                    Forms\Components\TextInput::make('bn_name')
-                        ->label('Name (বাংলা)')
-                        ->maxLength(191)
-                        ->dehydrated(false)
-                        ->afterStateHydrated(function ($state, $record, $set) {
-                            $set('bn_name', $record?->getTranslation('bn')?->name);
-                        }),
-
-                    Forms\Components\TextInput::make('bn_slug')
-                        ->label('Slug')
-                        ->maxLength(191)
-                        ->dehydrated(false)
-                        ->afterStateHydrated(function ($state, $record, $set) {
-                            $set('bn_slug', $record?->getTranslation('bn')?->slug);
-                        }),
-
-                    Forms\Components\Textarea::make('bn_short_description')
-                        ->label('Short Description (বাংলা)')
-                        ->rows(2)
-                        ->dehydrated(false)
-                        ->afterStateHydrated(function ($state, $record, $set) {
-                            $set('bn_short_description', $record?->getTranslation('bn')?->short_description);
-                        }),
-
-                    Forms\Components\RichEditor::make('bn_description')
-                        ->label('Full Description (বাংলা)')
-                        ->columnSpanFull()
-                        ->dehydrated(false)
-                        ->afterStateHydrated(function ($state, $record, $set) {
-                            $set('bn_description', $record?->getTranslation('bn')?->description);
-                        }),
-                ])->columns(2),
 
             Forms\Components\Section::make('Pricing & Stock')->schema([
                 Forms\Components\TextInput::make('price')
@@ -339,8 +296,6 @@ class ProductResource extends Resource
                     ->label('Category')
                     ->getStateUsing(fn ($record) => $record->category?->getTranslation('en')?->name ?? '—'),
 
-                Tables\Columns\TextColumn::make('brand.name')->label('Brand'),
-
                 Tables\Columns\TextColumn::make('price')
                     ->money('BDT')->sortable(),
 
@@ -362,9 +317,6 @@ class ProductResource extends Resource
                     ->label('Category')
                     ->options(fn () => Category::active()->with('translations')
                         ->get()->mapWithKeys(fn ($c) => [$c->id => $c->getTranslation('en')?->name ?? '#' . $c->id])),
-                Tables\Filters\SelectFilter::make('brand_id')
-                    ->label('Brand')
-                    ->options(Brand::active()->pluck('name', 'id')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
