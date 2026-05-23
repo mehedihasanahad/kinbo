@@ -10,7 +10,7 @@
     $catMeta = ($isSearch || $isAllProducts)
         ? ''
         : ($category->getTranslation($locale)?->meta_description ?? $category->getTranslation('en')?->meta_description ?? '');
-    $formAction = $isSearch ? route('shop.search') : route('shop.category');
+    $formAction = request()->url();
     $resetUrl   = $isSearch
         ? route('shop.search', ['q' => $q])
         : ($isAllProducts ? route('shop.category') : route('shop.category', ['category' => $slug]));
@@ -35,7 +35,7 @@
         @foreach($products as $i => $item)
         @php
             $t = $item->getTranslation(app()->getLocale()) ?? $item->getTranslation('en');
-            $slug = $t?->slug ?? $item->sku;
+            $productSlug = $t?->slug ?? $item->sku;
             $img = $item->primaryImage ? asset('storage/'.$item->primaryImage->path) : null;
         @endphp
         {
@@ -44,7 +44,7 @@
             "item": {
                 "@@type": "Product",
                 "name": "{{ addslashes($t?->name ?? $item->sku) }}",
-                "url": "{{ route('product.show', $slug) }}"
+                "url": "{{ route('product.show', $productSlug) }}"
                 @if($img),"image": "{{ $img }}"@endif
                 @if($t?->short_description),"description": "{{ addslashes(strip_tags($t->short_description)) }}"@endif,
                 "offers": {
@@ -125,14 +125,32 @@
         @endif
     </button>
 
+    {{-- Mobile drawer backdrop --}}
+    <div id="filter-overlay" class="lg:hidden fixed inset-0 bg-black/40 z-40 hidden"></div>
+
     <div class="flex gap-6 lg:gap-8 items-start">
 
         {{-- ═══════════════════════════════════════
              SIDEBAR
         ════════════════════════════════════════ --}}
         <aside id="shop-sidebar"
-               class="hidden lg:block lg:w-64 xl:w-72 shrink-0">
-            <div class="lg:sticky lg:top-20 space-y-4">
+               class="fixed top-0 left-0 h-full w-72 max-w-[85vw] bg-white z-50 shadow-2xl overflow-y-auto
+                      -translate-x-full transition-transform duration-300 ease-in-out
+                      lg:static lg:translate-x-0 lg:h-auto lg:w-64 xl:w-72 lg:shadow-none lg:z-auto
+                      lg:overflow-visible shrink-0">
+
+            {{-- Mobile drawer header --}}
+            <div class="lg:hidden flex items-center justify-between px-5 h-14 border-b border-gray-100 sticky top-0 bg-white z-10">
+                <span class="text-sm font-semibold text-gray-900">{{ __('front.filter_toggle') }}</span>
+                <button id="filter-close" type="button"
+                        class="text-gray-400 hover:text-gray-700 transition-colors p-1.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="lg:sticky lg:top-20 space-y-4 p-4 lg:p-0">
 
                 <form method="GET"
                       action="{{ $formAction }}"
@@ -463,12 +481,26 @@
 @push('scripts')
 <script>
 (function () {
-    var btn = document.getElementById('filter-toggle');
-    var sidebar = document.getElementById('shop-sidebar');
-    if (!btn || !sidebar) return;
-    btn.addEventListener('click', function () {
-        sidebar.classList.toggle('hidden');
-    });
+    var btn      = document.getElementById('filter-toggle');
+    var sidebar  = document.getElementById('shop-sidebar');
+    var overlay  = document.getElementById('filter-overlay');
+    var closeBtn = document.getElementById('filter-close');
+
+    function openFilter() {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeFilter() {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    if (btn)      btn.addEventListener('click', openFilter);
+    if (closeBtn) closeBtn.addEventListener('click', closeFilter);
+    if (overlay)  overlay.addEventListener('click', closeFilter);
 })();
 </script>
 @endpush

@@ -14,7 +14,7 @@ class ShopController extends Controller
     {
         $locale   = app()->getLocale();
         $category = null;
-        $slug     = $request->query('category');
+        $slug     = $request->query('category') ?: null;
 
         // ── Search query ───────────────────────────────────────────────────────
         $q        = trim((string) $request->query('q', ''));
@@ -29,13 +29,15 @@ class ShopController extends Controller
                     ->where('locale', 'en')
                     ->first();
 
-            if (! $translation) {
-                abort(404);
+            if ($translation) {
+                $category = Category::active()
+                    ->with(['translations', 'children.translations', 'parent.translations'])
+                    ->find($translation->category_id);
             }
 
-            $category = Category::active()
-                ->with(['translations', 'children.translations', 'parent.translations'])
-                ->findOrFail($translation->category_id);
+            if (! $category) {
+                $slug = null;
+            }
         }
 
         // ── Filter inputs ──────────────────────────────────────────────────────

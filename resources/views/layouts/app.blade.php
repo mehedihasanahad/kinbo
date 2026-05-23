@@ -117,11 +117,11 @@
                     @if($siteLogo)
                         <img src="{{ asset('storage/' . $siteLogo) }}"
                              alt="{{ config('app.name', 'Youth Collections') }}"
-                             class="h-10 w-auto object-contain">
+                             class="h-18 w-auto object-contain">
                     @else
                         <img src="{{ asset('images/youthcollection-logo.png') }}"
                              alt="{{ config('app.name', 'Youth Collections') }}"
-                             class="h-10 w-auto object-contain">
+                             class="h-18 w-auto object-contain">
                     @endif
                 </a>
             </div>
@@ -131,11 +131,11 @@
                 @if($siteLogo)
                     <img src="{{ asset('storage/' . $siteLogo) }}"
                          alt="{{ config('app.name', 'Youth Collections') }}"
-                         class="h-8 w-auto object-contain">
+                         class="h-14 w-auto object-contain">
                 @else
                     <img src="{{ asset('images/youthcollection-logo.png') }}"
                          alt="{{ config('app.name', 'Youth Collections') }}"
-                         class="h-8 w-auto object-contain">
+                         class="h-14 w-auto object-contain">
                 @endif
             </a>
 
@@ -361,7 +361,7 @@
                 <a href="{{ route('home') }}" class="inline-block mb-3">
                     <img src="{{ asset('images/youthcollection-logo.png') }}"
                          alt="{{ config('app.name') }}"
-                         class="h-14 w-auto">
+                         class="h-20 w-auto">
                 </a>
                 <p class="text-white text-xs font-bold uppercase tracking-widest mb-2">{{ config('app.name', 'Youth Collections') }}</p>
                 <p class="text-xs leading-relaxed mb-5">Choose well, be well. We bring you modest fashion that makes you feel confident and elegant every day.</p>
@@ -466,20 +466,8 @@
 
     {{-- Bottom bar --}}
     <div class="border-t border-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
             <p class="text-xs text-gray-600">&copy; {{ date('Y') }} {{ config('app.name', 'Youth Collections') }}. All Rights Reserved.</p>
-            <div class="flex items-center gap-1.5">
-                <span class="bg-white text-gray-900 text-[9px] font-black px-2 py-1 rounded">VISA</span>
-                <span class="bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded">Mastercard</span>
-                <span class="bg-pink-500 text-white text-[9px] font-black px-2 py-1 rounded">bKash</span>
-                <span class="bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded">Nagad</span>
-                <span class="bg-gray-700 text-white text-[9px] font-bold px-2 py-1 rounded flex items-center gap-1">
-                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
-                    SSL
-                </span>
-            </div>
         </div>
     </div>
 </footer>

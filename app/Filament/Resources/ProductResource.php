@@ -211,6 +211,16 @@ class ProductResource extends Resource
                                             strtolower((string) ($get('option_name') ?? '')),
                                             ['color', 'colour'],
                                         )),
+
+                                    Forms\Components\Textarea::make('size_note')
+                                        ->label('Exact Size Details')
+                                        ->placeholder('e.g. Chest: 38–40 in, Length: 28 in')
+                                        ->helperText('Shown to customers when they select this size on the product page.')
+                                        ->rows(2)
+                                        ->maxLength(500)
+                                        ->nullable()
+                                        ->columnSpanFull()
+                                        ->visible(fn (Get $get): bool => strtolower((string) ($get('option_name') ?? '')) === 'size'),
                                 ])
                                 ->columns(2)
                                 ->addActionLabel('Add Option')

@@ -339,15 +339,14 @@
     border-radius: 3px;
     border: none;
     box-shadow: 0 4px 18px rgba(203,120,136,0.45), 0 1px 4px rgba(0,0,0,0.10);
-    top: 38%;
-    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+    top: 50%;
+    margin-top: 0;
+    transform: translateY(-50%);
 }
 
 .best-deals-swiper-prev:hover,
 .best-deals-swiper-next:hover {
     background: #bb4e64;
-    box-shadow: 0 8px 26px rgba(203,120,136,0.58), 0 2px 8px rgba(0,0,0,0.12);
-    transform: translateY(-2px);
 }
 
 .best-deals-swiper-prev::after,
@@ -375,15 +374,13 @@
     border: none;
     box-shadow: 0 4px 18px rgba(203,120,136,0.45), 0 1px 4px rgba(0,0,0,0.10);
     top: 50%;
+    margin-top: 0;
     transform: translateY(-50%);
-    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 
 .category-swiper-prev:hover,
 .category-swiper-next:hover {
     background: #bb4e64;
-    box-shadow: 0 8px 26px rgba(203,120,136,0.58), 0 2px 8px rgba(0,0,0,0.12);
-    transform: translateY(-2px);
 }
 
 .category-swiper-prev::after,

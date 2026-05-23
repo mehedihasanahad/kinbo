@@ -304,7 +304,11 @@
                                 'stock'   => $v->stock,
                                 'label'   => $v->label,
                                 'options' => $v->options->map(function($o) {
-                                    return ['name' => $o->option_name, 'value' => $o->option_value];
+                                    return [
+                                        'name'      => $o->option_name,
+                                        'value'     => $o->option_value,
+                                        'size_note' => $o->size_note,
+                                    ];
                                 })->values(),
                                 'images'  => $v->images->map(fn($img) => asset('storage/' . $img->path))->values(),
                             ];
@@ -358,6 +362,13 @@
                                     </button>
                                 @endif
                             </div>
+
+                            {{-- Exact size note — shown when customer selects a size that has a note --}}
+                            @if($isSizeOption)
+                                <div id="size-exact-note"
+                                     class="hidden mt-2 text-xs text-amber-600 leading-relaxed">
+                                </div>
+                            @endif
 
                             {{-- Custom size input — shown when customer clicks the Custom Size button --}}
                             @if($isSizeOption && $product->custom_size_enabled)
@@ -1139,6 +1150,26 @@ function selectVariantOption(optionName, optionValue, btn) {
     } else {
         btn.classList.add('border-primary-600', 'bg-primary-50', 'text-primary-700');
         btn.classList.remove('border-gray-200', 'text-gray-700');
+    }
+
+    // Show/hide exact size note
+    if (optionName.toLowerCase() === 'size') {
+        const noteEl = document.getElementById('size-exact-note');
+        if (noteEl) {
+            let note = null;
+            if (optionValue !== '__custom__') {
+                for (const v of variantsData) {
+                    const opt = v.options.find(o => o.name === optionName && o.value === optionValue && o.size_note);
+                    if (opt) { note = opt.size_note; break; }
+                }
+            }
+            if (note) {
+                noteEl.textContent = note;
+                noteEl.classList.remove('hidden');
+            } else {
+                noteEl.classList.add('hidden');
+            }
+        }
     }
 
     // Show/hide custom size input box

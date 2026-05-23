@@ -105,7 +105,7 @@
                                 @if($category->image)
                                     <img src="{{ asset('storage/' . $category->image) }}"
                                          alt="{{ $t?->name ?? 'Category' }}"
-                                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                         class="absolute inset-0 w-full h-full object-cover">
                                 @else
                                     <div class="absolute inset-0 bg-gray-200"></div>
                                 @endif
@@ -344,7 +344,7 @@
                                     @if($product->primaryImage)
                                         <img src="{{ asset('storage/' . $product->primaryImage->path) }}"
                                              alt="{{ $dName }}"
-                                             class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                                             class="absolute inset-0 w-full h-full object-cover object-center">
                                     @else
                                         <div class="absolute inset-0 flex items-center justify-center bg-gray-100">
                                             <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -9,7 +9,7 @@ class ProductVariantOption extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['variant_id', 'option_name', 'option_value'];
+    protected $fillable = ['variant_id', 'option_name', 'option_value', 'size_note'];
 
     public function variant(): BelongsTo
     {
