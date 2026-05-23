@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\ProfilePage;
 use App\Filament\Widgets\OrdersByStatusChart;
 use App\Filament\Widgets\OrdersChart;
 use App\Filament\Widgets\RevenueChart;
@@ -43,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->profile(ProfilePage::class)
             ->brandName(config('app.name') . ' Admin')
             ->colors([
                 'primary' => Color::Indigo,
