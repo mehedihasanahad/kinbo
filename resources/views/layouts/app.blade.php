@@ -395,9 +395,9 @@
                 <ul class="space-y-2.5 text-xs">
                     <li><a href="{{ route('page.about') }}" class="hover:text-white transition-colors">About Us</a></li>
                     <li><a href="{{ route('shop.category', ['sort' => 'newest']) }}" class="hover:text-white transition-colors">New Arrivals</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Size Guide</a></li>
-                    <li><a href="{{ $trackUrl }}" class="hover:text-white transition-colors">Track Your Order</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Exchange &amp; Returns</a></li>
+                    <li><a href="{{ route('page.terms') }}" class="hover:text-white transition-colors">Terms &amp; Conditions</a></li>
+                    {{-- <li><a href="{{ $trackUrl }}" class="hover:text-white transition-colors">Track Your Order</a></li> --}}
+                    <li><a href="{{ route('page.return-policy') }}" class="hover:text-white transition-colors">Return &amp; Exchange Policy</a></li>
                     <li><a href="{{ route('page.faq') }}" class="hover:text-white transition-colors">Help Center</a></li>
                     <li><a href="{{ route('page.privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a></li>
                 </ul>
@@ -411,20 +411,20 @@
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
-                        <span>+880 1234-567890</span>
+                        @if($sitePhone)<span>{{ $sitePhone }}</span>@endif
                     </li>
                     <li class="flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        <span>youthcollections@gmail.com</span>
+                        @if($siteEmail)<span>{{ $siteEmail }}</span>@endif
                     </li>
                     <li class="flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        <span>Mirpur, Dhaka-1216<br>Bangladesh</span>
+                        @if($siteAddress)<span>{{ $siteAddress }}</span>@endif
                     </li>
                 </ul>
             </div>
@@ -680,5 +680,111 @@ function toggleWishlist(btn, productId) {
 </nav>
 
 @stack('scripts')
+
+@if($whatsappNumber)
+{{-- WhatsApp Chat Widget --}}
+<div id="wa-widget" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+
+    {{-- Chat Box --}}
+    <div id="wa-box" style="display:none;width:320px;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid #e5e7eb;">
+
+        {{-- Header --}}
+        <div style="background:#075e54;display:flex;align-items:center;gap:12px;padding:12px 16px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" style="width:20px;height:20px;fill:white;">
+                    <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.83.74 5.49 2.03 7.8L.5 31.5l7.93-2.08A15.45 15.45 0 0 0 16 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5zm0 28.18a13.1 13.1 0 0 1-6.68-1.83l-.48-.29-4.71 1.24 1.26-4.6-.31-.5A13.07 13.07 0 0 1 2.88 16C2.88 9.07 8.07 3.38 16 3.38 23.46 3.38 28.62 9.07 28.62 16c0 6.93-5.16 12.68-12.62 12.68zm7.13-9.47c-.39-.2-2.3-1.14-2.66-1.27-.36-.13-.62-.2-.88.2-.26.38-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.2-1.65-.61-3.14-1.94-1.16-1.04-1.94-2.32-2.17-2.71-.23-.39-.02-.6.17-.79.18-.18.39-.46.58-.69.2-.23.26-.39.39-.65.13-.26.07-.49-.03-.69-.1-.2-.88-2.12-1.2-2.9-.32-.77-.64-.66-.88-.67h-.75c-.26 0-.68.1-1.04.49-.36.39-1.37 1.34-1.37 3.26s1.4 3.78 1.6 4.04c.2.26 2.76 4.21 6.68 5.91.93.4 1.66.64 2.23.82.94.3 1.79.26 2.46.16.75-.11 2.3-.94 2.63-1.85.32-.91.32-1.69.23-1.85-.1-.16-.36-.26-.75-.46z"/>
+                </svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <p style="color:white;font-weight:700;font-size:14px;line-height:1.2;margin:0;">{{ config('app.name') }}</p>
+                <p style="color:#a7f3d0;font-size:12px;margin:2px 0 0;">Typically replies instantly</p>
+            </div>
+            <button onclick="waClose()" aria-label="Close" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.7);padding:4px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Chat Body --}}
+        <div style="background:#dfe5e1;padding:16px;">
+            <div style="display:flex;justify-content:flex-start;">
+                <div style="background:white;border-radius:0 8px 8px 8px;padding:12px 14px;max-width:90%;box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                    <p style="color:#1f2937;font-size:13px;line-height:1.6;margin:0;">👋 Hello! How can we help you today? Send us a message and we'll get back to you on WhatsApp.</p>
+                    <p style="color:#9ca3af;font-size:11px;margin:6px 0 0;text-align:right;">{{ config('app.name') }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Input Area --}}
+        <div style="background:white;padding:10px 12px;display:flex;align-items:flex-end;gap:8px;border-top:1px solid #f3f4f6;">
+            <textarea
+                id="wa-message"
+                rows="2"
+                placeholder="Type a message..."
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();waSend();}"
+                style="flex:1;resize:none;font-size:13px;color:#1f2937;border:1px solid #e5e7eb;border-radius:12px;padding:8px 12px;outline:none;font-family:inherit;line-height:1.5;"
+            >Hello! I have a question about your products.</textarea>
+            <button
+                onclick="waSend()"
+                aria-label="Send"
+                style="width:40px;height:40px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s;"
+                onmouseenter="this.style.transform='scale(1.1)'"
+                onmouseleave="this.style.transform='scale(1)'"
+            >
+                <svg style="width:18px;height:18px;fill:white;" viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    {{-- Toggle Button --}}
+    <button
+        id="wa-toggle"
+        onclick="waToggle()"
+        aria-label="Chat on WhatsApp"
+        style="width:56px;height:56px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,0.45);transition:transform .2s;"
+        onmouseenter="this.style.transform='scale(1.1)'"
+        onmouseleave="this.style.transform='scale(1)'"
+    >
+        <svg id="wa-icon-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" style="width:28px;height:28px;fill:white;">
+            <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.83.74 5.49 2.03 7.8L.5 31.5l7.93-2.08A15.45 15.45 0 0 0 16 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5zm0 28.18a13.1 13.1 0 0 1-6.68-1.83l-.48-.29-4.71 1.24 1.26-4.6-.31-.5A13.07 13.07 0 0 1 2.88 16C2.88 9.07 8.07 3.38 16 3.38 23.46 3.38 28.62 9.07 28.62 16c0 6.93-5.16 12.68-12.62 12.68zm7.13-9.47c-.39-.2-2.3-1.14-2.66-1.27-.36-.13-.62-.2-.88.2-.26.38-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.2-1.65-.61-3.14-1.94-1.16-1.04-1.94-2.32-2.17-2.71-.23-.39-.02-.6.17-.79.18-.18.39-.46.58-.69.2-.23.26-.39.39-.65.13-.26.07-.49-.03-.69-.1-.2-.88-2.12-1.2-2.9-.32-.77-.64-.66-.88-.67h-.75c-.26 0-.68.1-1.04.49-.36.39-1.37 1.34-1.37 3.26s1.4 3.78 1.6 4.04c.2.26 2.76 4.21 6.68 5.91.93.4 1.66.64 2.23.82.94.3 1.79.26 2.46.16.75-.11 2.3-.94 2.63-1.85.32-.91.32-1.69.23-1.85-.1-.16-.36-.26-.75-.46z"/>
+        </svg>
+        <svg id="wa-icon-close" style="display:none;width:24px;height:24px;" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+</div>
+
+<script>
+(function () {
+    var waNumber = '{{ $whatsappNumber }}';
+
+    window.waToggle = function () {
+        var box  = document.getElementById('wa-box');
+        var open = document.getElementById('wa-icon-open');
+        var cls  = document.getElementById('wa-icon-close');
+        var visible = box.style.display !== 'none';
+        box.style.display  = visible ? 'none' : 'block';
+        open.style.display = visible ? 'block' : 'none';
+        cls.style.display  = visible ? 'none'  : 'block';
+    };
+
+    window.waClose = function () {
+        document.getElementById('wa-box').style.display = 'none';
+        document.getElementById('wa-icon-open').style.display  = 'block';
+        document.getElementById('wa-icon-close').style.display = 'none';
+    };
+
+    window.waSend = function () {
+        var msg = document.getElementById('wa-message').value.trim();
+        if (!msg) return;
+        var url = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(msg);
+        window.open(url, '_blank', 'noopener,noreferrer');
+    };
+}());
+</script>
+@endif
 </body>
 </html>

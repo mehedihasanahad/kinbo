@@ -50,6 +50,11 @@
 @section('og_image', $ogImage)
 
 @push('styles')
+<style>
+#thumb-strip::-webkit-scrollbar       { width: 3px; }
+#thumb-strip::-webkit-scrollbar-track { background: transparent; }
+#thumb-strip::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 999px; }
+</style>
 <script type="application/ld+json">
 {
     "@@context": "https://schema.org/",
@@ -134,18 +139,75 @@
 @endif
 
 {{-- ── Main Product Block ──────────────────────────────────────────────────── --}}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-14">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-10 xl:gap-16">
 
         {{-- ── LEFT: Image Gallery ──────────────────────────────────────────── --}}
-        <div>
-            {{-- Main image --}}
-            <div class="relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 aspect-square mb-4 group">
+        <div class="flex sm:flex-row gap-3">
+
+            {{-- Thumbnail strip — vertical column on desktop (left), wrapping rows on mobile (bottom) --}}
+            @if($allImages->count() > 1)
+                <div class="hidden sm:flex sm:flex-col sm:flex-nowrap gap-2 sm:overflow-y-auto sm:max-h-[520px] shrink-0"
+                     id="thumb-strip">
+                    @foreach($allImages as $image)
+                        <button onclick="goToSlide({{ $loop->index }})"
+                                data-index="{{ $loop->index }}"
+                                data-variant-id="{{ $image->variant_id ?? 'null' }}"
+                                class="thumb-btn w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0
+                                       {{ $loop->first ? 'border-primary-500' : 'border-gray-200 hover:border-primary-300' }}
+                                       focus:outline-none focus:border-primary-500">
+                            <img src="{{ asset('storage/' . $image->path) }}"
+                                 alt="{{ $image->alt_text ?: $productName }}"
+                                 class="w-full h-full object-cover object-center">
+                        </button>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- Main image — Swiper for swipe/slide support --}}
+            <div class="relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 aspect-square flex-1">
+
+                {{-- Discount badge --}}
+                @if($product->is_on_sale)
+                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        -{{ $discountPct }}%
+                    </span>
+                @endif
+
                 @if($allImages->isNotEmpty())
-                    <img id="main-image"
-                         src="{{ asset('storage/' . $allImages->first()->path) }}"
-                         alt="{{ $productName }}"
-                         class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105">
+                    <div class="swiper main-image-swiper w-full h-full">
+                        <div class="swiper-wrapper">
+                            @foreach($allImages as $image)
+                                <div class="swiper-slide">
+                                    <img src="{{ asset('storage/' . $image->path) }}"
+                                         alt="{{ $image->alt_text ?: $productName }}"
+                                         class="w-full h-full object-cover object-center">
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Prev / Next navigation --}}
+                    @if($allImages->count() > 1)
+                        <button class="main-prev absolute left-3 top-1/2 -translate-y-1/2 z-10
+                                       w-9 h-9 rounded-full flex items-center justify-center
+                                       bg-white/80 backdrop-blur-sm border border-gray-200 shadow-md
+                                       text-gray-700 hover:bg-primary-600 hover:text-white hover:border-primary-600
+                                       transition-all duration-150">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <button class="main-next absolute right-3 top-1/2 -translate-y-1/2 z-10
+                                       w-9 h-9 rounded-full flex items-center justify-center
+                                       bg-white/80 backdrop-blur-sm border border-gray-200 shadow-md
+                                       text-gray-700 hover:bg-primary-600 hover:text-white hover:border-primary-600
+                                       transition-all duration-150">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    @endif
                 @else
                     <div class="w-full h-full flex items-center justify-center bg-gray-100">
                         <svg class="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,31 +216,8 @@
                         </svg>
                     </div>
                 @endif
-
-                {{-- Discount badge --}}
-                @if($product->is_on_sale)
-                    <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                        -{{ $discountPct }}%
-                    </span>
-                @endif
             </div>
 
-            {{-- Thumbnail strip (base + all variant images) --}}
-            @if($allImages->count() > 1)
-                <div class="flex gap-2 flex-wrap" id="thumb-strip">
-                    @foreach($allImages as $index => $image)
-                        <button onclick="swapMainImage('{{ asset('storage/' . $image->path) }}', this)"
-                                data-variant-id="{{ $image->variant_id ?? 'null' }}"
-                                class="thumb-btn w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200
-                                       {{ $index === 0 ? 'border-primary-500' : 'border-gray-200 hover:border-primary-300' }}
-                                       focus:outline-none focus:border-primary-500 shrink-0">
-                            <img src="{{ asset('storage/' . $image->path) }}"
-                                 alt="{{ $image->alt_text ?: $productName }}"
-                                 class="w-full h-full object-cover object-center">
-                        </button>
-                    @endforeach
-                </div>
-            @endif
         </div>
 
         {{-- ── RIGHT: Product Info ──────────────────────────────────────────── --}}
@@ -785,7 +824,27 @@
 
 @push('scripts')
 <script>
+let mainSwiper = null;
+
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Main image Swiper ──
+    @if($allImages->isNotEmpty())
+    mainSwiper = new Swiper('.main-image-swiper', {
+        loop: false,
+        allowTouchMove: true,
+        speed: 400,
+        navigation: {
+            nextEl: '.main-next',
+            prevEl: '.main-prev',
+        },
+        on: {
+            slideChange: function () {
+                updateThumbActive(this.activeIndex);
+            },
+        },
+    });
+    @endif
 
     // ── Related Products Swiper ──
     @if($relatedProducts->isNotEmpty())
@@ -807,17 +866,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-// ── Gallery: swap main image ──
-function swapMainImage(src, btn) {
-    const mainImg = document.getElementById('main-image');
-    if (mainImg) mainImg.src = src;
+// ── Gallery: navigate to slide by index ──
+function goToSlide(index) {
+    if (mainSwiper) mainSwiper.slideTo(index);
+}
 
-    document.querySelectorAll('.thumb-btn').forEach(b => {
-        b.classList.remove('border-primary-500');
-        b.classList.add('border-gray-200');
+// ── Gallery: sync thumbnail highlight with active slide ──
+function updateThumbActive(activeIndex) {
+    document.querySelectorAll('#thumb-strip .thumb-btn').forEach((btn, i) => {
+        if (i === activeIndex) {
+            btn.classList.add('border-primary-500');
+            btn.classList.remove('border-gray-200');
+        } else {
+            btn.classList.remove('border-primary-500');
+            btn.classList.add('border-gray-200');
+        }
     });
-    btn.classList.remove('border-gray-200');
-    btn.classList.add('border-primary-500');
 }
 
 // ── Qty: clamp typed value and sync to hidden form input ──
@@ -1026,26 +1090,16 @@ function applyVariant(variant, allSelected = true) {
 }
 
 function switchMainImageForVariant(variantId, variantImages) {
-    const mainImg = document.getElementById('main-image');
-    if (!mainImg) return;
+    if (!mainSwiper || !variantImages || variantImages.length === 0) return;
 
-    // If this variant has its own images, show the first one
-    // Otherwise keep the current main image unchanged
-    if (variantImages && variantImages.length > 0) {
-        const newSrc = variantImages[0];
-        mainImg.src = newSrc;
-
-        // Highlight the matching thumb, clear others
-        document.querySelectorAll('#thumb-strip .thumb-btn').forEach(b => {
-            const thumbSrc = b.querySelector('img')?.src;
-            if (thumbSrc === newSrc) {
-                b.classList.add('border-primary-500');
-                b.classList.remove('border-gray-200');
-            } else {
-                b.classList.remove('border-primary-500');
-                b.classList.add('border-gray-200');
-            }
-        });
+    const targetSrc = variantImages[0];
+    const slides = mainSwiper.slides;
+    for (let i = 0; i < slides.length; i++) {
+        const img = slides[i].querySelector('img');
+        if (img && img.src === targetSrc) {
+            mainSwiper.slideTo(i);
+            return;
+        }
     }
 }
 

@@ -28,6 +28,8 @@ Route::get('/contact', [PageController::class, 'contact'])->name('page.contact')
 Route::post('/contact', [PageController::class, 'contactSend'])->name('page.contact.send');
 Route::get('/faq',     [PageController::class, 'faq'])->name('page.faq');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('page.privacy');
+Route::get('/return-policy', [PageController::class, 'returnPolicy'])->name('page.return-policy');
+Route::get('/terms', [PageController::class, 'termsConditions'])->name('page.terms');
 Route::get('/blog',    [PageController::class, 'blog'])->name('page.blog');
 Route::get('/blog/{slug}', [PageController::class, 'blogPost'])->name('page.blog.post');
 

@@ -54,10 +54,11 @@ class SettingsPage extends Page
         ];
 
         $this->contact = [
-            'contact_email'   => Setting::get('contact_email', ''),
-            'contact_phone'   => Setting::get('contact_phone', ''),
-            'contact_address' => Setting::get('contact_address', ''),
-            'contact_city'    => Setting::get('contact_city', ''),
+            'contact_email'    => Setting::get('contact_email', ''),
+            'contact_phone'    => Setting::get('contact_phone', ''),
+            'whatsapp_number'  => Setting::get('whatsapp_number', ''),
+            'contact_address'  => Setting::get('contact_address', ''),
+            'contact_city'     => Setting::get('contact_city', ''),
         ];
 
         $this->payment = [
@@ -172,10 +173,27 @@ class SettingsPage extends Page
     public function contactForm(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('contact_email')->email()->nullable(),
-            Forms\Components\TextInput::make('contact_phone')->nullable(),
-            Forms\Components\TextInput::make('contact_city')->nullable(),
-            Forms\Components\Textarea::make('contact_address')->rows(2)->nullable()->columnSpanFull(),
+            Forms\Components\TextInput::make('contact_email')
+                ->label('Contact Email')
+                ->email()
+                ->nullable(),
+            Forms\Components\TextInput::make('contact_phone')
+                ->label('Phone Number')
+                ->nullable()
+                ->placeholder('+880 1XXX-XXXXXX'),
+            Forms\Components\TextInput::make('whatsapp_number')
+                ->label('WhatsApp Number')
+                ->nullable()
+                ->placeholder('+880 1XXX-XXXXXX')
+                ->helperText('Used for the WhatsApp chat button on the storefront.'),
+            Forms\Components\TextInput::make('contact_city')
+                ->label('City')
+                ->nullable(),
+            Forms\Components\Textarea::make('contact_address')
+                ->label('Full Address')
+                ->rows(2)
+                ->nullable()
+                ->columnSpanFull(),
         ])->statePath('contact')->columns(2);
     }
 

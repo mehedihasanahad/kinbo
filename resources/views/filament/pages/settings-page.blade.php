@@ -69,7 +69,7 @@
             </div>
         </x-filament::section>
 
-        <div class="mt-6 flex justify-end">
+        <div class="mt-6 flex justify-start">
             <x-filament::button type="submit" size="lg">
                 Save Settings
             </x-filament::button>

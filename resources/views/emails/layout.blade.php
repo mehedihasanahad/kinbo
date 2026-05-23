@@ -97,7 +97,6 @@
             <a href="{{ url('/contact') }}">Contact Us</a>
         </div>
         <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-        <p class="copyright">You received this email because you have an account or placed an order on {{ config('app.name') }}.</p>
     </div>
 
 </div>

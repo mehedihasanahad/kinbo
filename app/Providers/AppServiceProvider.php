@@ -59,11 +59,24 @@ class AppServiceProvider extends ServiceProvider
                 ->take(8)
                 ->get();
 
+            $rawWhatsapp = preg_replace('/\D/', '', \App\Models\Setting::get('whatsapp_number', ''));
+            $whatsappNumber = $rawWhatsapp !== ''
+                ? (str_starts_with($rawWhatsapp, '0') ? '880' . substr($rawWhatsapp, 1) : $rawWhatsapp)
+                : '';
+
+            $sitePhone   = \App\Models\Setting::get('contact_phone', '');
+            $siteEmail   = \App\Models\Setting::get('contact_email', '');
+            $siteAddress = \App\Models\Setting::get('contact_address', '');
+
             $view->with(compact(
                 'cartCount',
                 'wishlistCount',
                 'announcementBarText',
-                'navCategories'
+                'navCategories',
+                'whatsappNumber',
+                'sitePhone',
+                'siteEmail',
+                'siteAddress'
             ));
         });
     }

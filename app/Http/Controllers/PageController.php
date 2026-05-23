@@ -41,6 +41,16 @@ class PageController extends Controller
         return view('pages.privacy');
     }
 
+    public function returnPolicy()
+    {
+        return view('pages.return-policy');
+    }
+
+    public function termsConditions(): \Illuminate\View\View
+    {
+        return view('pages.terms-conditions');
+    }
+
     public function blog()
     {
         $locale = app()->getLocale();
