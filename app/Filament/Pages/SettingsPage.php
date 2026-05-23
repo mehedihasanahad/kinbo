@@ -35,6 +35,7 @@ class SettingsPage extends Page
     public array $oauth    = [];
     public array $homepage = [];
     public array $seo      = [];
+    public array $pixel    = [];
 
     // Branding — kept flat (no statePath) so FileUpload can store files properly
     public ?array $site_logo          = [];
@@ -91,6 +92,11 @@ class SettingsPage extends Page
             'robots_txt'       => Setting::get('robots_txt', "User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: " . url('/sitemap.xml')),
         ];
 
+        $this->pixel = [
+            'facebook_pixel_enabled' => (bool) Setting::get('facebook_pixel_enabled', '0'),
+            'facebook_pixel_id'      => Setting::get('facebook_pixel_id', ''),
+        ];
+
         $this->homepage = [
             'promo_banner_enabled'     => (bool) Setting::get('promo_banner_enabled', '1'),
             'promo_banner_label'       => Setting::get('promo_banner_label', 'Up To'),
@@ -114,7 +120,7 @@ class SettingsPage extends Page
 
     protected function getForms(): array
     {
-        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'socialForm', 'oauthForm', 'homepageForm', 'homepageImageForm', 'seoForm'];
+        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'socialForm', 'oauthForm', 'homepageForm', 'homepageImageForm', 'seoForm', 'pixelForm'];
     }
 
     public function brandingForm(Form $form): Form
@@ -388,6 +394,28 @@ class SettingsPage extends Page
         ])->statePath('oauth');
     }
 
+    public function pixelForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Section::make('Facebook / Meta Pixel')
+                ->description('Tracks visitor behaviour and conversion events for Meta Ads.')
+                ->schema([
+                    Forms\Components\Toggle::make('facebook_pixel_enabled')
+                        ->label('Enable Facebook Pixel')
+                        ->helperText('Injects the base Pixel code on every storefront page.')
+                        ->inline(false)
+                        ->live()
+                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('facebook_pixel_id')
+                        ->label('Pixel ID')
+                        ->placeholder('123456789012345')
+                        ->nullable()
+                        ->visible(fn ($get) => $get('facebook_pixel_enabled'))
+                        ->helperText('Events Manager → Data Sources → your Pixel → Settings.'),
+                ])->columns(2),
+        ])->statePath('pixel');
+    }
+
     public function save(): void
     {
         $this->generalForm->validate();
@@ -433,6 +461,10 @@ class SettingsPage extends Page
 
         foreach ($this->seo as $key => $value) {
             Setting::set($key, $value, 'seo');
+        }
+
+        foreach ($this->pixel as $key => $value) {
+            Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'pixel');
         }
 
         Cache::forget('settings.public');

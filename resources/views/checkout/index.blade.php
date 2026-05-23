@@ -440,6 +440,18 @@
 </div>{{-- end page container --}}
 @endsection
 
+@push('pixel-events')
+<script>
+if (typeof fbq !== 'undefined') {
+    fbq('track', 'InitiateCheckout', {
+        value:    {{ (float) ($subtotal - ($couponSession['discount'] ?? 0)) }},
+        currency: 'BDT',
+        num_items: {{ $cartItems->sum('quantity') }}
+    });
+}
+</script>
+@endpush
+
 @push('scripts')
 <script>
 const subtotalBase = {{ $subtotal - ($couponSession ? $couponSession['discount'] : 0) }};

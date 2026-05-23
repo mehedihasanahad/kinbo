@@ -69,6 +69,14 @@
             {{ $this->seoForm }}
         </x-filament::section>
 
+        {{-- Facebook Pixel --}}
+        <x-filament::section class="mt-6">
+            <x-slot name="heading">Facebook / Meta Pixel</x-slot>
+            <x-slot name="description">Tracks PageView, ViewContent, AddToCart, InitiateCheckout and Purchase events automatically.</x-slot>
+
+            {{ $this->pixelForm }}
+        </x-filament::section>
+
         <div class="mt-6 flex justify-start">
             <x-filament::button type="submit" size="lg">
                 Save Settings

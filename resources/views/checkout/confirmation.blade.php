@@ -184,3 +184,17 @@
 
 </div>
 @endsection
+
+@push('pixel-events')
+<script>
+if (typeof fbq !== 'undefined') {
+    fbq('track', 'Purchase', {
+        value:       {{ (float) $order->total_amount }},
+        currency:    'BDT',
+        content_ids: [{{ $order->items->pluck('product_id')->filter()->implode(',') }}],
+        content_type:'product',
+        num_items:   {{ $order->items->sum('quantity') }}
+    });
+}
+</script>
+@endpush
