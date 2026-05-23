@@ -209,7 +209,7 @@ class PaymentController extends Controller
 
         try {
             $order->load(['items', 'user']);
-            Mail::to($order->user->email)->send(new OrderConfirmation($order));
+            Mail::to($order->user->email)->queue(new OrderConfirmation($order));
         } catch (\Throwable) {}
 
         return redirect()->route('payment.result', $order->order_number);
@@ -257,8 +257,9 @@ class PaymentController extends Controller
     }
 
     /**
-     * Public result page — shown after SSLCommerz redirects back.
-     * No auth required; the order number in the URL is enough to identify the order.
+     * Result page — shown after SSLCommerz redirects back.
+     * Requires either authenticated owner or a matching sslcommerz_order_id session
+     * (set on checkout before the gateway redirect, cleared after display).
      */
     public function result(string $orderNumber)
     {
@@ -266,6 +267,11 @@ class PaymentController extends Controller
             ->where('payment_method', Order::METHOD_SSLCOMMERZ)
             ->with(['items.product', 'items.variant'])
             ->firstOrFail();
+
+        $isOwner    = auth()->check() && auth()->id() === $order->user_id;
+        $hasSession = session('sslcommerz_order_id') === $order->id;
+
+        abort_unless($isOwner || $hasSession, 403);
 
         return view('payment.result', compact('order'));
     }

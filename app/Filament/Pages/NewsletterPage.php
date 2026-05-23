@@ -26,9 +26,10 @@ class NewsletterPage extends Page
         return $user && ($user->isSuperAdmin() || $user->hasPermission('manage_newsletter'));
     }
 
-    public string $subject = '';
-    public string $body    = '';
-    public string $locale  = '';   // empty = all
+    public string $subject       = '';
+    public string $body          = '';
+    public string $recipientType = 'all';  // 'all' | 'specific'
+    public array  $subscriberIds = [];
 
     #[Computed]
     public function totalActive(): int
@@ -39,11 +40,10 @@ class NewsletterPage extends Page
     #[Computed]
     public function recipientCount(): int
     {
-        $q = Subscriber::active();
-        if ($this->locale) {
-            $q->where('locale', $this->locale);
+        if ($this->recipientType === 'specific') {
+            return count($this->subscriberIds);
         }
-        return $q->count();
+        return Subscriber::active()->count();
     }
 
     public function form(Form $form): Form
@@ -51,15 +51,24 @@ class NewsletterPage extends Page
         return $form->schema([
             Forms\Components\Section::make('Compose Newsletter')
                 ->schema([
-                    Forms\Components\Select::make('locale')
+                    Forms\Components\Select::make('recipientType')
                         ->label('Send to')
                         ->options([
-                            ''   => 'All subscribers',
-                            'en' => 'English subscribers only',
+                            'all'      => 'All active subscribers',
+                            'specific' => 'Choose specific subscribers',
                         ])
-                        ->default('')
+                        ->default('all')
                         ->live()
-                        ->helperText(fn () => 'Recipients: ' . $this->recipientCount),
+                        ->required(),
+
+                    Forms\Components\Select::make('subscriberIds')
+                        ->label('Select Subscribers')
+                        ->multiple()
+                        ->searchable()
+                        ->options(fn () => Subscriber::active()->orderBy('email')->pluck('email', 'id')->toArray())
+                        ->visible(fn (Forms\Get $get) => $get('recipientType') === 'specific')
+                        ->required(fn (Forms\Get $get) => $get('recipientType') === 'specific')
+                        ->helperText('Search and select one or more subscribers.'),
 
                     Forms\Components\TextInput::make('subject')
                         ->required()
@@ -76,25 +85,32 @@ class NewsletterPage extends Page
 
     public function send(): void
     {
-        $this->validate([
+        $rules = [
             'subject' => 'required|string|max:200',
             'body'    => 'required|string',
-        ]);
+        ];
+
+        if ($this->recipientType === 'specific') {
+            $rules['subscriberIds']   = 'required|array|min:1';
+            $rules['subscriberIds.*'] = 'exists:subscribers,id';
+        }
+
+        $this->validate($rules);
 
         $count = $this->recipientCount;
 
         if ($count === 0) {
             Notification::make()
-                ->title('No active subscribers found for the selected locale.')
+                ->title('No active subscribers found.')
                 ->warning()
                 ->send();
             return;
         }
 
         dispatch(new SendNewsletterJob(
-            subject: $this->subject,
-            body:    $this->body,
-            locale:  $this->locale ?: null,
+            subject:       $this->subject,
+            body:          $this->body,
+            subscriberIds: $this->recipientType === 'specific' ? $this->subscriberIds : null,
         ));
 
         Notification::make()
@@ -102,8 +118,10 @@ class NewsletterPage extends Page
             ->success()
             ->send();
 
-        $this->subject = '';
-        $this->body    = '';
+        $this->subject       = '';
+        $this->body          = '';
+        $this->recipientType = 'all';
+        $this->subscriberIds = [];
     }
 
     public function deleteSubscriber(int $id): void

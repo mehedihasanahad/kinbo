@@ -18,8 +18,11 @@ class Setting extends Model
 
     public static function get(string $key, mixed $default = null): mixed
     {
-        $setting = static::where('key', $key)->first();
-        return $setting?->value ?? $default;
+        $value = Cache::rememberForever('setting.' . $key, function () use ($key) {
+            return static::where('key', $key)->value('value') ?? '__null__';
+        });
+
+        return $value === '__null__' ? $default : $value;
     }
 
     public static function set(string $key, mixed $value, string $group = 'general'): void
@@ -28,7 +31,9 @@ class Setting extends Model
             ['key' => $key],
             ['value' => $value, 'group' => $group]
         );
+        Cache::forget('setting.' . $key);
         Cache::forget('settings.all');
+        Cache::forget('settings.public');
     }
 
     public static function allPublic(): array

@@ -35,7 +35,7 @@ class PageController extends Controller
         $adminEmail = User::role('super_admin')->value('email');
 
         if ($adminEmail) {
-            Mail::to($adminEmail)->send(new ContactFormSubmission($submission));
+            Mail::to($adminEmail)->queue(new ContactFormSubmission($submission));
         }
 
         return back()->with('contact_sent', true);

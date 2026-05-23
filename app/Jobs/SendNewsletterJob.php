@@ -18,21 +18,21 @@ class SendNewsletterJob implements ShouldQueue
     public function __construct(
         public string $subject,
         public string $body,
-        public ?string $locale = null, // null = all locales
+        public ?array $subscriberIds = null, // null = all active subscribers
     ) {}
 
     public function handle(): void
     {
         $query = Subscriber::active();
 
-        if ($this->locale) {
-            $query->where('locale', $this->locale);
+        if ($this->subscriberIds) {
+            $query->whereIn('id', $this->subscriberIds);
         }
 
         $query->orderBy('id')->chunk(100, function ($subscribers) {
             foreach ($subscribers as $subscriber) {
                 Mail::to($subscriber->email)
-                    ->queue(new NewsletterMail($this->subject, $this->body, $subscriber));
+                    ->send(new NewsletterMail($this->subject, $this->body, $subscriber));
             }
         });
     }

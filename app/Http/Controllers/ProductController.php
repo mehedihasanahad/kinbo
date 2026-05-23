@@ -36,24 +36,20 @@ class ProductController extends Controller
             ])
             ->findOrFail($translation->product_id);
 
-        // Load approved reviews with user, latest first, limit 10
-        $reviews = $product->reviews()
+        // Load all approved reviews once; derive counts/averages in PHP
+        $allApprovedReviews = $product->reviews()
             ->approved()
             ->with('user')
             ->latest()
-            ->take(10)
             ->get();
 
-        $reviewCount = $product->reviews()->approved()->count();
+        $reviews     = $allApprovedReviews->take(10);
+        $reviewCount = $allApprovedReviews->count();
+        $avgRating   = $reviewCount > 0 ? round($allApprovedReviews->avg('rating'), 1) : 0;
 
-        $avgRating = $reviewCount > 0
-            ? round($product->reviews()->approved()->avg('rating'), 1)
-            : 0;
-
-        // Rating distribution 5 → 1
-        $ratingCounts = [];
-        for ($i = 5; $i >= 1; $i--) {
-            $ratingCounts[$i] = $product->reviews()->approved()->where('rating', $i)->count();
+        $ratingCounts = array_fill_keys([1, 2, 3, 4, 5], 0);
+        foreach ($allApprovedReviews as $r) {
+            $ratingCounts[$r->rating]++;
         }
 
         // Related products: same category, exclude self

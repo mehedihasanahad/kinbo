@@ -49,11 +49,11 @@ class EditOrder extends EditRecord
             try {
                 $order->load(['items', 'user']);
                 if ($newStatus === 'shipped') {
-                    Mail::to($order->user->email)->send(new OrderShipped($order));
+                    Mail::to($order->user->email)->queue(new OrderShipped($order));
                 } elseif ($newStatus === 'delivered') {
-                    Mail::to($order->user->email)->send(new OrderDelivered($order));
+                    Mail::to($order->user->email)->queue(new OrderDelivered($order));
                 } elseif ($newStatus === 'cancelled') {
-                    Mail::to($order->user->email)->send(new OrderCancelled($order));
+                    Mail::to($order->user->email)->queue(new OrderCancelled($order));
                 }
             } catch (\Throwable) {
                 // Non-fatal

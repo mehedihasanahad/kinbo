@@ -52,10 +52,10 @@ Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('car
 
 // Checkout — guests auto-register/login on order placement
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout/shipping-rate', [CheckoutController::class, 'shippingRate'])->name('checkout.shipping-rate');
-Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('checkout.apply-coupon');
+Route::post('/checkout/shipping-rate', [CheckoutController::class, 'shippingRate'])->middleware('throttle:30,1')->name('checkout.shipping-rate');
+Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])->middleware('throttle:10,1')->name('checkout.apply-coupon');
 Route::post('/checkout/remove-coupon', [CheckoutController::class, 'removeCoupon'])->name('checkout.remove-coupon');
-Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.place-order');
+Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->middleware('throttle:5,1')->name('checkout.place-order');
 Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
 
 Route::middleware('auth')->group(function () {

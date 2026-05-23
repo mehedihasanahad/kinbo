@@ -11,7 +11,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = auth()->user()->orders()
-            ->with(['items'])
+            ->with(['items.product.primaryImage', 'items.variant'])
             ->latest()
             ->paginate(15);
 

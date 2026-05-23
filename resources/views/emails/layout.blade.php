@@ -85,7 +85,7 @@
     </div>
 
     {{-- Body --}}
-    <div class="body">
+    <div class="body" style="padding: 36px 36px 28px;">
         @yield('content')
     </div>
 

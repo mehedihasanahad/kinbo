@@ -170,7 +170,7 @@ class CheckoutController extends Controller
         $rules['payment_method']   = ['required', 'in:cod,bkash,nagad,sslcommerz'];
         $rules['sender_number']    = ['required_if:payment_method,bkash,nagad', 'excluded_if:payment_method,sslcommerz', 'nullable', 'string', 'max:20'];
         $rules['transaction_id']   = ['required_if:payment_method,bkash,nagad', 'excluded_if:payment_method,sslcommerz', 'nullable', 'string', 'max:100'];
-        $rules['screenshot']       = ['nullable', 'image', 'max:2048'];
+        $rules['screenshot']       = ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'];
 
         $messages = [
             'ship_phone.regex' => __('front.phone_invalid'),
@@ -346,12 +346,12 @@ class CheckoutController extends Controller
             return redirect()->route('payment.initiate');
         }
 
-        // Send order confirmation email
+        // Queue order confirmation email (non-fatal if queue is unavailable)
         try {
             $order->load(['items', 'user']);
-            Mail::to($order->user->email)->send(new OrderConfirmation($order));
+            Mail::to($order->user->email)->queue(new OrderConfirmation($order));
         } catch (\Throwable) {
-            // Non-fatal – order is placed even if email fails
+            // Non-fatal – order is placed even if email dispatch fails
         }
 
         return redirect()->route('checkout.confirmation', $order)->with('order_placed', true);

@@ -24,11 +24,12 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id'  => 'required|exists:products,id',
+            'variant_id'  => 'nullable|exists:product_variants,id',
             'quantity'    => 'integer|min:1|max:999',
             'custom_size' => 'nullable|string|max:255',
         ]);
 
-        $variantId = $request->variant_id ?: null;
+        $variantId = $request->integer('variant_id') ?: null;
         $qty = (int) $request->input('quantity', 1);
 
         if ($variantId) {

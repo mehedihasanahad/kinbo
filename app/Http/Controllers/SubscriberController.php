@@ -26,7 +26,7 @@ class SubscriberController extends Controller
             }
             // pending or unsubscribed — reset and resend
             $existing->update(['status' => 'pending', 'locale' => $locale]);
-            Mail::to($email)->send(new SubscribeConfirmationMail($existing));
+            Mail::to($email)->queue(new SubscribeConfirmationMail($existing));
             return $this->respond($request, 'check_email');
         }
 
@@ -36,7 +36,7 @@ class SubscriberController extends Controller
             'status' => 'pending',
         ]);
 
-        Mail::to($email)->send(new SubscribeConfirmationMail($subscriber));
+        Mail::to($email)->queue(new SubscribeConfirmationMail($subscriber));
 
         return $this->respond($request, 'check_email');
     }

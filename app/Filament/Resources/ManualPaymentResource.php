@@ -165,7 +165,7 @@ class ManualPaymentResource extends Resource
                         ]);
                         try {
                             $order = $record->order->load(['items', 'user']);
-                            Mail::to($order->user->email)->send(new PaymentVerified($order));
+                            Mail::to($order->user->email)->queue(new PaymentVerified($order));
                         } catch (\Throwable) {}
                         Notification::make()->title('Payment verified & order moved to Processing')->success()->send();
                     }),
@@ -189,7 +189,7 @@ class ManualPaymentResource extends Resource
                         $record->order->update(['payment_status' => 'failed']);
                         try {
                             $order = $record->order->load(['items', 'user']);
-                            Mail::to($order->user->email)->send(new PaymentRejected($order, $record));
+                            Mail::to($order->user->email)->queue(new PaymentRejected($order, $record));
                         } catch (\Throwable) {}
                         Notification::make()->title('Payment rejected')->danger()->send();
                     }),
