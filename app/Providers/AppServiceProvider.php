@@ -10,6 +10,7 @@ use App\Observers\BannerObserver;
 use App\Observers\BrandObserver;
 use App\Observers\CategoryObserver;
 use App\Observers\ProductImageObserver;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Super admin bypasses every Gate check
+        Gate::before(function (\App\Models\User $user, string $ability) {
+            if ($user->isSuperAdmin()) {
+                return true;
+            }
+        });
+
         // Image optimization observers
         ProductImage::observe(ProductImageObserver::class);
         Banner::observe(BannerObserver::class);

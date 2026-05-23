@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Permission;
@@ -10,70 +12,71 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         $guard = 'web';
 
         // ── Permissions ──────────────────────────────────────────────────────
-        $permissions = [
+        $all = [
             // Products
             'view_products', 'create_products', 'edit_products', 'delete_products',
             // Categories
             'view_categories', 'create_categories', 'edit_categories', 'delete_categories',
-            // Brands
-            'view_brands', 'create_brands', 'edit_brands', 'delete_brands',
             // Orders
             'view_orders', 'update_order_status', 'cancel_orders',
             // Payments
             'view_payments', 'verify_payments', 'reject_payments',
             // Coupons
             'view_coupons', 'create_coupons', 'edit_coupons', 'delete_coupons',
-            // Customers
-            'view_customers', 'edit_customers', 'ban_customers',
+            // Content (Banners, Blog Posts)
+            'view_content', 'create_content', 'edit_content', 'delete_content',
+            // Newsletter
+            'manage_newsletter',
+            // Users
+            'view_users', 'create_users', 'edit_users', 'delete_users',
             // Reviews
             'view_reviews', 'approve_reviews', 'delete_reviews',
             // Shipping
             'view_shipping', 'manage_shipping',
             // Settings
             'view_settings', 'edit_settings',
-            // Staff
-            'view_staff', 'manage_staff',
-            // Reports
-            'view_reports',
+            // Roles
+            'view_roles', 'manage_roles',
         ];
 
-        $permissionModels = [];
-        foreach ($permissions as $name) {
-            $permissionModels[$name] = Permission::firstOrCreate(
-                ['name' => $name, 'guard_name' => $guard]
-            );
+        // Remove any stale permissions no longer in the canonical list
+        Permission::where('guard_name', $guard)->whereNotIn('name', $all)->delete();
+
+        foreach ($all as $name) {
+            Permission::firstOrCreate(['name' => $name, 'guard_name' => $guard]);
         }
 
-        // ── Roles & assignments ───────────────────────────────────────────────
+        // ── Roles ─────────────────────────────────────────────────────────────
 
-        // Super Admin — everything
+        // Super Admin — everything (Gate::before already grants all; explicit sync kept for consistency)
         $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => $guard]);
-        $superAdmin->permissions()->sync(array_column($permissionModels, 'id'));
+        $superAdmin->syncPermissions($all);
 
-        // Admin — all except manage_staff
+        // Admin — all except staff/role management
         $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => $guard]);
-        $adminPerms = array_filter($permissionModels, fn($k) => $k !== 'manage_staff', ARRAY_FILTER_USE_KEY);
-        $admin->permissions()->sync(array_column($adminPerms, 'id'));
+        $admin->syncPermissions(array_values(array_filter(
+            $all,
+            fn ($p) => ! in_array($p, ['view_roles', 'manage_roles'], true)
+        )));
 
-        // Staff — limited operational permissions
+        // Staff — read + operational tasks only
         $staff = Role::firstOrCreate(['name' => 'staff', 'guard_name' => $guard]);
-        $staffPerms = [
-            'view_products', 'view_categories', 'view_brands',
+        $staff->syncPermissions([
+            'view_products', 'view_categories',
             'view_orders', 'update_order_status',
             'view_payments', 'verify_payments', 'reject_payments',
-            'view_customers',
+            'view_users',
             'view_reviews', 'approve_reviews',
             'view_shipping',
-            'view_reports',
-        ];
-        $staff->permissions()->sync(
-            array_map(fn($k) => $permissionModels[$k]->id, $staffPerms)
-        );
+            'view_content',
+        ]);
 
-        // Customer — no admin permissions (role used for identification only)
+        // Customer — no admin permissions
         Role::firstOrCreate(['name' => 'customer', 'guard_name' => $guard]);
 
         $this->command->info('  Roles & permissions seeded.');

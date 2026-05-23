@@ -20,6 +20,12 @@ class NewsletterPage extends Page
 
     protected static string $view = 'filament.pages.newsletter-page';
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        return $user && ($user->isSuperAdmin() || $user->hasPermission('manage_newsletter'));
+    }
+
     public string $subject = '';
     public string $body    = '';
     public string $locale  = '';   // empty = all

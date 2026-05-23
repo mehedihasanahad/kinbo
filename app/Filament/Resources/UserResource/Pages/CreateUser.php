@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
@@ -12,13 +14,15 @@ class CreateUser extends CreateRecord
 
     protected function afterCreate(): void
     {
-        if (! (auth()->user()?->hasPermission('manage_staff') || auth()->user()?->isSuperAdmin())) {
+        if (! auth()->user()?->isSuperAdmin()) {
             return;
         }
 
         $roleId = $this->data['roles'] ?? null;
-        if ($roleId) {
-            $this->record->roles()->attach($roleId, ['model_type' => $this->record::class]);
+        $role   = $roleId ? Role::find((int) $roleId) : null;
+
+        if ($role) {
+            $this->record->syncRoles([$role]);
         }
     }
 }

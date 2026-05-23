@@ -397,7 +397,6 @@
                     <li><a href="{{ route('shop.category', ['sort' => 'newest']) }}" class="hover:text-white transition-colors">New Arrivals</a></li>
                     <li><a href="{{ route('page.terms') }}" class="hover:text-white transition-colors">Terms &amp; Conditions</a></li>
                     {{-- <li><a href="{{ $trackUrl }}" class="hover:text-white transition-colors">Track Your Order</a></li> --}}
-                    <li><a href="{{ route('page.return-policy') }}" class="hover:text-white transition-colors">Return &amp; Exchange Policy</a></li>
                     <li><a href="{{ route('page.faq') }}" class="hover:text-white transition-colors">Help Center</a></li>
                     <li><a href="{{ route('page.privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a></li>
                 </ul>

@@ -16,10 +16,10 @@ class UserResource extends Resource
 {
     use HasResourcePermissions;
 
-    protected static string $viewPermission   = 'view_customers';
-    protected static string $createPermission = 'manage_staff';
-    protected static string $editPermission   = 'edit_customers';
-    protected static string $deletePermission = 'ban_customers';
+    protected static string $viewPermission   = 'view_users';
+    protected static string $createPermission = 'create_users';
+    protected static string $editPermission   = 'edit_users';
+    protected static string $deletePermission = 'delete_users';
 
     protected static ?string $model = User::class;
     protected static ?string $navigationIcon = 'heroicon-o-users';
@@ -28,23 +28,13 @@ class UserResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $staffRoles = Role::whereIn('name', ['super_admin', 'admin', 'staff'])
-            ->pluck('name', 'id')
-            ->map(fn ($name) => match ($name) {
-                'super_admin' => 'Super Admin',
-                'admin'       => 'Admin',
-                'staff'       => 'Staff',
-                default       => ucfirst($name),
-            })
-            ->toArray();
-
         return $form->schema([
             Forms\Components\Section::make('User Info')->schema([
                 Forms\Components\TextInput::make('name')->required()->maxLength(191),
                 Forms\Components\TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('phone')->maxLength(20)->nullable(),
                 Forms\Components\TextInput::make('password')
-                    ->password()->dehydrateStateUsing(fn ($state) => bcrypt($state))
+                    ->password()
                     ->dehydrated(fn ($state) => filled($state))
                     ->required(fn (string $context) => $context === 'create')
                     ->label(fn (string $context) => $context === 'edit' ? 'New Password (leave blank to keep)' : 'Password'),
@@ -54,22 +44,17 @@ class UserResource extends Resource
                 Forms\Components\Toggle::make('is_active')->default(true)->inline(false),
 
                 Forms\Components\Select::make('roles')
-                    ->label('Admin Role')
-                    ->options($staffRoles)
-                    ->placeholder('Customer (no admin access)')
+                    ->label('Role')
+                    ->options(fn () => Role::orderBy('name')->pluck('name', 'id')
+                        ->map(fn ($name) => ucwords(str_replace('_', ' ', $name))))
+                    ->placeholder('Customer (no panel access)')
                     ->nullable()
-                    ->helperText('Assign an admin role to grant panel access. Leave blank for regular customers.')
-                    ->visible(fn () => auth()->user()?->hasPermission('manage_staff') || auth()->user()?->isSuperAdmin())
+                    ->helperText('Only super admin can assign roles.')
+                    ->visible(fn () => auth()->user()?->isSuperAdmin())
                     ->afterStateHydrated(function (Forms\Components\Select $component, $record) {
-                        if ($record) {
-                            $role = $record->roles()
-                                ->whereIn('name', ['super_admin', 'admin', 'staff'])
-                                ->first();
-                            $component->state($role?->id);
-                        }
+                        $component->state($record?->roles()->first()?->id);
                     })
-                    ->dehydrated(false)
-                    ->live(),
+                    ->dehydrated(false),
             ])->columns(2),
         ]);
     }
@@ -122,10 +107,7 @@ class UserResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->after(function (User $record, array $data, Forms\Components\Select $roleField = null) {
-                        // Role assignment is handled in EditUser page via afterSave hook
-                    }),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn (User $record) => ! $record->isSuperAdmin()),
             ])

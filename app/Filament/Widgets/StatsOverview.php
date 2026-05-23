@@ -74,10 +74,6 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-users')
                 ->color('info'),
 
-            Stat::make('Pending Returns', \App\Models\ReturnRequest::where('status', 'pending')->count())
-                ->description('Awaiting review')
-                ->descriptionIcon('heroicon-m-arrow-uturn-left')
-                ->color(\App\Models\ReturnRequest::where('status', 'pending')->count() > 0 ? 'warning' : 'success'),
         ];
     }
 }

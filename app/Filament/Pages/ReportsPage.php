@@ -17,6 +17,7 @@ class ReportsPage extends Page
     protected static ?string $navigationLabel = 'Reports & Analytics';
     protected static ?string $title           = 'Reports & Analytics';
     protected static ?int    $navigationSort  = 5;
+    protected static bool    $shouldRegisterNavigation = false;
 
     public static function canAccess(): bool
     {

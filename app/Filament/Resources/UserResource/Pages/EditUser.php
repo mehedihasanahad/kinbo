@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
@@ -18,24 +20,14 @@ class EditUser extends EditRecord
 
     protected function afterSave(): void
     {
-        $this->syncUserRole();
-    }
-
-    private function syncUserRole(): void
-    {
-        if (! (auth()->user()?->hasPermission('manage_staff') || auth()->user()?->isSuperAdmin())) {
+        if (! auth()->user()?->isSuperAdmin()) {
             return;
         }
 
         $roleId = $this->data['roles'] ?? null;
         $user   = $this->record;
+        $role   = $roleId ? Role::find((int) $roleId) : null;
 
-        // Detach all admin roles first
-        $adminRoleIds = Role::whereIn('name', ['super_admin', 'admin', 'staff'])->pluck('id');
-        $user->roles()->detach($adminRoleIds);
-
-        if ($roleId) {
-            $user->roles()->attach($roleId, ['model_type' => $user::class]);
-        }
+        $role ? $user->syncRoles([$role]) : $user->syncRoles([]);
     }
 }

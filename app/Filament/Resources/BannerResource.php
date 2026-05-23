@@ -15,11 +15,10 @@ class BannerResource extends Resource
 {
     use HasResourcePermissions;
 
-    // Banners are catalog content — editor-level access
-    protected static string $viewPermission   = 'view_products';
-    protected static string $createPermission = 'create_products';
-    protected static string $editPermission   = 'edit_products';
-    protected static string $deletePermission = 'delete_products';
+    protected static string $viewPermission   = 'view_content';
+    protected static string $createPermission = 'create_content';
+    protected static string $editPermission   = 'edit_content';
+    protected static string $deletePermission = 'delete_content';
 
     protected static ?string $model = Banner::class;
 
