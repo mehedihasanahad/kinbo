@@ -77,6 +77,8 @@ Route::middleware('auth')->group(function () {
     // Account hub
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
     Route::get('/account/reviews', [AccountController::class, 'reviews'])->name('account.reviews');
+    Route::get('/account/password', [AccountController::class, 'password'])->name('account.password');
+    Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
 
     // Address book
     Route::get('/account/addresses', [UserAddressController::class, 'index'])->name('account.addresses');

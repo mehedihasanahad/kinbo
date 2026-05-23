@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewAccountCredentials;
 use App\Mail\OrderConfirmation;
 use App\Models\CartItem;
 use App\Models\Coupon;
@@ -180,15 +181,23 @@ class CheckoutController extends Controller
 
         // Auto-register or login guest users before order placement
         if (! auth()->check()) {
-            $sessionId = session()->getId();
+            $sessionId     = session()->getId();
+            $plainPassword = Str::random(12);
 
             $user = User::firstOrCreate(
                 ['email' => $request->email],
                 [
                     'name'     => $request->ship_name,
-                    'password' => Hash::make(Str::random(16)),
+                    'password' => Hash::make($plainPassword),
                 ]
             );
+
+            // Send credentials only for brand-new accounts
+            if ($user->wasRecentlyCreated) {
+                try {
+                    Mail::to($user->email)->queue(new NewAccountCredentials($user, $plainPassword));
+                } catch (\Throwable) {}
+            }
 
             auth()->login($user);
 

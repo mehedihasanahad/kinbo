@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
+
 class AccountController extends Controller
 {
     public function index()
@@ -17,6 +22,31 @@ class AccountController extends Controller
         return view('account.index', compact(
             'user', 'recentOrders', 'orderCount', 'reviewCount', 'wishlistCount', 'addressCount'
         ));
+    }
+
+    public function password(): View
+    {
+        return view('account.password');
+    }
+
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $user = auth()->user();
+
+        $rules = [
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ];
+
+        // OAuth-only users never set a password — skip current_password check
+        if (! $user->provider) {
+            $rules['current_password'] = ['required', 'current_password'];
+        }
+
+        $request->validate($rules);
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        return back()->with('password_updated', true);
     }
 
     public function reviews()
