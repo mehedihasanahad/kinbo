@@ -40,6 +40,8 @@ class RolePermissionSeeder extends Seeder
             'view_reviews', 'approve_reviews', 'delete_reviews',
             // Shipping
             'view_shipping', 'manage_shipping',
+            // Courier
+            'view_courier_orders', 'manage_courier_orders', 'manage_courier_settings',
             // Settings
             'view_settings', 'edit_settings',
             // Roles
@@ -77,6 +79,7 @@ class RolePermissionSeeder extends Seeder
             'view_shipping',
             'view_content',
             'view_contact',
+            'view_courier_orders',
         ]);
 
         // Customer — no admin permissions

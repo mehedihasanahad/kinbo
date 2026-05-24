@@ -19,7 +19,7 @@ class StatsOverview extends BaseWidget
         $pendingOrders  = Order::where('status', 'pending')->count();
         $totalOrders    = Order::count();
         $totalProducts  = Product::active()->count();
-        $totalUsers     = User::where('is_active', true)->count();
+        $totalUsers     = User::where('is_active', true)->whereDoesntHave('roles')->count();
         $lowStock       = Product::active()->where('stock', '>', 0)
                             ->whereColumn('stock', '<=', 'low_stock_threshold')->count();
 
@@ -41,7 +41,8 @@ class StatsOverview extends BaseWidget
         $aov       = $paidCount > 0 ? $totalRevenue / $paidCount : 0;
 
         // New customers this month
-        $newCustomers = User::whereMonth('created_at', now()->month)
+        $newCustomers = User::whereDoesntHave('roles')
+                            ->whereMonth('created_at', now()->month)
                             ->whereYear('created_at', now()->year)
                             ->count();
 

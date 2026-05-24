@@ -20,9 +20,25 @@ class CourierOrderResource extends Resource
     protected static ?string $navigationLabel = 'Courier Orders';
     protected static ?int    $navigationSort  = 11;
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        return $user && ($user->isSuperAdmin() || $user->hasPermission('view_courier_orders'));
+    }
+
     public static function canCreate(): bool
     {
         return false;
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return auth()->user()?->isSuperAdmin() ?? false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return auth()->user()?->isSuperAdmin() ?? false;
     }
 
     public static function table(Table $table): Table

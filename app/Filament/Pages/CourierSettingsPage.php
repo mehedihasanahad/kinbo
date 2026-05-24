@@ -27,7 +27,7 @@ class CourierSettingsPage extends Page
     public static function canAccess(): bool
     {
         $user = auth()->user();
-        return $user && ($user->isSuperAdmin() || $user->hasPermission('edit_settings'));
+        return $user && ($user->isSuperAdmin() || $user->hasPermission('manage_courier_settings'));
     }
 
     public array $steadfast = [];

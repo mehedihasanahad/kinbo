@@ -10,7 +10,6 @@ use App\Models\ShippingZoneDistrict;
 use App\Services\Couriers\PathaoService;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,7 +27,7 @@ class PathaoDistrictMappingResource extends Resource
     public static function canAccess(): bool
     {
         $user = auth()->user();
-        return $user && ($user->isSuperAdmin() || $user->hasPermission('edit_settings'));
+        return $user && ($user->isSuperAdmin() || $user->hasPermission('manage_courier_settings'));
     }
 
     public static function form(Form $form): Form
@@ -39,7 +38,7 @@ class PathaoDistrictMappingResource extends Resource
                     Forms\Components\Select::make('district_name')
                         ->label('District')
                         ->options(
-                            ShippingZoneDistrict::orderBy('district_name')
+                            ShippingZoneDistrict::orderBy('district_name', 'asc')
                                 ->pluck('district_name', 'district_name')
                         )
                         ->searchable()
