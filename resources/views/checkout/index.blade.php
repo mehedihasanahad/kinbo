@@ -90,7 +90,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('front.ship_phone') }} <span class="text-red-500">*</span></label>
                             <input type="text" name="ship_phone" value="{{ old('ship_phone', auth()->user()?->phone ?? '') }}" id="field-ship_phone"
-                                   placeholder="01712345678"
+                                   placeholder="017xxxxxxxx"
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 @error('ship_phone') border-red-400 @enderror">
                             @error('ship_phone')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                         </div>

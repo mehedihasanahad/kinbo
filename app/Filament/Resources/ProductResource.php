@@ -10,6 +10,8 @@ use App\Models\ProductTranslation;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -52,8 +54,14 @@ class ProductResource extends Resource
                     ->required()
                     ->maxLength(191)
                     ->dehydrated(false)
+                    ->live(onBlur: true)
                     ->afterStateHydrated(function ($state, $record, $set) {
                         $set('translation_name', $record?->getTranslation('en')?->name);
+                    })
+                    ->afterStateUpdated(function (string $operation, ?string $state, Set $set): void {
+                        if ($operation === 'create') {
+                            $set('translation_slug', Str::slug($state ?? ''));
+                        }
                     }),
 
                 Forms\Components\TextInput::make('translation_slug')
@@ -85,7 +93,8 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('price')
                     ->numeric()->prefix('৳')->required(),
                 Forms\Components\TextInput::make('sale_price')
-                    ->numeric()->prefix('৳')->nullable(),
+                    ->label('Discount Price')
+                    ->numeric()->prefix('৳')->nullable()->minValue(1),
                 Forms\Components\TextInput::make('stock')
                     ->numeric()->integer()->required()->default(0),
                 Forms\Components\TextInput::make('low_stock_threshold')
@@ -197,20 +206,31 @@ class ProductResource extends Resource
                                     Forms\Components\TextInput::make('option_value')
                                         ->label('Value')
                                         ->placeholder('M')
-                                        ->required()
+                                        ->required(fn (Get $get): bool => ! \in_array(
+                                            strtolower((string) ($get('option_name') ?? '')),
+                                            ['color', 'colour'],
+                                        ))
                                         ->maxLength(100)
                                         ->visible(fn (Get $get): bool => ! \in_array(
                                             strtolower((string) ($get('option_name') ?? '')),
                                             ['color', 'colour'],
-                                        )),
+                                        ))
+                                        ->dehydrated(true),
 
-                                    Forms\Components\ColorPicker::make('option_value')
+                                    Forms\Components\ColorPicker::make('option_color_picker')
                                         ->label('Color')
-                                        ->required()
+                                        ->required(fn (Get $get): bool => \in_array(
+                                            strtolower((string) ($get('option_name') ?? '')),
+                                            ['color', 'colour'],
+                                        ))
                                         ->visible(fn (Get $get): bool => \in_array(
                                             strtolower((string) ($get('option_name') ?? '')),
                                             ['color', 'colour'],
-                                        )),
+                                        ))
+                                        ->dehydrated(false)
+                                        ->live()
+                                        ->afterStateUpdated(fn (?string $state, Set $set) => $set('option_value', $state ?? ''))
+                                        ->afterStateHydrated(fn ($state, Get $get, Set $set) => $set('option_color_picker', $get('option_value'))),
 
                                     Forms\Components\Textarea::make('size_note')
                                         ->label('Exact Size Details')

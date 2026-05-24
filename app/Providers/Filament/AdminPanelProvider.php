@@ -67,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Catalog',
                 'Commerce',
+                'Courier',
                 'Users & Access',
                 'Settings',
             ])

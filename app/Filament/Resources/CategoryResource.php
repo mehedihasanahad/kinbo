@@ -7,7 +7,9 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Illuminate\Support\Str;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -53,8 +55,14 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('translation_name')
                     ->label('Name')->required()->maxLength(191)
                     ->dehydrated(false)
+                    ->live(onBlur: true)
                     ->afterStateHydrated(fn ($record, $set) =>
-                        $set('translation_name', $record?->getTranslation('en')?->name)),
+                        $set('translation_name', $record?->getTranslation('en')?->name))
+                    ->afterStateUpdated(function (string $operation, ?string $state, Set $set): void {
+                        if ($operation === 'create') {
+                            $set('translation_slug', Str::slug($state ?? ''));
+                        }
+                    }),
 
                 Forms\Components\TextInput::make('translation_slug')
                     ->label('Slug')->maxLength(191)

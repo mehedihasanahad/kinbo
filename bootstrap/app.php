@@ -24,5 +24,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Stale Livewire temp file — redirect back with a flash error instead of crashing.
+        $exceptions->render(function (\RuntimeException $e, \Illuminate\Http\Request $request) {
+            if (str_starts_with($e->getMessage(), 'Unable to retrieve the file_size for file at location:')) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'The uploaded file expired. Please re-upload the image and try again.');
+            }
+        });
     })->create();

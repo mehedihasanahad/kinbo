@@ -9,14 +9,15 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed order matters — later seeders depend on earlier ones.
      *
-     * 1. RolePermissionSeeder  — roles & permissions (no deps)
-     * 2. UserSeeder            — users with role assignments & addresses (needs roles)
-     * 3. BrandCategorySeeder   — brands, categories, translations (no deps)
-     * 4. ProductSeeder         — products, variants, images, translations (needs categories + brands)
-     * 5. ShippingSeeder        — zones, districts, rates (no deps)
-     * 6. CouponSeeder          — coupons (no deps)
-     * 7. OrderSeeder           — orders, items, payments, reviews (needs all above)
-     * 8. SettingSeeder         — site config key-value store (no deps)
+     * 1. RolePermissionSeeder          — roles & permissions (no deps)
+     * 2. UserSeeder                    — users with role assignments & addresses (needs roles)
+     * 3. BrandCategorySeeder           — brands, categories, translations (no deps)
+     * 4. ProductSeeder                 — products, variants, images, translations (needs categories + brands)
+     * 5. ShippingSeeder                — zones, districts, rates (no deps)
+     * 6. CouponSeeder                  — coupons (no deps)
+     * 7. OrderSeeder                   — orders, items, payments, reviews (needs all above)
+     * 8. SettingSeeder                 — site config key-value store (no deps)
+     * 9. PathaoDistrictMappingSeeder   — district → Pathao city/zone IDs (needs ShippingSeeder)
      */
     public function run(): void
     {
@@ -34,6 +35,7 @@ class DatabaseSeeder extends Seeder
             CouponSeeder::class,
             OrderSeeder::class,
             SettingSeeder::class,
+            PathaoDistrictMappingSeeder::class,
         ]);
 
         $this->command->info('');

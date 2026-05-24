@@ -194,7 +194,7 @@ return [
     'remove_coupon'                => 'Remove',
     'coupon_applied'               => 'Coupon ":code" applied!',
     'coupon_invalid'               => 'Invalid or expired coupon code.',
-    'phone_invalid'                => 'Please enter a valid Bangladesh mobile number (e.g. 01712345678).',
+    'phone_invalid'                => 'Please enter a valid Bangladesh mobile number (e.g. 017xxxxxxxx).',
     'discount'                     => 'Discount',
     'free_shipping'                => 'Free Shipping',
     'calculating'                  => 'Calculating...',

@@ -35,7 +35,6 @@ class HomeController extends Controller
             ->inStock()
             ->with(['primaryImage', 'translations', 'brand'])
             ->orderBy('sort_order')
-            ->take(4)
             ->get();
 
         $onSaleProducts = Product::active()

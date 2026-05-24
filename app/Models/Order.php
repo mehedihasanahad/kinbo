@@ -96,6 +96,11 @@ class Order extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function courierOrder(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CourierOrder::class);
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;

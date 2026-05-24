@@ -4,15 +4,20 @@ namespace App\Filament\Resources;
 
 use App\Filament\Concerns\HasResourcePermissions;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Jobs\DispatchCourierOrderJob;
 use App\Models\Order;
+use App\Models\PathaoDistrictMapping;
+use App\Services\CourierManager;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Illuminate\Support\HtmlString;
 
 class OrderResource extends Resource
 {
@@ -20,7 +25,6 @@ class OrderResource extends Resource
 
     protected static string $viewPermission   = 'view_orders';
     protected static string $editPermission   = 'update_order_status';
-    // Orders cannot be created or deleted from admin
     protected static string $createPermission = '';
     protected static string $deletePermission = 'cancel_orders';
 
@@ -55,11 +59,11 @@ class OrderResource extends Resource
 
                 Forms\Components\Select::make('payment_status')
                     ->options([
-                        'unpaid'                 => 'Unpaid',
-                        'pending_verification'   => 'Pending Verification',
-                        'paid'                   => 'Paid',
-                        'refunded'               => 'Refunded',
-                        'failed'                 => 'Failed',
+                        'unpaid'               => 'Unpaid',
+                        'pending_verification' => 'Pending Verification',
+                        'paid'                 => 'Paid',
+                        'refunded'             => 'Refunded',
+                        'failed'               => 'Failed',
                     ])->required(),
 
                 Forms\Components\TextInput::make('tracking_number')->maxLength(100)->nullable(),
@@ -121,22 +125,24 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('total_amount')
                     ->money('BDT')->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'info'    => 'processing',
-                        'primary' => 'shipped',
-                        'success' => 'delivered',
-                        'danger'  => ['cancelled', 'returned'],
-                    ]),
+                Tables\Columns\TextColumn::make('status')->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'pending'    => 'warning',
+                        'processing' => 'info',
+                        'shipped'    => 'primary',
+                        'delivered'  => 'success',
+                        'cancelled', 'returned' => 'danger',
+                        default      => 'gray',
+                    }),
 
-                Tables\Columns\BadgeColumn::make('payment_status')
-                    ->colors([
-                        'success' => 'paid',
-                        'danger'  => ['unpaid', 'failed'],
-                        'warning' => 'pending_verification',
-                        'info'    => 'refunded',
-                    ]),
+                Tables\Columns\TextColumn::make('payment_status')->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'paid'      => 'success',
+                        'unpaid', 'failed' => 'danger',
+                        'pending_verification' => 'warning',
+                        'refunded'  => 'info',
+                        default     => 'gray',
+                    }),
 
                 Tables\Columns\TextColumn::make('payment_method'),
 
@@ -178,6 +184,87 @@ class OrderResource extends Resource
                             ['Content-Type' => 'application/pdf']
                         );
                     }),
+
+                Tables\Actions\Action::make('dispatch_courier')
+                    ->label(fn (Order $record) => $record->courierOrder ? 'Courier: ' . ucfirst($record->courierOrder->status) : 'Send to Courier')
+                    ->icon('heroicon-o-truck')
+                    ->color(fn (Order $record) => match (true) {
+                        $record->courierOrder?->isFailed()     => 'danger',
+                        $record->courierOrder?->isDispatched() => 'success',
+                        (bool) $record->courierOrder           => 'warning',
+                        default                                => 'gray',
+                    })
+                    ->form([
+                        Forms\Components\Select::make('courier')
+                            ->label('Courier Provider')
+                            ->options(fn () => app(CourierManager::class)->available())
+                            ->required()
+                            ->default('steadfast')
+                            ->live(),
+                        Forms\Components\Placeholder::make('order_info')
+                            ->label('Order')
+                            ->content(fn (Order $record) => "{$record->order_number} — {$record->ship_name} ({$record->ship_phone})"),
+                        Forms\Components\Placeholder::make('cod_info')
+                            ->label('COD Amount')
+                            ->content(fn (Order $record) => $record->payment_method === Order::METHOD_COD
+                                ? '৳' . number_format((float) $record->total_amount, 2)
+                                : 'No COD (prepaid)'),
+                        Forms\Components\Section::make('Pathao — District Mapping')
+                            ->description('The customer\'s district will be auto-mapped to Pathao city/zone IDs.')
+                            ->visible(fn (Forms\Get $get) => $get('courier') === 'pathao')
+                            ->schema([
+                                Forms\Components\Placeholder::make('district_info')
+                                    ->label('Customer District')
+                                    ->content(fn (Order $record) => $record->ship_district ?: '—'),
+                                Forms\Components\Placeholder::make('mapping_status')
+                                    ->label('Mapping Status')
+                                    ->content(function (Order $record) {
+                                        $mapping = PathaoDistrictMapping::findByDistrict($record->ship_district ?? '');
+                                        if ($mapping) {
+                                            return new HtmlString(
+                                                '<span class="text-success-600 font-medium">'
+                                                . '&#10003; Mapped — City ID: ' . $mapping->pathao_city_id
+                                                . ', Zone ID: ' . $mapping->pathao_zone_id
+                                                . ($mapping->pathao_area_id ? ', Area ID: ' . $mapping->pathao_area_id : '')
+                                                . '</span>'
+                                            );
+                                        }
+                                        return new HtmlString(
+                                            '<span class="text-danger-600 font-medium">'
+                                            . '&#10007; No mapping for &quot;' . htmlspecialchars($record->ship_district ?? '') . '&quot;'
+                                            . ' — add it in Courier &rarr; Pathao District Mappings.'
+                                            . '</span>'
+                                        );
+                                    }),
+                            ])->columns(2),
+                    ])
+                    ->modalHeading('Send Order to Courier')
+                    ->modalSubmitActionLabel('Dispatch')
+                    ->action(function (Order $record, array $data): void {
+                        if ($data['courier'] === 'pathao') {
+                            $mapping = PathaoDistrictMapping::findByDistrict($record->ship_district ?? '');
+                            if ($mapping === null) {
+                                Notification::make()
+                                    ->title('No district mapping')
+                                    ->body('District "' . ($record->ship_district ?? '') . '" is not mapped to Pathao IDs. Add it in Courier → Pathao District Mappings.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                        }
+
+                        DispatchCourierOrderJob::dispatch($record->id, $data['courier']);
+
+                        Notification::make()
+                            ->title('Courier dispatch queued')
+                            ->body("Order {$record->order_number} queued for {$data['courier']}.")
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (Order $record) =>
+                        ! $record->courierOrder?->isDispatched()
+                        || $record->courierOrder?->isFailed()
+                    ),
             ])
             ->defaultSort('created_at', 'desc');
     }
