@@ -203,20 +203,6 @@ class ProductResource extends Resource
                                         ->maxLength(50)
                                         ->live(onBlur: true),
 
-                                    Forms\Components\TextInput::make('option_value')
-                                        ->label('Value')
-                                        ->placeholder('M')
-                                        ->required(fn (Get $get): bool => ! \in_array(
-                                            strtolower((string) ($get('option_name') ?? '')),
-                                            ['color', 'colour'],
-                                        ))
-                                        ->maxLength(100)
-                                        ->visible(fn (Get $get): bool => ! \in_array(
-                                            strtolower((string) ($get('option_name') ?? '')),
-                                            ['color', 'colour'],
-                                        ))
-                                        ->dehydrated(true),
-
                                     Forms\Components\ColorPicker::make('option_color_picker')
                                         ->label('Color')
                                         ->required(fn (Get $get): bool => \in_array(
@@ -231,6 +217,25 @@ class ProductResource extends Resource
                                         ->live()
                                         ->afterStateUpdated(fn (?string $state, Set $set) => $set('option_value', $state ?? ''))
                                         ->afterStateHydrated(fn ($state, Get $get, Set $set) => $set('option_color_picker', $get('option_value'))),
+
+                                    Forms\Components\TextInput::make('option_value')
+                                        ->label('Value')
+                                        ->placeholder('M')
+                                        ->required()
+                                        ->maxLength(100)
+                                        ->hiddenLabel(fn (Get $get): bool =>
+                                            \in_array(strtolower((string) ($get('option_name') ?? '')), ['color', 'colour'])
+                                        )
+                                        ->extraAttributes(fn (Get $get): array =>
+                                            \in_array(strtolower((string) ($get('option_name') ?? '')), ['color', 'colour'])
+                                                ? ['style' => 'display:none']
+                                                : []
+                                        )
+                                        ->extraInputAttributes(fn (Get $get): array =>
+                                            \in_array(strtolower((string) ($get('option_name') ?? '')), ['color', 'colour'])
+                                                ? ['type' => 'hidden']
+                                                : []
+                                        ),
 
                                     Forms\Components\Textarea::make('size_note')
                                         ->label('Exact Size Details')
