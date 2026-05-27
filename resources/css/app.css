@@ -165,9 +165,8 @@
 
 @media (max-width: 640px) {
     .hero-slide { align-items: center; }
-    .hero-slide-content { padding: 0.875rem 1.25rem; text-align: left; transform: translateY(-15%); }
-    .hero-slide-content h1 { font-size: 1.1rem; margin-bottom: 0.25rem; }
-    .hero-slide-content a { font-size: 0.55rem; padding: 0.4rem 1rem; }
+    .hero-slide-overlay { display: none; }
+    .hero-slide-content { display: none; }
 }
 
 /* Nav arrows */
@@ -428,6 +427,10 @@
     border-radius: 0;
     background: #f9fafb;
     display: block;
+}
+
+@media (max-width: 640px) {
+    #wa-widget { bottom: 72px !important; }
 }
 
 /* ============================================================

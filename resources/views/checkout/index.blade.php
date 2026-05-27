@@ -203,10 +203,10 @@
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
                                         <span class="w-5 h-5 bg-pink-600 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0">b</span>
-                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_bkash') }}</span>
+                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_bkash') }} <span class="text-pink-600 font-normal text-xs">(Send Money)</span></span>
                                     </div>
                                     @if($bkashNumber)
-                                        <p class="text-xs text-gray-500 mt-1">{{ __('front.pay_to_number') }}: <span class="font-semibold text-gray-700">{{ $bkashNumber }}</span>{{ $bkashName ? ' (' . $bkashName . ')' : '' }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">Send Money to: <span class="font-semibold text-gray-700">{{ $bkashNumber }}</span>{{ $bkashName ? ' (' . $bkashName . ')' : '' }}</p>
                                     @endif
                                 </div>
                             </label>
@@ -248,10 +248,10 @@
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
                                         <span class="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0">N</span>
-                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_nagad') }}</span>
+                                        <span class="font-semibold text-gray-800 text-sm">{{ __('front.payment_method_nagad') }} <span class="text-orange-600 font-normal text-xs">(Send Money)</span></span>
                                     </div>
                                     @if($nagadNumber)
-                                        <p class="text-xs text-gray-500 mt-1">{{ __('front.pay_to_number') }}: <span class="font-semibold text-gray-700">{{ $nagadNumber }}</span>{{ $nagadName ? ' (' . $nagadName . ')' : '' }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">Send Money to: <span class="font-semibold text-gray-700">{{ $nagadNumber }}</span>{{ $nagadName ? ' (' . $nagadName . ')' : '' }}</p>
                                     @endif
                                 </div>
                             </label>

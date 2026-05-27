@@ -760,22 +760,37 @@ function toggleWishlist(btn, productId) {
         </div>
     </div>
 
-    {{-- Toggle Button --}}
-    <button
-        id="wa-toggle"
-        onclick="waToggle()"
-        aria-label="Chat on WhatsApp"
-        style="width:56px;height:56px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,0.45);transition:transform .2s;"
-        onmouseenter="this.style.transform='scale(1.1)'"
-        onmouseleave="this.style.transform='scale(1)'"
-    >
-        <svg id="wa-icon-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" style="width:28px;height:28px;fill:white;">
-            <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.83.74 5.49 2.03 7.8L.5 31.5l7.93-2.08A15.45 15.45 0 0 0 16 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5zm0 28.18a13.1 13.1 0 0 1-6.68-1.83l-.48-.29-4.71 1.24 1.26-4.6-.31-.5A13.07 13.07 0 0 1 2.88 16C2.88 9.07 8.07 3.38 16 3.38 23.46 3.38 28.62 9.07 28.62 16c0 6.93-5.16 12.68-12.62 12.68zm7.13-9.47c-.39-.2-2.3-1.14-2.66-1.27-.36-.13-.62-.2-.88.2-.26.38-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.2-1.65-.61-3.14-1.94-1.16-1.04-1.94-2.32-2.17-2.71-.23-.39-.02-.6.17-.79.18-.18.39-.46.58-.69.2-.23.26-.39.39-.65.13-.26.07-.49-.03-.69-.1-.2-.88-2.12-1.2-2.9-.32-.77-.64-.66-.88-.67h-.75c-.26 0-.68.1-1.04.49-.36.39-1.37 1.34-1.37 3.26s1.4 3.78 1.6 4.04c.2.26 2.76 4.21 6.68 5.91.93.4 1.66.64 2.23.82.94.3 1.79.26 2.46.16.75-.11 2.3-.94 2.63-1.85.32-.91.32-1.69.23-1.85-.1-.16-.36-.26-.75-.46z"/>
-        </svg>
-        <svg id="wa-icon-close" style="display:none;width:24px;height:24px;" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-    </button>
+    {{-- Toggle Button + Dismiss --}}
+    <div style="position:relative;display:inline-flex;">
+        <button
+            id="wa-toggle"
+            onclick="waToggle()"
+            aria-label="Chat on WhatsApp"
+            style="width:56px;height:56px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,0.45);transition:transform .2s;"
+            onmouseenter="this.style.transform='scale(1.1)'"
+            onmouseleave="this.style.transform='scale(1)'"
+        >
+            <svg id="wa-icon-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" style="width:28px;height:28px;fill:white;">
+                <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.83.74 5.49 2.03 7.8L.5 31.5l7.93-2.08A15.45 15.45 0 0 0 16 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5zm0 28.18a13.1 13.1 0 0 1-6.68-1.83l-.48-.29-4.71 1.24 1.26-4.6-.31-.5A13.07 13.07 0 0 1 2.88 16C2.88 9.07 8.07 3.38 16 3.38 23.46 3.38 28.62 9.07 28.62 16c0 6.93-5.16 12.68-12.62 12.68zm7.13-9.47c-.39-.2-2.3-1.14-2.66-1.27-.36-.13-.62-.2-.88.2-.26.38-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.2-1.65-.61-3.14-1.94-1.16-1.04-1.94-2.32-2.17-2.71-.23-.39-.02-.6.17-.79.18-.18.39-.46.58-.69.2-.23.26-.39.39-.65.13-.26.07-.49-.03-.69-.1-.2-.88-2.12-1.2-2.9-.32-.77-.64-.66-.88-.67h-.75c-.26 0-.68.1-1.04.49-.36.39-1.37 1.34-1.37 3.26s1.4 3.78 1.6 4.04c.2.26 2.76 4.21 6.68 5.91.93.4 1.66.64 2.23.82.94.3 1.79.26 2.46.16.75-.11 2.3-.94 2.63-1.85.32-.91.32-1.69.23-1.85-.1-.16-.36-.26-.75-.46z"/>
+            </svg>
+            <svg id="wa-icon-close" style="display:none;width:24px;height:24px;" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        {{-- Dismiss button --}}
+        <button
+            onclick="waDismiss()"
+            aria-label="Hide WhatsApp button"
+            style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#4b5563;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.3);transition:background .15s;"
+            onmouseenter="this.style.background='#1f2937'"
+            onmouseleave="this.style.background='#4b5563'"
+        >
+            <svg style="width:9px;height:9px;" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
 </div>
 
 <script>
@@ -796,6 +811,10 @@ function toggleWishlist(btn, productId) {
         document.getElementById('wa-box').style.display = 'none';
         document.getElementById('wa-icon-open').style.display  = 'block';
         document.getElementById('wa-icon-close').style.display = 'none';
+    };
+
+    window.waDismiss = function () {
+        document.getElementById('wa-widget').style.display = 'none';
     };
 
     window.waSend = function () {

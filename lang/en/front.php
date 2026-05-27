@@ -59,7 +59,7 @@ return [
     // Product card
     'add_to_cart'    => 'Add to Cart',
     'buy_now'        => 'Buy Now',
-    'select_options'          => 'Select Options',
+    'select_options'          => 'View Details',
     'select_options_to_add'   => 'This product has variants — please select your options to add it to the cart.',
     'low_stock'      => 'Low Stock',
     'new_badge'     => 'New',

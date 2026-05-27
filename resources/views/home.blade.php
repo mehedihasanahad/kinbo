@@ -18,16 +18,20 @@
                         <img src="{{ asset('storage/' . $banner->image) }}"
                              alt="{{ $banner->title }}"
                              loading="{{ $loop->first ? 'eager' : 'lazy' }}">
-                        <div class="hero-slide-overlay"></div>
-                        <div class="hero-slide-content">
-                            <h1>{!! nl2br(e($banner->title)) !!}</h1>
-                            @if($banner->subtitle)
-                                <p>{{ $banner->subtitle }}</p>
-                            @endif
-                            @if($banner->button_text && $banner->button_url)
-                                <a href="{{ $banner->button_url }}">{{ $banner->button_text }}</a>
-                            @endif
-                        </div>
+                        @if($banner->title || $banner->subtitle || ($banner->button_text && $banner->button_url))
+                            <div class="hero-slide-overlay"></div>
+                            <div class="hero-slide-content">
+                                @if($banner->title)
+                                    <h1>{!! nl2br(e($banner->title)) !!}</h1>
+                                @endif
+                                @if($banner->subtitle)
+                                    <p>{{ $banner->subtitle }}</p>
+                                @endif
+                                @if($banner->button_text && $banner->button_url)
+                                    <a href="{{ $banner->button_url }}">{{ $banner->button_text }}</a>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 </div>
             @empty

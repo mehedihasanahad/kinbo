@@ -35,7 +35,7 @@ class BannerResource extends Resource
                 ->description('Text content displayed over the banner image.')
                 ->schema([
                     Forms\Components\TextInput::make('title')
-                        ->required()
+                        ->nullable()
                         ->maxLength(191)
                         ->columnSpanFull(),
 

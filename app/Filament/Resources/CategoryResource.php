@@ -66,6 +66,7 @@ class CategoryResource extends Resource
 
                 Forms\Components\TextInput::make('translation_slug')
                     ->label('Slug')->maxLength(191)
+                    ->required()
                     ->dehydrated(false)
                     ->afterStateHydrated(fn ($record, $set) =>
                         $set('translation_slug', $record?->getTranslation('en')?->slug)),

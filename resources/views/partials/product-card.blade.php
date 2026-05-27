@@ -27,7 +27,7 @@
                 <img src="{{ asset('storage/' . $product->primaryImage->path) }}"
                      alt="{{ $productName }}"
                      itemprop="image"
-                     class="w-full h-full object-contain object-center
+                     class="absolute inset-0 w-full h-full object-cover object-center
                             group-hover:scale-105 transition-transform duration-500">
             @else
                 <div class="w-full h-full flex items-center justify-center bg-gray-100">
