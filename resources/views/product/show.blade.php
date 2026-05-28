@@ -144,7 +144,7 @@
 
             {{-- Thumbnail strip — vertical column on desktop (left), wrapping rows on mobile (bottom) --}}
             @if($allImages->count() > 1)
-                <div class="hidden sm:flex sm:flex-col sm:flex-nowrap gap-2 sm:overflow-y-auto sm:max-h-[520px] shrink-0"
+                <div class="hidden sm:flex sm:flex-col sm:flex-nowrap gap-2 sm:overflow-y-auto shrink-0"
                      id="thumb-strip">
                     @foreach($allImages as $image)
                         <button onclick="goToSlide({{ $loop->index }})"
@@ -162,7 +162,7 @@
             @endif
 
             {{-- Main image — Swiper for swipe/slide support --}}
-            <div class="relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 aspect-square flex-1">
+            <div class="relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 aspect-square flex-1 self-start">
 
                 {{-- Discount badge --}}
                 @if($product->is_on_sale)
@@ -218,10 +218,10 @@
         </div>
 
         {{-- ── RIGHT: Product Info ──────────────────────────────────────────── --}}
-        <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-3 lg:gap-2">
 
             {{-- Product name --}}
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">{{ $productName }}</h1>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">{{ $productName }}</h1>
 
             {{-- Star rating summary --}}
             <div class="flex items-center gap-2">
@@ -251,17 +251,17 @@
             {{-- Price block --}}
             <div id="price-block" class="flex items-baseline gap-3 flex-wrap">
                 @if($product->is_on_sale)
-                    <span id="current-price" class="text-3xl font-extrabold text-primary-700">
+                    <span id="current-price" class="text-2xl font-extrabold text-primary-700">
                         ৳{{ number_format($product->current_price, 0) }}
                     </span>
-                    <span class="text-lg text-gray-400 line-through">
+                    <span class="text-base text-gray-400 line-through">
                         ৳{{ number_format($product->price, 0) }}
                     </span>
                     <span class="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full">
                         {{ __('front.discount_off', ['percent' => $discountPct]) }}
                     </span>
                 @else
-                    <span id="current-price" class="text-3xl font-extrabold text-gray-900">
+                    <span id="current-price" class="text-2xl font-extrabold text-gray-900">
                         ৳{{ number_format($product->current_price, 0) }}
                     </span>
                 @endif
@@ -448,13 +448,13 @@
                     <input type="hidden" name="custom_size" id="form-custom-size" value="">
                     <input type="hidden" name="buy_now" id="buy-now-flag" value="0">
 
-                    <div class="flex flex-col gap-2">
-                        {{-- Add to Cart — 50% --}}
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        {{-- Add to Cart --}}
                         <button type="submit"
                                 id="atc-btn"
                                 onclick="document.getElementById('buy-now-flag').value='0'"
                                 @if($variantOptions->isNotEmpty() || ! $product->is_in_stock) disabled @endif
-                                class="w-full sm:w-1/2 flex items-center justify-center gap-2 bg-gray-900
+                                class="flex-1 flex items-center justify-center gap-2 bg-gray-900
                                        {{ $product->is_in_stock && $variantOptions->isEmpty()
                                             ? 'hover:bg-black active:bg-black cursor-pointer'
                                             : 'opacity-50 cursor-not-allowed' }}
@@ -467,12 +467,12 @@
                             {{ __('front.add_to_cart') }}
                         </button>
 
-                        {{-- Buy Now — 50% --}}
+                        {{-- Buy Now --}}
                         <button type="submit"
                                 id="buy-now-btn"
                                 onclick="document.getElementById('buy-now-flag').value='1'"
                                 @if($variantOptions->isNotEmpty() || ! $product->is_in_stock) disabled @endif
-                                class="w-full sm:w-1/2 flex items-center justify-center gap-2 bg-primary-600
+                                class="flex-1 flex items-center justify-center gap-2 bg-primary-600
                                        {{ $product->is_in_stock && $variantOptions->isEmpty()
                                             ? 'hover:bg-primary-700 active:bg-primary-800 cursor-pointer'
                                             : 'opacity-50 cursor-not-allowed' }}
@@ -854,6 +854,17 @@ if (typeof fbq !== 'undefined') {
 let mainSwiper = null;
 
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Sync thumbnail strip height to main image ──
+    var strip   = document.getElementById('thumb-strip');
+    var imgWrap = strip ? strip.nextElementSibling : null;
+    if (strip && imgWrap) {
+        function syncThumbHeight() {
+            strip.style.maxHeight = imgWrap.offsetHeight + 'px';
+        }
+        syncThumbHeight();
+        window.addEventListener('resize', syncThumbHeight);
+    }
 
     // ── Main image Swiper ──
     @if($allImages->isNotEmpty())

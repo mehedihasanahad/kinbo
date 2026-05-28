@@ -84,8 +84,21 @@
                                        class="text-sm font-semibold text-gray-900 hover:text-primary-600 transition-colors line-clamp-2">
                                         {{ $productName }}
                                     </a>
-                                    @if($item->variant && $item->variant->label)
-                                        <p class="text-xs text-gray-500 mt-0.5">{{ $item->variant->label }}</p>
+                                    @if($item->variant && $item->variant->options->isNotEmpty())
+                                        <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
+                                            @foreach($item->variant->options as $opt)
+                                                @php $isColor = in_array(strtolower($opt->option_name), ['color', 'colour']); @endphp
+                                                @if($isColor)
+                                                    <span class="inline-flex items-center gap-1 text-xs text-gray-500">
+                                                        {{ $opt->option_name }}:
+                                                        <span class="w-4 h-4 rounded-full border border-gray-300 shrink-0"
+                                                              style="background-color: {{ $opt->option_value }};"></span>
+                                                    </span>
+                                                @else
+                                                    <span class="text-xs text-gray-500">{{ $opt->option_name }}: {{ $opt->option_value }}</span>
+                                                @endif
+                                            @endforeach
+                                        </div>
                                     @endif
                                     @if($item->custom_size)
                                         <p class="text-xs text-primary-600 mt-0.5">Custom size: {{ $item->custom_size }}</p>
