@@ -266,11 +266,16 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="relative bg-gray-900 overflow-hidden rounded-xl" style="aspect-ratio:1200/450;">
 
+            @php
+                $promoHasContent = $promoBanner['headline'] || $promoBanner['label'] || $promoBanner['subtext'] || $promoBanner['button_text'];
+            @endphp
             @if($promoBanner['image'])
                 <img src="{{ $promoBanner['image'] }}"
                      alt=""
                      class="absolute inset-0 w-full h-full object-cover object-center">
-                <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/50 to-transparent"></div>
+                @if($promoHasContent)
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/50 to-transparent"></div>
+                @endif
             @elseif($banners->isNotEmpty())
                 <div class="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
                     <img src="{{ asset('storage/' . $banners->first()->image) }}"
@@ -284,22 +289,26 @@
                 </div>
             @endif
 
-            <div class="absolute inset-0 flex flex-col justify-center px-6 sm:px-10 lg:px-16">
-                @if($promoBanner['label'])
-                    <p class="text-gray-300 text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold mb-0.5 sm:mb-1">{{ $promoBanner['label'] }}</p>
-                @endif
-                <h2 class="text-xl sm:text-3xl lg:text-5xl font-black text-white leading-none mb-0.5 sm:mb-2">{{ $promoBanner['headline'] }}</h2>
-                @if($promoBanner['subtext'])
-                    <p class="text-gray-300 text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold mb-2 sm:mb-5">{{ $promoBanner['subtext'] }}</p>
-                @endif
-                @if($promoBanner['button_text'])
-                    @php $promoUrl = $promoBanner['button_url'] ?: route('shop.category', ['sort' => 'discount']); @endphp
-                    <a href="{{ $promoUrl }}"
-                       class="inline-block bg-primary-600 hover:bg-primary-700 text-white text-[8px] sm:text-[10px] font-bold uppercase tracking-widest px-3 sm:px-6 py-1.5 sm:py-2.5 transition-colors duration-200 self-start">
-                        {{ $promoBanner['button_text'] }}
-                    </a>
-                @endif
-            </div>
+            @if($promoHasContent)
+                <div class="absolute inset-0 flex flex-col justify-center px-6 sm:px-10 lg:px-16">
+                    @if($promoBanner['label'])
+                        <p class="text-gray-300 text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold mb-0.5 sm:mb-1">{{ $promoBanner['label'] }}</p>
+                    @endif
+                    @if($promoBanner['headline'])
+                        <h2 class="text-xl sm:text-3xl lg:text-5xl font-black text-white leading-none mb-0.5 sm:mb-2">{{ $promoBanner['headline'] }}</h2>
+                    @endif
+                    @if($promoBanner['subtext'])
+                        <p class="text-gray-300 text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold mb-2 sm:mb-5">{{ $promoBanner['subtext'] }}</p>
+                    @endif
+                    @if($promoBanner['button_text'])
+                        @php $promoUrl = $promoBanner['button_url'] ?: route('shop.category', ['sort' => 'discount']); @endphp
+                        <a href="{{ $promoUrl }}"
+                           class="inline-block bg-primary-600 hover:bg-primary-700 text-white text-[8px] sm:text-[10px] font-bold uppercase tracking-widest px-3 sm:px-6 py-1.5 sm:py-2.5 transition-colors duration-200 self-start">
+                            {{ $promoBanner['button_text'] }}
+                        </a>
+                    @endif
+                </div>
+            @endif
 
         </div>
     </div>

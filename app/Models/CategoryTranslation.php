@@ -10,7 +10,7 @@ class CategoryTranslation extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'category_id', 'locale', 'name', 'slug', 'meta_title', 'meta_description',
+        'category_id', 'locale', 'name', 'slug', 'description', 'meta_title', 'meta_description',
     ];
 
     public function category(): BelongsTo
