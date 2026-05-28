@@ -421,7 +421,7 @@
 }
 
 .home-product-card-img {
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     position: relative;
     overflow: hidden;
     border-radius: 0;

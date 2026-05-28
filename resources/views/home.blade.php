@@ -353,7 +353,7 @@
                         <div class="swiper-slide">
                             <div class="best-deals-card group border border-gray-100 rounded-xl overflow-hidden">
                                 {{-- Image --}}
-                                <a href="{{ route('product.show', $dSlug) }}" class="block relative overflow-hidden" style="aspect-ratio:3/4;">
+                                <a href="{{ route('product.show', $dSlug) }}" class="block relative overflow-hidden" style="aspect-ratio:1/1;">
                                     @if($product->primaryImage)
                                         <img src="{{ asset('storage/' . $product->primaryImage->path) }}"
                                              alt="{{ $dName }}"
