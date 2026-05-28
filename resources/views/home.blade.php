@@ -169,7 +169,7 @@
 
             {{-- Right: 1×4 product grid --}}
             @if($newArrivals->isNotEmpty())
-                <div class="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="flex-1 new-arrivals-grid">
                     @foreach($newArrivals as $product)
                         @php
                             $pLocale       = app()->getLocale();
