@@ -66,7 +66,11 @@
             <x-slot name="heading">SEO & Meta</x-slot>
             <x-slot name="description">Default meta tags, Open Graph image, and robots.txt configuration.</x-slot>
 
-            {{ $this->seoForm }}
+            {{ $this->ogImageForm }}
+
+            <div class="mt-6">
+                {{ $this->seoForm }}
+            </div>
         </x-filament::section>
 
         {{-- Facebook Pixel --}}

@@ -12,6 +12,7 @@
         $siteOgImagePath     = \App\Models\Setting::get('og_image', '');
         $siteOgImage         = $siteOgImagePath ? Storage::url($siteOgImagePath) : asset('images/og-default.png');
         $favicon             = \App\Models\Setting::get('site_favicon', '');
+        $siteName            = \App\Models\Setting::get('site_name', config('app.name', 'Youth Collections'));
     @endphp
 
     <title>@yield('title', $siteMetaTitle)</title>
@@ -363,7 +364,7 @@
                          alt="{{ config('app.name') }}"
                          class="h-20 w-auto">
                 </a>
-                <p class="text-white text-xs font-bold uppercase tracking-widest mb-2">{{ config('app.name', 'Youth Collections') }}</p>
+                <p class="text-white text-xs font-bold uppercase tracking-widest mb-2">{{ $siteName }}</p>
                 <p class="text-xs leading-relaxed mb-5">Choose well, be well. We bring you modest fashion that makes you feel confident and elegant every day.</p>
                 <div class="flex items-center gap-3">
                     @if($facebookUrl)

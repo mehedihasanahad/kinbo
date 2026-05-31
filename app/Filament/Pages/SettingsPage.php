@@ -37,10 +37,11 @@ class SettingsPage extends Page
     public array $seo      = [];
     public array $pixel    = [];
 
-    // Branding — kept flat (no statePath) so FileUpload can store files properly
+    // Branding / media — kept flat (no statePath) so FileUpload can store files properly
     public ?array $site_logo          = [];
     public ?array $site_favicon       = [];
     public ?array $promo_banner_image = [];
+    public ?array $og_image           = [];
 
     public function mount(): void
     {
@@ -116,11 +117,14 @@ class SettingsPage extends Page
 
         $promoImagePath = Setting::get('promo_banner_image', '');
         $this->promo_banner_image = $promoImagePath ? [$promoImagePath => $promoImagePath] : [];
+
+        $ogImagePath = Setting::get('og_image', '');
+        $this->og_image = $ogImagePath ? [$ogImagePath => $ogImagePath] : [];
     }
 
     protected function getForms(): array
     {
-        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'socialForm', 'oauthForm', 'homepageForm', 'homepageImageForm', 'seoForm', 'pixelForm'];
+        return ['brandingForm', 'generalForm', 'contactForm', 'paymentForm', 'socialForm', 'oauthForm', 'homepageForm', 'homepageImageForm', 'seoForm', 'ogImageForm', 'pixelForm'];
     }
 
     public function brandingForm(Form $form): Form
@@ -269,6 +273,24 @@ class SettingsPage extends Page
         // No statePath — binds directly to $this->promo_banner_image
     }
 
+    public function ogImageForm(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\FileUpload::make('og_image')
+                ->label('Default OG Image')
+                ->image()
+                ->disk('public')
+                ->visibility('public')
+                ->directory('settings')
+                ->imagePreviewHeight('120')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                ->maxSize(2048)
+                ->nullable()
+                ->helperText('Recommended: 1200×630px, max 2 MB. Shown when pages are shared on Facebook, WhatsApp, Twitter, etc.'),
+        ]);
+        // No statePath — binds directly to $this->og_image
+    }
+
     public function homepageForm(Form $form): Form
     {
         return $form->schema([
@@ -335,27 +357,6 @@ class SettingsPage extends Page
                         ->maxLength(500)
                         ->helperText('Comma-separated, e.g. hijab, modest fashion, abaya')
                         ->columnSpanFull(),
-                ])->columns(1),
-
-            Forms\Components\Section::make('Open Graph / Social Sharing')
-                ->description('Default image shown when pages are shared on Facebook, WhatsApp, Twitter etc.')
-                ->schema([
-                    Forms\Components\FileUpload::make('og_image_upload')
-                        ->label('Default OG Image')
-                        ->image()
-                        ->disk('public')
-                        ->visibility('public')
-                        ->directory('settings')
-                        ->imagePreviewHeight('120')
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                        ->maxSize(2048)
-                        ->nullable()
-                        ->helperText('Recommended: 1200×630px, max 2 MB. Used when no page-specific OG image is set.')
-                        ->dehydrated(false)
-                        ->afterStateHydrated(function ($set) {
-                            $path = Setting::get('og_image', '');
-                            $set('og_image_upload', $path ? [$path => $path] : []);
-                        }),
                 ])->columns(1),
 
             Forms\Components\Section::make('Robots.txt')
@@ -455,8 +456,7 @@ class SettingsPage extends Page
             Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : $value, 'homepage');
         }
 
-        $ogUpload = $this->seoForm->getRawState()['og_image_upload'] ?? [];
-        $ogImagePath = $this->storeOrKeep(is_array($ogUpload) ? $ogUpload : [], 'settings');
+        $ogImagePath = $this->storeOrKeep($this->og_image, 'settings');
         Setting::set('og_image', $ogImagePath, 'seo');
 
         foreach ($this->seo as $key => $value) {
