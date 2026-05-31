@@ -23,12 +23,12 @@
         .header table td { vertical-align: top; }
 
         .logo-img { max-height: 52px; max-width: 180px; }
-        .brand-name { font-size: 22px; font-weight: bold; color: #93394b; }
+        .brand-name { font-size: 22px; font-weight: bold; color: #a0420a; }
         .brand-tagline { font-size: 10px; color: #9ca3af; margin-top: 2px; letter-spacing: 0.3px; }
 
         .invoice-badge {
             display: inline-block;
-            background: #93394b;
+            background: #a0420a;
             color: #ffffff;
             font-size: 11px;
             font-weight: bold;
@@ -44,15 +44,15 @@
         .invoice-meta strong { color: #374151; }
 
         /* ── Divider ── */
-        .divider { height: 2px; background: #93394b; margin-bottom: 24px; border-radius: 2px; }
-        .divider-light { height: 1px; background: #f3e8eb; margin: 0 0 24px; }
+        .divider { height: 2px; background: #a0420a; margin-bottom: 24px; border-radius: 2px; }
+        .divider-light { height: 1px; background: #ffe8d1; margin: 0 0 24px; }
 
         /* ── Info boxes ── */
         .info-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
         .info-table td { width: 50%; vertical-align: top; padding: 16px 18px; }
         .info-table .ship-box {
-            background: #fdf4f6;
-            border: 1px solid #f0d0d8;
+            background: #fff7f0;
+            border: 1px solid #fed7b0;
             border-radius: 8px 0 0 8px;
         }
         .info-table .pay-box {
@@ -67,7 +67,7 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #93394b;
+            color: #a0420a;
             margin-bottom: 8px;
         }
         .box-name { font-size: 13px; font-weight: bold; color: #111827; margin-bottom: 3px; }
@@ -79,12 +79,12 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #93394b;
+            color: #a0420a;
             margin-bottom: 10px;
         }
 
         .items-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-        .items-table thead tr { background: #93394b; }
+        .items-table thead tr { background: #a0420a; }
         .items-table thead th {
             padding: 10px 12px;
             text-align: left;
@@ -94,8 +94,8 @@
             letter-spacing: 0.6px;
             color: #ffffff;
         }
-        .items-table tbody tr { border-bottom: 1px solid #f3e8eb; }
-        .items-table tbody tr.even { background: #fdf4f6; }
+        .items-table tbody tr { border-bottom: 1px solid #ffe8d1; }
+        .items-table tbody tr.even { background: #fff4ed; }
         .items-table tbody td { padding: 10px 12px; font-size: 11px; vertical-align: middle; }
         .product-name { font-weight: 600; color: #111827; }
         .variant-label { font-size: 10px; color: #9ca3af; margin-top: 2px; }
@@ -110,14 +110,14 @@
         .totals-table td { padding: 5px 10px; font-size: 11px; }
         .totals-table .lbl { color: #6b7280; }
         .totals-table .amt { text-align: right; color: #374151; font-weight: 500; }
-        .totals-table .disc-lbl { color: #bb4e64; }
-        .totals-table .disc-amt { text-align: right; color: #bb4e64; font-weight: 500; }
+        .totals-table .disc-lbl { color: #cc560a; }
+        .totals-table .disc-amt { text-align: right; color: #cc560a; font-weight: 500; }
         .totals-table .grand-row td {
-            border-top: 2px solid #93394b;
+            border-top: 2px solid #a0420a;
             padding-top: 10px;
             font-size: 14px;
             font-weight: bold;
-            color: #93394b;
+            color: #a0420a;
         }
 
         .clearfix:after { content: ""; display: table; clear: both; }
@@ -130,7 +130,7 @@
         /* ── Notes ── */
         .notes-box {
             background: #f9fafb;
-            border-left: 3px solid #cb7888;
+            border-left: 3px solid #FD6C01;
             border-radius: 0 6px 6px 0;
             padding: 10px 14px;
             margin-bottom: 28px;
@@ -141,15 +141,15 @@
 
         /* ── Footer ── */
         .footer {
-            border-top: 1px solid #f3e8eb;
+            border-top: 1px solid #ffe8d1;
             padding-top: 14px;
             text-align: center;
             font-size: 10px;
             color: #9ca3af;
             clear: both;
         }
-        .footer strong { color: #93394b; }
-        .footer .thank-you { font-size: 13px; font-weight: bold; color: #93394b; margin-bottom: 4px; }
+        .footer strong { color: #a0420a; }
+        .footer .thank-you { font-size: 13px; font-weight: bold; color: #a0420a; margin-bottom: 4px; }
     </style>
 </head>
 <body>

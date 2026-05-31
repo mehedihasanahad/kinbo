@@ -77,7 +77,7 @@
 
         <div class="privacy-content">
 
-            <p>At {{ config('app.name') }}, accessible from <strong>https://youthcollections.com/</strong>, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by {{ config('app.name') }} and how we use it.</p>
+            <p>At {{ config('app.name') }}, accessible from <strong>{{ config('app.url') }}</strong>, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by {{ config('app.name') }} and how we use it.</p>
             <p>If you have additional questions or require more information about our Privacy Policy, do not hesitate to <a href="{{ route('page.contact') }}">contact us</a>.</p>
             <p>This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in {{ config('app.name') }}. This policy is not applicable to any information collected offline or via channels other than this website.</p>
 

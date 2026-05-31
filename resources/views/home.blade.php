@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', config('app.name') . ' — Modest Fashion')
-@section('meta_description', 'Discover modest fashion that reflects your beauty and confidence. Shop hijab, abaya, dresses, shrug and more.')
+@section('title', config('app.name') . ' — Online Shopping Bangladesh | Best Deals & Fast Delivery')
+@section('meta_description', 'Shop thousands of products at ' . config('app.name') . ' — fashion, electronics, home & lifestyle, beauty and more. Best prices, secure payment, fast delivery across Bangladesh.')
 
 @section('content')
 
@@ -36,11 +36,11 @@
                 </div>
             @empty
                 <div class="swiper-slide">
-                    <div class="hero-slide" style="background: linear-gradient(135deg, #2d1b2e 0%, #1a0a14 100%);">
+                    <div class="hero-slide" style="background: linear-gradient(135deg, #1a1200 0%, #3d1900 100%);">
                         <div class="hero-slide-content">
-                            <h1>Timeless<br>Elegance</h1>
-                            <p>Modest fashion that reflects your beauty and confidence.</p>
-                            <a href="{{ route('shop.category') }}">Explore Collection</a>
+                            <h1>Everything<br>You Need</h1>
+                            <p>Thousands of products. One destination. Fast delivery across Bangladesh.</p>
+                            <a href="{{ route('shop.category') }}">Shop Now</a>
                         </div>
                     </div>
                 </div>
@@ -61,7 +61,7 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100">
 
             @foreach([
-                ['icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'title' => 'Premium Quality', 'sub' => 'Fabric You Can Trust'],
+                ['icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'title' => 'Premium Quality', 'sub' => 'Quality You Can Trust'],
                 ['icon' => 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'title' => 'Easy Exchange', 'sub' => 'Hassle Free Returns'],
                 ['icon' => 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 10a2 2 0 002 2h8a2 2 0 002-2L19 8', 'title' => 'Fast Delivery', 'sub' => 'Across Bangladesh'],
                 ['icon' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', 'title' => 'Secure Payment', 'sub' => '100% Safe & Secure'],
@@ -158,7 +158,7 @@
                 <div class="hidden lg:block">
                     <p class="text-primary-600 text-xs font-bold uppercase tracking-widest mb-1">New</p>
                     <h2 class="text-5xl font-black text-gray-900 uppercase leading-none mb-4">Arrivals</h2>
-                    <p class="text-sm text-gray-500 leading-relaxed mb-7">Discover our latest modest fashion pieces, designed for comfort and elegance.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed mb-7">Discover our latest arrivals — fashion, electronics, home essentials and more, curated just for you.</p>
                     <a href="{{ route('shop.category', ['sort' => 'newest']) }}"
                        class="inline-block border border-gray-900 text-gray-900 text-[11px] font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-gray-900 hover:text-white transition-colors duration-200">
                         View All

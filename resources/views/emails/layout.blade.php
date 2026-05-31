@@ -81,7 +81,7 @@
         <div class="header-brand">
             <h1>{{ config('app.name') }}</h1>
         </div>
-        <p style="text-align:center;">Premium Modest Fashion</p>
+        <p style="text-align:center;">Your Trusted Online Shopping Mart</p>
     </div>
 
     {{-- Body --}}

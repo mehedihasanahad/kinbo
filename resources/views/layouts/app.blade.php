@@ -6,13 +6,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @php
-        $siteMetaTitle       = \App\Models\Setting::get('meta_title', config('app.name', 'Youth Collections'));
-        $siteMetaDescription = \App\Models\Setting::get('meta_description', 'Modest fashion that reflects your beauty and confidence.');
+        $siteMetaTitle       = \App\Models\Setting::get('meta_title', config('app.name', 'Kinbo'));
+        $siteMetaDescription = \App\Models\Setting::get('meta_description', 'Shop thousands of products at ' . config('app.name', 'Kinbo') . ' — fashion, electronics, home & lifestyle, beauty and more. Best prices, fast delivery across Bangladesh.');
         $siteMetaKeywords    = \App\Models\Setting::get('meta_keywords', '');
         $siteOgImagePath     = \App\Models\Setting::get('og_image', '');
         $siteOgImage         = $siteOgImagePath ? Storage::url($siteOgImagePath) : asset('images/og-default.png');
         $favicon             = \App\Models\Setting::get('site_favicon', '');
-        $siteName            = \App\Models\Setting::get('site_name', config('app.name', 'Youth Collections'));
+        $siteName            = \App\Models\Setting::get('site_name', config('app.name', 'Kinbo'));
     @endphp
 
     <title>@yield('title', $siteMetaTitle)</title>
@@ -117,11 +117,11 @@
                 <a href="{{ route('home') }}" class="hidden lg:flex shrink-0 items-center">
                     @if($siteLogo)
                         <img src="{{ asset('storage/' . $siteLogo) }}"
-                             alt="{{ config('app.name', 'Youth Collections') }}"
+                             alt="{{ config('app.name', 'Kinbo') }}"
                              class="h-18 w-auto object-contain">
                     @else
                         <img src="{{ asset('images/youthcollection-logo.png') }}"
-                             alt="{{ config('app.name', 'Youth Collections') }}"
+                             alt="{{ config('app.name', 'Kinbo') }}"
                              class="h-18 w-auto object-contain">
                     @endif
                 </a>
@@ -131,11 +131,11 @@
             <a href="{{ route('home') }}" class="lg:hidden absolute left-1/2 -translate-x-1/2 shrink-0 flex items-center">
                 @if($siteLogo)
                     <img src="{{ asset('storage/' . $siteLogo) }}"
-                         alt="{{ config('app.name', 'Youth Collections') }}"
+                         alt="{{ config('app.name', 'Kinbo') }}"
                          class="h-14 w-auto object-contain">
                 @else
                     <img src="{{ asset('images/youthcollection-logo.png') }}"
-                         alt="{{ config('app.name', 'Youth Collections') }}"
+                         alt="{{ config('app.name', 'Kinbo') }}"
                          class="h-14 w-auto object-contain">
                 @endif
             </a>
@@ -365,7 +365,7 @@
                          class="h-20 w-auto">
                 </a>
                 <p class="text-white text-xs font-bold uppercase tracking-widest mb-2">{{ $siteName }}</p>
-                <p class="text-xs leading-relaxed mb-5">Choose well, be well. We bring you modest fashion that makes you feel confident and elegant every day.</p>
+                <p class="text-xs leading-relaxed mb-5">Your one-stop online mart — shop fashion, electronics, home essentials, beauty and more. Fast delivery across Bangladesh.</p>
                 <div class="flex items-center gap-3">
                     @if($facebookUrl)
                     <a href="{{ $facebookUrl }}" target="_blank" rel="noopener" class="text-gray-500 hover:text-white transition-colors" aria-label="Facebook">
@@ -401,7 +401,7 @@
             {{-- Col 2: Newsletter --}}
             <div>
                 <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-4">Newsletter</h4>
-                <p class="text-xs leading-relaxed mb-4">Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
+                <p class="text-xs leading-relaxed mb-4">Subscribe to get exclusive deals, new arrival alerts, and members-only discounts.</p>
                 <form class="subscribe-form" data-url="{{ route('subscribe.store') }}">
                     @csrf
                     <div class="flex">
@@ -468,7 +468,7 @@
     {{-- Bottom bar --}}
     <div class="border-t border-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
-            <p class="text-xs text-gray-600">&copy; {{ date('Y') }} {{ config('app.name', 'Youth Collections') }}. All Rights Reserved.</p>
+            <p class="text-xs text-gray-600">&copy; {{ date('Y') }} {{ config('app.name', 'Kinbo') }}. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
@@ -657,7 +657,7 @@ function toggleWishlist(btn, productId) {
            class="flex flex-col items-center justify-center flex-1 -mt-6">
             <span class="w-13 h-13 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95
                          {{ request()->routeIs('home') ? 'bg-primary-700' : 'bg-primary-600' }}"
-                  style="width:52px;height:52px;box-shadow:0 4px 18px rgba(203,120,136,0.55);">
+                  style="width:52px;height:52px;box-shadow:0 4px 18px rgba(253,108,1,0.55);">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>

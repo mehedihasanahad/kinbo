@@ -6,20 +6,20 @@
 @source "../**/*.js";
 
 /* ============================================================
-   Global Design Tokens — Dusty Rose Palette (#CB7888)
+   Global Design Tokens — Orange Palette (#FD6C01)
 ============================================================ */
 @theme {
-    --color-primary-50:   #fbf4f5;
-    --color-primary-100:  #f6e9ec;
-    --color-primary-200:  #edcfd5;
-    --color-primary-300:  #e0aeb8;
-    --color-primary-400:  #d694a1;
-    --color-primary-500:  #d08594;
-    --color-primary-600:  #CB7888;
-    --color-primary-700:  #bb4e64;
-    --color-primary-800:  #93394b;
-    --color-primary-900:  #6e2b38;
-    --color-primary-950:  #421a22;
+    --color-primary-50:   #fff5ed;
+    --color-primary-100:  #ffe8d1;
+    --color-primary-200:  #ffd0a5;
+    --color-primary-300:  #feb069;
+    --color-primary-400:  #fd8c34;
+    --color-primary-500:  #fd771a;
+    --color-primary-600:  #FD6C01;
+    --color-primary-700:  #cc560a;
+    --color-primary-800:  #a0420a;
+    --color-primary-900:  #733008;
+    --color-primary-950:  #471d05;
 
     --color-accent-50:    #fffbeb;
     --color-accent-100:   #fef3c7;
@@ -140,7 +140,7 @@
 .hero-slide-content a {
     display: inline-flex;
     align-items: center;
-    background-color: #CB7888;
+    background-color: #FD6C01;
     color: #ffffff;
     font-weight: 700;
     font-size: 0.72rem;
@@ -150,13 +150,13 @@
     text-transform: uppercase;
     text-decoration: none;
     transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 8px 24px rgba(203,120,136,0.35);
+    box-shadow: 0 8px 24px rgba(253,108,1,0.35);
 }
 
 .hero-slide-content a:hover {
-    background-color: #bb4e64;
+    background-color: #cc560a;
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(203,120,136,0.45);
+    box-shadow: 0 12px 28px rgba(253,108,1,0.45);
 }
 
 @media (min-width: 768px) {
@@ -172,13 +172,13 @@
 /* Nav arrows */
 #heroSwiper .swiper-button-prev,
 #heroSwiper .swiper-button-next {
-    color: #CB7888;
+    color: #FD6C01;
     background: rgba(255,255,255,0.92);
     width: 52px;
     height: 52px;
     border-radius: 3px;
     border: none;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.22), 0 2px 8px rgba(203,120,136,0.18);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.22), 0 2px 8px rgba(253,108,1,0.18);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     transition: color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
@@ -188,9 +188,9 @@
 #heroSwiper .swiper-button-prev:hover,
 #heroSwiper .swiper-button-next:hover {
     color: #ffffff;
-    background: #CB7888;
+    background: #FD6C01;
     transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(203,120,136,0.55), 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 32px rgba(253,108,1,0.55), 0 4px 12px rgba(0,0,0,0.15);
 }
 
 #heroSwiper .swiper-button-prev::after,
@@ -219,7 +219,7 @@
     opacity: 0.45;
     font-size: 0.68rem;
     font-weight: 700;
-    color: #CB7888;
+    color: #FD6C01;
     letter-spacing: 0.06em;
     transition: opacity 0.3s;
     transform: none;
@@ -231,7 +231,7 @@
     display: inline-block;
     width: 36px;
     height: 1px;
-    background: rgba(203,120,136,0.35);
+    background: rgba(253,108,1,0.35);
     margin: 0 8px;
     vertical-align: middle;
 }
@@ -252,7 +252,7 @@
 .products-swiper .swiper-button-prev,
 .new-arrivals-swiper .swiper-button-next,
 .new-arrivals-swiper .swiper-button-prev {
-    color: #CB7888;
+    color: #FD6C01;
     background: white;
     width: 38px;
     height: 38px;
@@ -272,11 +272,11 @@
 .reviews-swiper { padding-bottom: 48px !important; }
 
 .reviews-swiper .swiper-pagination-bullet {
-    background: #edcfd5;
+    background: #ffd0a5;
     opacity: 1;
 }
 
-.reviews-swiper .swiper-pagination-bullet-active { background: #CB7888; }
+.reviews-swiper .swiper-pagination-bullet-active { background: #FD6C01; }
 
 /* ============================================================
    Product Card
@@ -332,12 +332,12 @@
 .best-deals-swiper-prev,
 .best-deals-swiper-next {
     color: #ffffff;
-    background: #CB7888;
+    background: #FD6C01;
     width: 36px;
     height: 36px;
     border-radius: 3px;
     border: none;
-    box-shadow: 0 4px 18px rgba(203,120,136,0.45), 0 1px 4px rgba(0,0,0,0.10);
+    box-shadow: 0 4px 18px rgba(253,108,1,0.45), 0 1px 4px rgba(0,0,0,0.10);
     top: 50%;
     margin-top: 0;
     transform: translateY(-50%);
@@ -345,7 +345,7 @@
 
 .best-deals-swiper-prev:hover,
 .best-deals-swiper-next:hover {
-    background: #bb4e64;
+    background: #cc560a;
 }
 
 .best-deals-swiper-prev::after,
@@ -366,12 +366,12 @@
 .category-swiper-prev,
 .category-swiper-next {
     color: #ffffff;
-    background: #CB7888;
+    background: #FD6C01;
     width: 36px;
     height: 36px;
     border-radius: 3px;
     border: none;
-    box-shadow: 0 4px 18px rgba(203,120,136,0.45), 0 1px 4px rgba(0,0,0,0.10);
+    box-shadow: 0 4px 18px rgba(253,108,1,0.45), 0 1px 4px rgba(0,0,0,0.10);
     top: 50%;
     margin-top: 0;
     transform: translateY(-50%);
@@ -379,7 +379,7 @@
 
 .category-swiper-prev:hover,
 .category-swiper-next:hover {
-    background: #bb4e64;
+    background: #cc560a;
 }
 
 .category-swiper-prev::after,
@@ -465,5 +465,5 @@
 .rich-text h3 { font-size: 1.1rem; }
 .rich-text strong { font-weight: 700; }
 .rich-text em { font-style: italic; }
-.rich-text a { color: #CB7888; text-decoration: underline; }
-.rich-text blockquote { border-left: 3px solid #edcfd5; padding-left: 1rem; color: #6b7280; margin: 0.75rem 0; }
+.rich-text a { color: #FD6C01; text-decoration: underline; }
+.rich-text blockquote { border-left: 3px solid #ffd0a5; padding-left: 1rem; color: #6b7280; margin: 0.75rem 0; }
