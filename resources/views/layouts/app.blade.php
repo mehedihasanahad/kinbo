@@ -120,7 +120,7 @@
                              alt="{{ config('app.name', 'Kinbo') }}"
                              class="h-18 w-auto object-contain">
                     @else
-                        <img src="{{ asset('images/youthcollection-logo.png') }}"
+                        <img src="{{ asset('images/kinbo-logo-bg-removed.png') }}"
                              alt="{{ config('app.name', 'Kinbo') }}"
                              class="h-18 w-auto object-contain">
                     @endif
@@ -134,7 +134,7 @@
                          alt="{{ config('app.name', 'Kinbo') }}"
                          class="h-14 w-auto object-contain">
                 @else
-                    <img src="{{ asset('images/youthcollection-logo.png') }}"
+                    <img src="{{ asset('images/kinbo-logo-bg-removed.png') }}"
                          alt="{{ config('app.name', 'Kinbo') }}"
                          class="h-14 w-auto object-contain">
                 @endif
@@ -270,7 +270,7 @@
             @if($siteLogo)
                 <img src="{{ asset('storage/' . $siteLogo) }}" alt="{{ config('app.name') }}" class="h-8 w-auto object-contain">
             @else
-                <img src="{{ asset('images/youthcollection-logo.png') }}" alt="{{ config('app.name') }}" class="h-8 w-auto object-contain">
+                <img src="{{ asset('images/kinbo-logo-bg-removed.png') }}" alt="{{ config('app.name') }}" class="h-8 w-auto object-contain">
             @endif
         </a>
         <button id="drawer-close" type="button" aria-label="Close menu"
@@ -360,7 +360,7 @@
             {{-- Col 1: Brand --}}
             <div class="sm:col-span-2 lg:col-span-1">
                 <a href="{{ route('home') }}" class="inline-block mb-3">
-                    <img src="{{ asset('images/youthcollection-logo.png') }}"
+                    <img src="{{ asset('images/kinbo-logo.jpeg') }}"
                          alt="{{ config('app.name') }}"
                          class="h-20 w-auto">
                 </a>
