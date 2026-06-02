@@ -206,6 +206,12 @@ class CheckoutController extends Controller
                 ->update(['user_id' => $user->id, 'session_id' => null]);
         }
 
+        // Persist phone on the user profile if they don't have one yet
+        $authUser = auth()->user();
+        if (empty($authUser->phone)) {
+            $authUser->update(['phone' => $request->ship_phone]);
+        }
+
         $cartItems = auth()->user()->cartItems()
             ->with(['product', 'variant.options'])
             ->get();
