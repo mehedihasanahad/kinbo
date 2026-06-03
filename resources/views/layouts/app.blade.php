@@ -48,6 +48,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     @include('partials.facebook-pixel')
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NFB3L5J5MD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NFB3L5J5MD');
+    </script>
 </head>
 <body class="bg-white text-gray-900 antialiased">
 

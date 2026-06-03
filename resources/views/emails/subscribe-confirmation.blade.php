@@ -18,7 +18,7 @@
     <hr class="divider">
     <p class="help-text">
         Don't want to receive emails from us?
-        <a href="{{ $unsubscribeUrl }}" style="color:#c4155c;text-decoration:none;font-weight:600;">Unsubscribe here</a>.
+        <a href="{{ $unsubscribeUrl }}" style="color:#FD6C01;text-decoration:none;font-weight:600;">Unsubscribe here</a>.
     </p>
 </div>
 @endsection
