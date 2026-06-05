@@ -7,10 +7,17 @@ use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class ViewOrder extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
+
+    protected function resolveRecord(int|string $key): Model
+    {
+        return Order::with(['items.product.primaryImage', 'user', 'manualPayment', 'coupon'])
+            ->findOrFail($key);
+    }
 
     protected function getHeaderActions(): array
     {

@@ -98,7 +98,8 @@
         .items-table tbody tr.even { background: #fff4ed; }
         .items-table tbody td { padding: 10px 12px; font-size: 11px; vertical-align: middle; }
         .product-name { font-weight: 600; color: #111827; }
-        .variant-label { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+        .variant-label { font-size: 10px; color: #9ca3af; margin-top: 3px; line-height: 14px; }
+        .variant-color-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.18); vertical-align: -6px; margin-left: 2px; margin-right: 1px; margin-bottom: 2px; }
 
         /* ── Totals ── */
         .totals-wrap { width: 100%; margin-bottom: 28px; }
@@ -235,7 +236,21 @@
                     <td>
                         <div class="product-name">{{ $item->product_name }}</div>
                         @if($item->variant_label)
-                            <div class="variant-label">{{ $item->variant_label }}</div>
+                            <div class="variant-label">
+                                @php $vParts = explode(' / ', $item->variant_label); @endphp
+                                @foreach($vParts as $vIdx => $vPart)
+                                    @if($vIdx > 0)<span> / </span>@endif
+                                    @php
+                                        [$vKey, $vVal] = array_pad(explode(': ', $vPart, 2), 2, '');
+                                    @endphp
+                                    <span>{{ $vKey }}:</span>
+                                    @if(strtolower(trim($vKey)) === 'color')
+                                        <span class="variant-color-dot" style="background-color:{{ trim($vVal) }};"></span>
+                                    @else
+                                        <span> {{ $vVal }}</span>
+                                    @endif
+                                @endforeach
+                            </div>
                         @endif
                     </td>
                     <td style="text-align:center;">{{ $item->quantity }}</td>

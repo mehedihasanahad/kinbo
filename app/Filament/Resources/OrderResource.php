@@ -35,7 +35,8 @@ class OrderResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) Order::where('status', 'pending')->count() ?: null;
+        $count = Order::where('status', 'pending')->count();
+        return $count ? (string) $count : null;
     }
 
     public static function getNavigationBadgeColor(): string
@@ -108,7 +109,92 @@ class OrderResource extends Resource
                 Infolists\Components\TextEntry::make('ship_address'),
                 Infolists\Components\TextEntry::make('ship_city'),
                 Infolists\Components\TextEntry::make('ship_district'),
+                Infolists\Components\TextEntry::make('shipping_amount')
+                    ->label('Shipping Charge')
+                    ->money('BDT'),
             ])->columns(3),
+
+            Infolists\Components\Section::make('Order Items')->schema([
+                Infolists\Components\RepeatableEntry::make('items')
+                    ->label('')
+                    ->schema([
+                        Infolists\Components\ImageEntry::make('product.primaryImage.path')
+                            ->label('')
+                            ->disk('public')
+                            ->height(52)
+                            ->width(52)
+                            ->extraImgAttributes(['class' => 'rounded object-cover']),
+
+                        Infolists\Components\TextEntry::make('product_name')
+                            ->label('Product')
+                            ->weight(\Filament\Support\Enums\FontWeight::SemiBold)
+                            ->columnSpan(2),
+
+                        Infolists\Components\TextEntry::make('variant_label')
+                            ->label('Variant')
+                            ->html()
+                            ->formatStateUsing(function (?string $state): string {
+                                if (blank($state)) {
+                                    return '<span class="text-gray-400">—</span>';
+                                }
+                                $parts = explode(' / ', $state);
+                                $rendered = [];
+                                foreach ($parts as $part) {
+                                    [$key, $val] = array_pad(explode(': ', $part, 2), 2, '');
+                                    $key = trim($key);
+                                    $val = trim($val);
+                                    if (strtolower($key) === 'color') {
+                                        $rendered[] = e($key) . ': <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:' . e($val) . ';border:1px solid #d1d5db;vertical-align:middle;margin-bottom:2px;" title="' . e($val) . '"></span>';
+                                    } else {
+                                        $rendered[] = e($key) . ': ' . e($val);
+                                    }
+                                }
+                                return implode(' <span class="text-gray-300">/</span> ', $rendered);
+                            }),
+
+                        Infolists\Components\TextEntry::make('quantity')
+                            ->label('Qty')
+                            ->alignCenter(),
+
+                        Infolists\Components\TextEntry::make('unit_price')
+                            ->label('Unit Price')
+                            ->money('BDT'),
+
+                        Infolists\Components\TextEntry::make('subtotal')
+                            ->label('Subtotal')
+                            ->money('BDT')
+                            ->weight(\Filament\Support\Enums\FontWeight::SemiBold),
+                    ])
+                    ->columns(7),
+            ]),
+
+            Infolists\Components\Section::make('Order Summary')->schema([
+                Infolists\Components\TextEntry::make('subtotal')
+                    ->label('Subtotal')
+                    ->money('BDT'),
+
+                Infolists\Components\TextEntry::make('discount_amount')
+                    ->label('Discount')
+                    ->money('BDT')
+                    ->color(fn ($state) => $state > 0 ? 'danger' : 'gray'),
+
+                Infolists\Components\TextEntry::make('shipping_amount')
+                    ->label('Shipping')
+                    ->money('BDT'),
+
+                Infolists\Components\TextEntry::make('total_amount')
+                    ->label('Grand Total')
+                    ->money('BDT')
+                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                    ->size(\Filament\Infolists\Components\TextEntry\TextEntrySize::Large)
+                    ->color('primary'),
+
+                Infolists\Components\TextEntry::make('notes')
+                    ->label('Customer Notes')
+                    ->columnSpanFull()
+                    ->placeholder('No notes')
+                    ->visible(fn ($record) => filled($record->notes)),
+            ])->columns(4),
         ]);
     }
 
