@@ -109,7 +109,20 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-gray-800">{{ $item->product_name }}</p>
                             @if($item->variant_label)
-                                <p class="text-xs text-gray-500">{{ $item->variant_label }}</p>
+                                <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5">
+                                    @foreach(explode(' / ', $item->variant_label) as $i => $vPart)
+                                        @if($i > 0)<span class="text-[10px] text-gray-300">/</span>@endif
+                                        @php [$vKey, $vVal] = array_pad(explode(': ', $vPart, 2), 2, ''); @endphp
+                                        <span class="text-[11px] text-gray-500">{{ trim($vKey) }}:</span>
+                                        @if(strtolower(trim($vKey)) === 'color')
+                                            <span class="inline-block w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0"
+                                                  style="background-color: {{ trim($vVal) }};"
+                                                  title="{{ trim($vVal) }}"></span>
+                                        @else
+                                            <span class="text-[11px] text-gray-500">{{ trim($vVal) }}</span>
+                                        @endif
+                                    @endforeach
+                                </div>
                             @endif
                             <p class="text-xs text-gray-400">{{ $item->quantity }} × ৳{{ number_format($item->unit_price, 0) }}</p>
                         </div>
