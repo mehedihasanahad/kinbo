@@ -96,34 +96,28 @@
         </div>
 
         @if($categories->isNotEmpty())
-            <div class="swiper category-swiper">
-                <div class="swiper-wrapper">
-                    @foreach($categories->take(10) as $category)
-                        @php
-                            $t = $category->getTranslation(app()->getLocale()) ?? $category->getTranslation('en');
-                            $catSlug = $t?->slug;
-                        @endphp
-                        <div class="swiper-slide">
-                            <a href="{{ !empty($catSlug) ? route('shop.category', ['category' => $catSlug]) : '#' }}"
-                               class="category-scroll-card group">
-                                @if($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}"
-                                         alt="{{ $t?->name ?? 'Category' }}"
-                                         class="absolute inset-0 w-full h-full object-cover">
-                                @else
-                                    <div class="absolute inset-0 bg-gray-200"></div>
-                                @endif
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-primary-900/80 transition-colors duration-300"></div>
-                                <div class="absolute bottom-0 left-0 right-0 p-4 text-center">
-                                    <p class="font-bold text-white text-xs uppercase tracking-widest leading-tight">{{ $t?->name ?? 'Category' }}</p>
-                                    <p class="text-primary-200 text-[11px] mt-1.5 italic font-light">Explore Now</p>
-                                </div>
-                            </a>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                @foreach($categories->take(10) as $category)
+                    @php
+                        $t = $category->getTranslation(app()->getLocale()) ?? $category->getTranslation('en');
+                        $catSlug = $t?->slug;
+                    @endphp
+                    <a href="{{ !empty($catSlug) ? route('shop.category', ['category' => $catSlug]) : '#' }}"
+                       class="category-grid-card group">
+                        @if($category->image)
+                            <img src="{{ asset('storage/' . $category->image) }}"
+                                 alt="{{ $t?->name ?? 'Category' }}"
+                                 class="absolute inset-0 w-full h-full object-cover">
+                        @else
+                            <div class="absolute inset-0 bg-gray-200"></div>
+                        @endif
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-primary-900/80 transition-colors duration-300"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4 text-center">
+                            <p class="font-bold text-white text-xs uppercase tracking-widest leading-tight">{{ $t?->name ?? 'Category' }}</p>
+                            <p class="text-primary-200 text-[11px] mt-1.5 italic font-light">Explore Now</p>
                         </div>
-                    @endforeach
-                </div>
-                <div class="swiper-button-prev category-swiper-prev"></div>
-                <div class="swiper-button-next category-swiper-next"></div>
+                    </a>
+                @endforeach
             </div>
         @else
             <p class="text-center text-gray-400 py-12">No categories available.</p>

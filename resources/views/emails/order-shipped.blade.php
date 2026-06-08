@@ -39,7 +39,7 @@
             <td>
                 {{ $item->product_name }}
                 @if($item->variant_label)
-                    <br><span style="font-size:12px;color:#9ca3af;">{{ $item->variant_label }}</span>
+                    <br><span style="font-size:12px;color:#9ca3af;">@foreach(explode(' / ', $item->variant_label) as $vIdx => $vPart)@if($vIdx > 0) <span style="color:#d1d5db;">/</span> @endif@php [$vKey, $vVal] = array_pad(explode(': ', $vPart, 2), 2, ''); @endphp{{ trim($vKey) }}: @if(strtolower(trim($vKey)) === 'color')<span style="display:inline-block;width:11px;height:11px;border-radius:50%;background-color:{{ trim($vVal) }};border:1px solid rgba(0,0,0,0.18);vertical-align:middle;margin-bottom:2px;" title="{{ trim($vVal) }}"></span>@else{{ trim($vVal) }}@endif@endforeach</span>
                 @endif
             </td>
             <td style="text-align:right">{{ $item->quantity }}</td>
