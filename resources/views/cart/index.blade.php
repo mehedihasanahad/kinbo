@@ -60,38 +60,37 @@
                     @endphp
 
                     <div class="bg-white border border-gray-100 rounded-2xl p-4">
-                        {{-- Mobile: stacked, Desktop: grid --}}
-                        <div class="flex gap-4 md:grid md:grid-cols-12 md:items-center">
+                        {{-- Mobile: flex-col stack | Desktop: 12-col grid --}}
+                        <div class="flex flex-col gap-3 md:grid md:grid-cols-12 md:items-center md:gap-0">
 
-                            {{-- Product info --}}
-                            <div class="flex items-center gap-4 md:col-span-5 min-w-0">
-                                {{-- Image --}}
+                            {{-- Product info: image + name + variants --}}
+                            <div class="flex items-start gap-3 md:col-span-5 min-w-0">
                                 <a href="{{ route('product.show', $productSlug) }}" class="shrink-0">
                                     @if($item->product->primaryImage)
                                         <img src="{{ asset('storage/' . $item->product->primaryImage->path) }}"
                                              alt="{{ $productName }}"
                                              class="w-16 h-16 object-cover rounded-xl border border-gray-100">
                                     @else
-                                        <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center">
+                                        <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
                                             <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                             </svg>
                                         </div>
                                     @endif
                                 </a>
-                                <div class="min-w-0">
+                                <div class="min-w-0 flex-1">
                                     <a href="{{ route('product.show', $productSlug) }}"
-                                       class="text-sm font-semibold text-gray-900 hover:text-primary-600 transition-colors line-clamp-2">
+                                       class="text-sm font-semibold text-gray-900 hover:text-primary-600 transition-colors line-clamp-2 leading-snug">
                                         {{ $productName }}
                                     </a>
                                     @if($item->variant && $item->variant->options->isNotEmpty())
-                                        <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
+                                        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
                                             @foreach($item->variant->options as $opt)
                                                 @php $isColor = in_array(strtolower($opt->option_name), ['color', 'colour']); @endphp
                                                 @if($isColor)
                                                     <span class="inline-flex items-center gap-1 text-xs text-gray-500">
                                                         {{ $opt->option_name }}:
-                                                        <span class="w-4 h-4 rounded-full border border-gray-300 shrink-0"
+                                                        <span class="w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0 inline-block"
                                                               style="background-color: {{ $opt->option_value }};"></span>
                                                     </span>
                                                 @else
@@ -106,13 +105,17 @@
                                 </div>
                             </div>
 
-                            {{-- Unit price (desktop) --}}
+                            {{-- Unit price: desktop only --}}
                             <div class="hidden md:block md:col-span-2 text-center text-sm font-medium text-gray-700">
                                 ৳{{ number_format($unitPrice, 0) }}
                             </div>
 
-                            {{-- Quantity + remove --}}
-                            <div class="md:col-span-3 flex items-center justify-center gap-2">
+                            {{-- Quantity + remove | mobile: also shows unit price & total --}}
+                            <div class="flex items-center gap-2 md:col-span-3 md:justify-center">
+
+                                {{-- Mobile: unit price label --}}
+                                <span class="text-xs text-gray-400 md:hidden shrink-0">৳{{ number_format($unitPrice, 0) }} each</span>
+
                                 <form method="POST" action="{{ route('cart.update', $item) }}" class="flex items-center border border-gray-200 rounded-xl overflow-hidden">
                                     @csrf
                                     @method('PATCH')
@@ -130,7 +133,6 @@
                                     </button>
                                 </form>
 
-                                {{-- Remove --}}
                                 <form method="POST" action="{{ route('cart.destroy', $item) }}">
                                     @csrf
                                     @method('DELETE')
@@ -143,15 +145,16 @@
                                         </svg>
                                     </button>
                                 </form>
-                            </div>
 
-                            {{-- Line total --}}
-                            <div class="md:col-span-2 text-right">
-                                <span class="text-sm font-bold text-gray-900">
+                                {{-- Mobile: line total --}}
+                                <span class="text-sm font-bold text-gray-900 md:hidden ml-auto shrink-0">
                                     ৳{{ number_format($item->line_total, 0) }}
                                 </span>
-                                {{-- Mobile: show unit price --}}
-                                <p class="text-xs text-gray-400 md:hidden">৳{{ number_format($unitPrice, 0) }} each</p>
+                            </div>
+
+                            {{-- Line total: desktop only --}}
+                            <div class="hidden md:block md:col-span-2 text-right">
+                                <span class="text-sm font-bold text-gray-900">৳{{ number_format($item->line_total, 0) }}</span>
                             </div>
                         </div>
                     </div>
